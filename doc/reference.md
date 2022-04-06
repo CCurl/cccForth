@@ -87,12 +87,11 @@ example: "1 10 for i . next" prints 1 2 3 4 5 6 7 8 9 10
 ## Default dictionary entries:
 |Word|stack|notes|
 |-|-|-|
-|base|(--a)|Address of BASE|
-|vb  |(--a)|Start address for VARIABLES|
+|cb   |(--a)|Base address for CODE space|
+|vb  |(--a)|Base address for VARIABLES|
+|vsz |(--a)|Size of VARIABLES space (bytes)|
+|csz |(--a)|Size of CODE space (bytes)|
 |va  |(--a)|Address of VHERE|
 |la  |(--a)|Address of LAST|
 |ha  |(--a)|Address of HERE|
-|vsz |(--a)|Size of VARIABLES space (bytes)|
-|usz |(--a)|Size of USER/CODE space (bytes)|
-|u   |(--a)|Start address for USER/CODE space|
-
+|base|(--a)|Address of BASE|

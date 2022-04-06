@@ -16,7 +16,7 @@
   #define  _CRT_SECURE_NO_WARNINGS
   #include <Windows.h>
   #include <conio.h>
-  #define USER_SZ      (64*1024)
+  #define CODE_SZ      (64*1024)
   #define VARS_SZ      (128*1024)
   #define STK_SZ        16
   #define LSTK_SZ        8
@@ -44,9 +44,9 @@
 #define AOS           (byte*)TOS
 #define LOS           lstk[lsp]
 #define DROP2         pop(); pop()
-#define U(l)          user[l]
+#define U(l)          code[l]
 #define UA(l)         &U(l)
-#define DP_AT(l)      ((DICT_T *)(&user[l]))
+#define DP_AT(l)      ((DICT_T *)(&code[l]))
 #define betw(x, a, b) ((a<=x)&&(x<=b))
 #define BA(a)         ((byte *)a)
 
@@ -70,7 +70,7 @@ typedef struct {
 extern char sp, isError;
 extern CELL BASE, STATE, LAST, HERE, tempWords[10];
 extern byte *VHERE, *VHERE2;
-extern byte user[];
+extern byte code[];
 extern byte vars[];
 extern CELL stk[];
 extern CELL rstk[];

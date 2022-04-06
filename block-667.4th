@@ -6,19 +6,26 @@ reset
 : mil 1000 dup * * ;
 : bm timer swap 1 for next timer swap - . ;
 
+here s7
+
 : T1 if 'Y' else 'N' then emit ;
-: T2 1 2 3 + + . 19 42 for i . next ;
-: T3 20 begin dup . 1- while ;
-: T4 +tmps 123 s0 445 s1     r0 . r1 . -tmps ;
-: T5 +tmps 666 s0 777 s1 T4 r0 . r1 . -tmps ;
+: T2 cr 1 2 3 + + . 19 42 for i . next ;
+: T3 cr 20 s1 begin r1 . d1 r1 while ;
+: T4 cr +tmps 123 445 s2 s1 r1 . r2 . -tmps ;
+: T5 cr +tmps 666 777 s2 s1 r1 . r2 . T4 r1 . r2 . -tmps ;
 
-cr 1 T1 0 T1 cr T2 cr T3 cr T4 cr T5
+cr 1 T1 0 T1 
+T2 T3 T4 T5
 
-: x1 ." %nx1-" 9 s1 begin r1 dup . 1+ s1 r1 34 < while ." -out1" ;
-: x2 ." %nx2-" 8 s1 begin r1 dup . 1+ s1 r1 27 = until ." -out2" ;
-: x3 ." %nx3-" 7 s1 begin r1 41 = if break then r1 dup . 1+ s1 again ." -out3" ;
+: T1 ." %nx1-"  9 s1 begin r1 dup . 1+ s1 r1 34 < while ." -out1" ;
+: T2 ." %nx2-"  8 s1 begin r1 dup . 1+ s1 r1 27 = until ." -out2" ;
+: T3 ." %nx3-"  7 s1 begin r1 41 = if break then r1 dup . 1+ s1 again ." -out3" ;
 
-x1 x2 x3
+T1 T2 T3
+
+r7 ha !
 
 cr words
 cr .code
+cr .vars
+

@@ -10,13 +10,13 @@ reset
 ( n a b -betw- f )
 : betw +tmps s3 s2 s1  r2 r1 <=  r1 r3 <=  and -tmps ;
 
-: .ch s9 r9 #32 #126 betw if r9 emit else r9 ." (%d)" then ;
-: dump for i c@ . next ;
-: dumpc for i c@ .ch next ;
-: .code u dup here + 1- dumpc ;
-: .vars vb vhere dumpc ;
+: T0 ( c-- ) s9 r9 #32 $7e betw if r9 emit else r9 ." (%d)" then ;
+: dumpN  ( a n-- ) 1 for dup c@ .  1+ next drop ;
+: dumpNC ( a n-- ) 1 for dup c@ T0 1+ next drop ;
+: .code cb here dumpNC ;
+: .vars vb vhere vb - dumpNC ;
 : dump-code 0 s9 ." [" 
-    u dup here + 1- for i c@ ." %d, " 
+    cb dup here + 1- for i c@ ." %d, " 
         i9 r9 10 = if 0 s9 cr then
     next ." 0]" ;
 

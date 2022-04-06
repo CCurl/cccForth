@@ -42,9 +42,9 @@ byte lastWasCall = 0, isBye = 0;
 byte *VHERE, *VHERE2;
 CELL HERE, LAST, STATE, tempWords[10];
 
-void CComma(CELL v) { user[HERE++] = (byte)v; }
-void Comma(CELL v) { SET_LONG(&user[HERE], v); HERE += CELL_SZ; }
-void WComma(WORD v) { SET_WORD(&user[HERE], v); HERE += 2; }
+void CComma(CELL v) { code[HERE++] = (byte)v; }
+void Comma(CELL v) { SET_LONG(&code[HERE], v); HERE += CELL_SZ; }
+void WComma(WORD v) { SET_WORD(&code[HERE], v); HERE += 2; }
 
 char lower(char c) { return betw(c, 'A', 'Z') ? (c + 32) : c; }
 
@@ -74,7 +74,7 @@ int strLen(const char* str) {
 }
 
 void printStringF(const char* fmt, ...) {
-    char* buf = (char*)&user[USER_SZ-64];
+    char* buf = (char*)&code[CODE_SZ-64];
     va_list args;
     va_start(args, fmt);
     vsnprintf(buf, 100, fmt, args);
@@ -271,7 +271,7 @@ int doParseWord(char* wd) {
 
     if (strEq(wd, ";")) {
         STATE = 0;
-        if (lwc && (user[HERE - 3] == ':')) { user[HERE - 3] = 'J'; }
+        if (lwc && (code[HERE - 3] == ':')) { code[HERE - 3] = 'J'; }
         else { CComma(';'); }
         return 1;
     }
@@ -350,7 +350,7 @@ int doParseWord(char* wd) {
     }
 
     if (strEqI(wd, "UNTIL")) {
-        CComma('y');
+        CComma('u');
         CELL tgt = pop();
         SET_WORD(UA(tgt), (WORD)HERE);
         return 1;
@@ -400,14 +400,13 @@ char *rtrim(char* str) {
 
 void systemWords() {
     char* cp = (char*)(VHERE + 6);
-    sprintf(cp, ": x ;");                       doParse(cp);
-    sprintf(cp, ": u %lu ;", (UCELL)user);      doParse(cp);
-    sprintf(cp, ": usz %d ;", USER_SZ);         doParse(cp);
+    sprintf(cp, ": cb %lu ;", (UCELL)code);     doParse(cp);
+    sprintf(cp, ": vb %lu ;", (UCELL)vars);     doParse(cp);
+    sprintf(cp, ": csz %d ;", CODE_SZ);         doParse(cp);
     sprintf(cp, ": vsz %d ;", VARS_SZ);         doParse(cp);
     sprintf(cp, ": ha %lu ;", (UCELL)&HERE);    doParse(cp);
     sprintf(cp, ": la %lu ;", (UCELL)&LAST);    doParse(cp);
     sprintf(cp, ": va %lu ;", (UCELL)&VHERE);   doParse(cp);
-    sprintf(cp, ": vb %lu ;", (UCELL)vars);     doParse(cp);
     sprintf(cp, ": base %lu ;", (UCELL)&BASE);  doParse(cp);
 }
 
@@ -427,8 +426,7 @@ WORD doLoad(CELL ir, CELL pc) {
         if (input_fp) { fpPush(input_fp); }
         input_fp = fp;
     }
-    else { return 0; }
-    return 1;
+    return (WORD)pc;
 }
 
 WORD doExt(CELL ir, WORD pc) {

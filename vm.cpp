@@ -2,7 +2,7 @@
 
 char sp, rsp, lsp, locSP, locBase, isError;
 CELL BASE, stk[STK_SZ+1], rstk[STK_SZ+1], locals[LOCALS_SZ];
-byte user[USER_SZ+1], vars[VARS_SZ+1];
+byte code[CODE_SZ+1], vars[VARS_SZ+1];
 LOOP_T lstk[LSTK_SZ + 1];
 
 void vmReset() {
@@ -10,7 +10,8 @@ void vmReset() {
     BASE = 10;
     HERE = LAST = 0;
     VHERE = VHERE2 = &vars[0];
-    for (int i = 0; i < USER_SZ; i++) { user[i] = 0; }
+    HERE = 2;
+    for (int i = 0; i < CODE_SZ; i++) { code[i] = 0; }
     for (int i = 0; i < VARS_SZ; i++) { vars[i] = 0; }
     for (int i = 0; i < 10; i++) { tempWords[i] = 0; }
     systemWords();
@@ -34,7 +35,7 @@ void SET_LONG(byte *l, long v) { SET_WORD(l, v & 0xFFFF); SET_WORD(l + 2, (WORD)
 void printBase(CELL num, CELL base) {
     UCELL n = (UCELL) num, isNeg = 0;
     if ((base == 10) && (num < 0)) { isNeg = 1; n = -num; }
-    char* cp = (char *)&user[USER_SZ];
+    char* cp = (char *)&code[CODE_SZ];
     *(cp--) = 0;
     do {
         int x = (n % base) + '0';
@@ -68,7 +69,7 @@ void run(WORD start) {
     WORD pc = start;
     CELL t1, t2;
     rsp = lsp = locSP = isError = 0;
-    while (isError == 0) {
+    while ((pc) && (isError == 0)) {
         byte ir = U(pc++);
         switch (ir) {
         case 0: return;
