@@ -185,8 +185,8 @@ int isNum(const char* wd) {
         char c = *(wd++);
         int t = -1;
         if (betw(c, '0', lastCh)) { t = c - '0'; }
-        if ((9 < base) && (betw(c, 'A', 'F'))) { t = c - 'A' + 10; }
-        if ((9 < base) && (betw(c, 'a', 'f'))) { t = c - 'a' + 10; }
+        if ((base == 16) && (betw(c, 'A', 'F'))) { t = c - 'A' + 10; }
+        if ((base == 16) && (betw(c, 'a', 'f'))) { t = c - 'a' + 10; }
         if (t < 0) { return 0; }
         x = (x * base) + t;
     }
