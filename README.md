@@ -3,10 +3,11 @@
 The main goals for this minimal Forth are as follows:
 
 - To be very frugal with its usage of memory.
-- For the implementation of it to be minimal and "intuitively obvious upon casual inspection".
+- To be easy to modify and add/extend the primitives.
+- To have an implementation that is minimal and "intuitively obvious upon casual inspection".
 - To be able to run on any system that has a C compiler.
 - To be deployable to as many different kinds of development boards as possible via the Arduino IDE.
-- To be easy to modify and extend the primitives.
+- To have a VML (virtual machine language) that is as human-reabable as possible, but not at the expense of performance.
 
 To these ends, I have wandered off the beaten path in the following ways:
 
