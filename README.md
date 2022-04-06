@@ -2,8 +2,9 @@
 
 The main goals for this minimal Forth are as follows:
 
+- To be very frugal with its usage of memory.
 - For the implementation of it to be minimal and "intuitively obvious upon casual inspection".
-- To be able to run under any system that has a C compiler.
+- To be able to run on any system that has a C compiler.
 - To be deployable to as many different kinds of development boards as possible via the Arduino IDE.
 - To be easy to modify and extend the primitives.
 
