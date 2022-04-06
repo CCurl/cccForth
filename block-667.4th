@@ -3,8 +3,6 @@
 reset
 1 load
 
-: rst ;
-
 : mil 1000 dup * * ;
 : bm timer swap 1 for next timer swap - . ;
 

@@ -12,8 +12,8 @@ PRIM_T prims[] = {
     {"+","+"}, {"-","-"}, {"/","/"}, {"*","*"},{"/mod","&"},
     {"swap","$"}, {"drop","\\"}, {"over","%"}, {"dup","#"},
     {"emit",","}, {"(.)","."}, {"space","b"}, {"cr","n"}, {"bl","k"},
-    {"=","="}, {"<","<"}, {">",">"}, {"0=","N"},
-    {"<<","L"}, {">>","R"}, {"type","Z"}, {".",".b"},
+    {"=","="}, {"<","<"}, {">",">"}, {"<=",">N"}, {">=","<N"}, {"0=","N"},
+    {"<<","L"}, {">>","R"}, {"zlen","T"}, {"ztype","Z"}, {".",".b"},
     {"@","@"}, {"c@","c"}, {"w@","w"}, {"!","!"}, {"c!","C"}, {"w!","W"},
     {"and","a"}, {"or","o"}, {"xor","x"}, {"com","~"}, {"not","N"},
     {"1+","i"}, {"1-","d"}, {"I", "I"}, {"+I", "m"}, {"execute","G"},
@@ -197,9 +197,10 @@ int isNum(const char* wd) {
 
 int doPrim(const char* wd) {
     const char* vml = NULL;
-    if (betw(wd[0],'r','s') && betw(wd[1],'0','9') && (!wd[2])) {
-        vml = wd;
-    }
+    char x[3];
+    if (betw(wd[0],'r','s') && betw(wd[1],'0','9') && (!wd[2])) { vml = wd; }
+    if ((wd[0]=='i') && betw(wd[1], '0', '9') && (!wd[2])) { strCpy(x, wd); x[0] = 'e'; vml = x; }
+    if ((wd[0]=='d') && betw(wd[1], '0', '9') && (!wd[2])) { strCpy(x, wd); x[0] = 'f'; vml = x; }
     for (int i = 0; prims[i].op && (!vml); i++) {
         if (strEqI(prims[i].name, wd)) { vml = prims[i].op; }
     }
@@ -349,7 +350,7 @@ int doParseWord(char* wd) {
     }
 
     if (strEqI(wd, "UNTIL")) {
-        CComma('u');
+        CComma('y');
         CELL tgt = pop();
         SET_WORD(UA(tgt), (WORD)HERE);
         return 1;

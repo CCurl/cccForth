@@ -34,20 +34,21 @@
   #define STK_SZ        16
   #define LSTK_SZ        8
   #define LSTK_SZ      128
-  // #define __EDITOR__
+  #define __EDITOR__
 #endif
 
 #define CELL_SZ      4
 
-#define TOS   stk[sp]
-#define NOS   stk[sp-1]
-#define AOS  (byte*)stk[sp]
-#define LOS   lstk[lsp]
-#define DROP2 pop(); pop()
-#define U(l)  user[l]
-#define UA(l) &U(l)
-#define DP_AT(l) ((DICT_T *)(&user[l]))
+#define TOS           stk[sp]
+#define NOS           stk[sp-1]
+#define AOS           (byte*)TOS
+#define LOS           lstk[lsp]
+#define DROP2         pop(); pop()
+#define U(l)          user[l]
+#define UA(l)         &U(l)
+#define DP_AT(l)      ((DICT_T *)(&user[l]))
 #define betw(x, a, b) ((a<=x)&&(x<=b))
+#define BA(a)         ((byte *)a)
 
 typedef unsigned char byte;
 typedef unsigned short WORD;

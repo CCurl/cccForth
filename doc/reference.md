@@ -59,7 +59,9 @@ NOTES:
 |+tmp|p|(--)|TempVars: allocate new|
 |-tmp|q|(--)|TempVars: destroy last allocated|
 |r0..r9|r|(--n)|TempVar(0..9): read|
-|s0..s9|s|(n--)|TempVar(0..9): set|
+|s0..s9|r|(--n)|TempVar(0..9): set|
+|i0..i9|r|(--n)|TempVar(0..9): increment|
+|d0..d9|s|(n--)|TempVar(0..9): decrement|
 |TIMER|t|(--n)|Push current MS|
 |RESET|Y|(--)||
 
@@ -93,3 +95,4 @@ example: "1 10 for i . next" prints 1 2 3 4 5 6 7 8 9 10
 |vsz |(--a)|Size of VARIABLES space (bytes)|
 |usz |(--a)|Size of USER/CODE space (bytes)|
 |u   |(--a)|Start address for USER/CODE space|
+
