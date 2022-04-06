@@ -102,7 +102,6 @@ void run(WORD start) {
         case 'L': NOS = (NOS << TOS); pop();                                break; // LSHIFT
         case 'N': TOS = (TOS) ? 0 : 1;                                      break; // NOT (0=)
         case 'R': NOS = (NOS >> TOS); pop();                                break; // RSHIFT
-        case 'S': delay();                                                  break; // SLEEP
         case 'W': SET_WORD(AOS, (WORD)NOS); DROP2;                          break; // W!
         case 'Y': vmReset();                                               return; // RESET
         case 'Z': doZType((byte *)pop());                                   break; // ZTYPE
@@ -134,14 +133,14 @@ void run(WORD start) {
         case 'q': locBase -= 10;                                            break; // -tmp
         case 'r': t1 = U(pc++) - '0'; push(locals[locBase + t1]);           break; // readTemp
         case 's': t1 = U(pc++) - '0'; locals[locBase + t1] = pop();         break; // setTemp
-        case 't': push(timer());                                            break; // TIMER
         case 'v': if (pop()) { pc = LOS.s; }                                break; // WHILE
         case 'u': if (pop() == 0) { pc = LOS.s; }                           break; // UNTIL
         case 'w': TOS = GET_WORD(AOS);                                      break; // w@
         case 'x': t1 = pop(); TOS ^= t1;                                    break; // XOR
+        case 'z': pc = doExt(U(pc), pc+1);                                  break; // EXT
         case '{': lpush()->e = GET_WORD(UA(pc)); pc += 2; LOS.s = pc;       break; // BEGIN
         case '}': pc = LOS.s;                                               break; // AGAIN
-        default: pc = doExt(ir, pc);                                        break;
+        default: printStringF("-unk ir: (%c)(%d)-", ir, ir);                return;
         }
     }
 }

@@ -17,16 +17,18 @@ PRIM_T prims[] = {
     {"@","@"}, {"c@","c"}, {"w@","w"}, {"!","!"}, {"c!","C"}, {"w!","W"},
     {"and","a"}, {"or","o"}, {"xor","x"}, {"com","~"}, {"not","N"},
     {"1+","i"}, {"1-","d"}, {"I", "I"}, {"+I", "m"}, {"execute","G"},
-    {"leave",";"}, {"timer","t"}, {"wait","t"}, {"reset","Y"}, {"break","^"},
-    {"+tmps","p"}, {"-tmps","q"}, 
+    {"leave",";"}, {"timer","zT"}, {"wait","zW"}, {"reset","Y"}, {"break","^"},
     {"key","K"}, {"key?","?"}, 
-    {"bye","zZ"}, 
+    {"+tmps","p"}, {"-tmps","q"},
     // Extensions
 #if __BOARD__ == PC
-    {"load","zL"}, { "edit","zE" },
+    { "bye","zZ" }, {"load","zL"},
 #else
     { "p-i","zPO" }, { "p-o","zPI" }, { "p-u","zPU" },
     { "a-r","zAR" }, { "a-w","zAW" }, { "d-r","zDR" }, { "d-w","zDW" },
+#endif
+#ifdef __EDITOR__
+    { "edit","zE" },
 #endif
 #ifdef __GAMEPAD__
     // Extensions
@@ -430,12 +432,12 @@ WORD doLoad(CELL ir, CELL pc) {
 
 WORD doExt(CELL ir, WORD pc) {
     switch (ir) {
-    case 'z': ir = U(pc++);
-        if (ir == 'E') { doEditor(); }
-        if (ir == 'L') { pc = doLoad(ir, pc); }
-        if (ir == 'Z') { isBye = 1; }
-        break;
-    default: printStringF("-unk ir: (%c)(%d)-", ir, ir);
+    case 'E': doEditor();                   break;
+    case 'L': pc = doLoad(ir, pc);          break;
+    case 'T': push(GetTickCount());         break;
+    case 'W': Sleep(pop());                 break;
+    case 'Z': isBye = 1;                    break;
+    default: printString("-unk ext-");
     }
     return pc;
 }
@@ -445,8 +447,6 @@ void printChar(char c) { printf("%c", c); }
 int charAvailable(void) { return _kbhit(); }
 int getChar(void) { return _getch(); }
 
-CELL timer() { return GetTickCount(); }
-void delay() { return Sleep(pop()); }
 
 void doHistory(const char* txt) {
     FILE* fp = fopen("history.txt", "at");
