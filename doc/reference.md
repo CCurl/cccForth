@@ -25,6 +25,8 @@ NOTES:
 |BL|k|(--n)|FORTH CORE|
 |SPACE|b|(--)|FORTH CORE|
 |CR|n|(--)|FORTH CORE|
+|KEY?|?|(--n)|FORTH CORE|
+|KEY|K|(--n)|FORTH CORE|
 |+,-,*,/|+,-,*,/|(a b--n)|FORTH CORE|
 |/MOD|&|(a b--q r)|FORTH CORE|
 |AND,OR,XOR|A,O,X|(a b--n)|FORTH CORE|
@@ -81,3 +83,13 @@ example: "1 10 for i . next" prints 1 2 3 4 5 6 7 8 9 10
          "10 1 for i . next" prints 1 2 3 4 5 6 7 8 9 10
 ```
 ## Default dictionary entries:
+|Word|stack|notes|
+|-|-|-|
+|base|(--a)|Address of BASE|
+|vb  |(--a)|Start address for VARIABLES|
+|va  |(--a)|Address of VHERE|
+|la  |(--a)|Address of LAST|
+|ha  |(--a)|Address of HERE|
+|vsz |(--a)|Size of VARIABLES space (bytes)|
+|usz |(--a)|Size of USER/CODE space (bytes)|
+|u   |(--a)|Start address for USER/CODE space|

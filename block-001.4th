@@ -6,7 +6,6 @@ reset
 
 : vhere va @ ;
 : here ha @ ;
-// : last la @ ;
 
 : betw +tmps s3 s2 s1 ( n a b--f )
     r1 r2 < 0= 
@@ -19,5 +18,6 @@ reset
 : .code u dup here + 1- dumpc ;
 : .vars vb vhere dumpc ;
 
+// Screen stuff
 : ->XY #27 ." %c[%d;%dH" ;
 : CLS #27 ." %c[2J" 1 dup ->XY ;

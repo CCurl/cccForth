@@ -17,7 +17,7 @@
   #include <Windows.h>
   #include <conio.h>
   #define USER_SZ      (64*1024)
-  #define VARS_SZ      (64*1024)
+  #define VARS_SZ      (128*1024)
   #define STK_SZ        16
   #define LSTK_SZ        8
   #define LOCALS_SZ    128
@@ -26,7 +26,6 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-
 
 #if __BOARD__ != PC
   // For TEENSY4
@@ -95,7 +94,16 @@ extern void doParse(const char *);
 extern int charAvailable();
 extern int getChar();
 extern WORD getXT(WORD, DICT_T *);
-
 extern CELL timer();
+extern void delay();
+
+// FILEs
+extern void fileInit();
+extern void fileOpen();
+extern void fileRead();
+extern void fileWrite();
+extern void fileClose();
+extern void readBlock();
+extern void writeBlock();
 
 #endif

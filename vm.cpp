@@ -91,15 +91,18 @@ void run(WORD start) {
         case '1': push(U(pc++));                                            break; // BLIT
         case '2': push(GET_WORD(UA(pc))); pc += 2;                          break; // WLIT
         case '4': push(GET_LONG(UA(pc))); pc += 4;                          break; // LIT
+        case '?': push(charAvailable());                                    break; // ?KEY
         case '@': TOS = GET_LONG((byte*)TOS);                               break; // FETCH
         case '!': SET_LONG(AOS, NOS); DROP2;                                break; // STORE
         case 'C': *AOS = (byte)NOS; DROP2;                                  break; // CSTORE
         case 'G': pc = (WORD)pop();                                         break; // EXECUTE
         case 'I': push(LOS.f);                                              break; // I
         case 'J': pc = GET_WORD(UA(pc));                                    break; // BRANCH
+        case 'K': push(getChar());                                          break; // KEY
         case 'L': NOS = (NOS << TOS); pop();                                break; // LSHIFT
         case 'N': TOS = (TOS) ? 0 : 1;                                      break; // NOT (0=)
         case 'R': NOS = (NOS >> TOS); pop();                                break; // RSHIFT
+        case 'S': delay();                                                  break; // SLEEP
         case 'W': SET_WORD(AOS, (WORD)NOS); DROP2;                          break; // W!
         case 'Y': vmReset();                                               return; // RESET
         case 'Z': doZType((byte *)pop());                                   break; // ZTYPE

@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "shared.h"
+#include "file-board.h"
 
 #define AR(x) analogRead(x)
 #define DR(x) digitalRead(x)
@@ -51,7 +52,6 @@ void printChar(const char ch) {
     char b[2] = { ch, 0 };
     printString(b);
 }
-
 
 WORD doPin(WORD pc) {
     CELL pin = pop();

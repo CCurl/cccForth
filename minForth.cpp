@@ -17,13 +17,18 @@ PRIM_T prims[] = {
     {"@","@"}, {"c@","c"}, {"w@","w"}, {"!","!"}, {"c!","C"}, {"w!","W"},
     {"and","a"}, {"or","o"}, {"xor","x"}, {"com","~"}, {"not","N"},
     {"1+","i"}, {"1-","d"}, {"I", "I"}, {"+I", "m"}, {"execute","G"},
-    {"leave",";"}, {"timer","t"}, {"reset","Y"}, {"break","^"},
+    {"leave",";"}, {"timer","t"}, {"wait","t"}, {"reset","Y"}, {"break","^"},
     {"+tmps","p"}, {"-tmps","q"}, 
+    {"key","K"}, {"key?","?"}, 
     {"bye","zZ"}, 
-#if __BOARD__ == PC
     // Extensions
+#if __BOARD__ == PC
     {"load","zL"}, { "edit","zE" },
-#elif __GAMEPAD__
+#else
+    { "p-i","zPO" }, { "p-o","zPI" }, { "p-u","zPU" },
+    { "a-r","zAR" }, { "a-w","zAW" }, { "d-r","zDR" }, { "d-w","zDW" },
+#endif
+#ifdef __GAMEPAD__
     // Extensions
     { "gp-button","xGB" },
 #endif

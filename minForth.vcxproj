@@ -145,15 +145,17 @@
     <ClCompile Include="vm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="file-board.h" />
     <ClInclude Include="shared.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="block-000.4th" />
     <None Include="block-001.4th" />
+    <None Include="doc\reference.md" />
+    <None Include="LICENSE" />
     <None Include="minForth.ino" />
     <None Include="README.md" />
     <None Include="block-667.4th" />
-    <None Include="reference.md" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="history.txt" />
