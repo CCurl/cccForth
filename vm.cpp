@@ -73,6 +73,7 @@ void run(WORD start) {
         byte ir = U(pc++);
         switch (ir) {
         case 0: return;
+        case ' ': /* NOP */                                                 break; // NOP
         case '#': push(TOS);                                                break; // DUP
         case '%': push(NOS);                                                break; // OVER
         case '$': t1 = TOS; TOS = NOS; NOS = t1;                            break; // SWAP
@@ -90,19 +91,25 @@ void run(WORD start) {
         case '?': push(charAvailable());                                    break; // ?KEY
         case '@': TOS = GET_LONG((byte*)TOS);                               break; // FETCH
         case '!': SET_LONG(AOS, NOS); DROP2;                                break; // STORE
+        case 'A': case 'B': /* UNUSED */                                    break;
         case 'C': *AOS = (byte)NOS; DROP2;                                  break; // CSTORE
+        case 'D': case 'E': case 'F':                                       break;
         case 'G': pc = (WORD)pop();                                         break; // EXECUTE
+        case 'H': /* UNUSED */                                              break;
         case 'I': push(LOS.f);                                              break; // I
         case 'J': pc = GET_WORD(UA(pc));                                    break; // BRANCH
         case 'K': push(getChar());                                          break; // KEY
         case 'L': NOS = (NOS << TOS); pop();                                break; // LSHIFT
         case 'N': TOS = (TOS) ? 0 : 1;                                      break; // NOT (0=)
+        case 'O': case 'P': case 'Q':                                       break;
         case 'R': NOS = (NOS >> TOS); pop();                                break; // RSHIFT
+        case 'S': /* UNUSED */                                              break;
         case 'T': t1 = TOS; TOS = 0; while (BA(t1)[TOS]) { ++TOS; }         break; // ZLEN
+        case 'U': case 'V':                                                 break;
         case 'W': SET_WORD(AOS, (WORD)NOS); DROP2;                          break; // W!
+        case 'X': /* UNUSED */                                              break;
         case 'Y': vmReset();                                               return; // RESET
         case 'Z': doType((byte *)pop(),-1);                                 break; // ZTYPE
-        case '~': TOS = ~TOS;                                               break; // COM
         case '=': NOS = (NOS == TOS) ? 1 : 0; pop();                        break; // =
         case '>': NOS = (NOS > TOS) ? 1 : 0; pop();                         break; // >
         case '<': NOS = (NOS < TOS) ? 1 : 0; pop();                         break; // <
@@ -121,10 +128,11 @@ void run(WORD start) {
         case 'd': TOS--;                                                    break; // 1-
         case 'e': t1 = U(pc++) - '0'; ++locals[locBase + t1];               break; // incTemp
         case 'f': t1 = U(pc++) - '0'; --locals[locBase + t1];               break; // decTemp
+        case 'g': case 'h': /* UNUSED */                                    break;
         case 'i': TOS++;                                                    break; // 1+
         case 'j': if (pop() == 0) { pc = GET_WORD(UA(pc)); }                       // IF (0BRANCH)
                 else { pc += 2; }                                           break;
-        case 'k': push(' ');                                                break; // BL
+        case 'k': case 'l': /* UNUSED */                                    break;
         case 'm': LOS.f += pop();                                           break; // +I
         case 'n': printString("\r\n");                                      break; // CR
         case 'o': t1 = pop(); TOS |= t1;                                    break; // OR
@@ -132,14 +140,17 @@ void run(WORD start) {
         case 'q': locBase -= 10;                                            break; // -tmp
         case 'r': t1 = U(pc++) - '0'; push(locals[locBase + t1]);           break; // readTemp
         case 's': t1 = U(pc++) - '0'; locals[locBase + t1] = pop();         break; // setTemp
+        case 't': /* UNUSED */                                              break;
         case 'u': if (pop() == 0) { pc = LOS.s; }                           break; // UNTIL
         case 'v': if (pop()) { pc = LOS.s; }                                break; // WHILE
         case 'w': TOS = GET_WORD(AOS);                                      break; // w@
         case 'x': t1 = pop(); TOS ^= t1;                                    break; // XOR
+        case 'y': /* UNUSED */                                              break;
         case 'z': pc = doExt(U(pc), pc+1);                                  break; // EXT
         case '{': lpush()->e = GET_WORD(UA(pc)); pc += 2; LOS.s = pc;       break; // BEGIN
         case '}': pc = LOS.s;                                               break; // AGAIN
-        default: printStringF("-unk ir: (%c)(%d)-", ir, ir);                return;
+        case '~': TOS = ~TOS;                                               break; // COM
+        default: printStringF("-unk ir: %d (%c)-", ir, ir);                return;
         }
     }
 }

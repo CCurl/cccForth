@@ -10,7 +10,7 @@ reset
 ( n a b -betw- f )
 : betw +tmps s3 s2 s1  r2 r1 <=  r1 r3 <=  and -tmps ;
 
-: T0 ( c-- ) s9 r9 #32 $7e betw if r9 emit else r9 ." (%d)" then ;
+: T0 ( c-- ) s9 r9 BL $7E betw if r9 emit else r9 ." (%d)" then ;
 : dumpN  ( a n-- ) 1 for dup c@ .  1+ next drop ;
 : dumpNC ( a n-- ) 1 for dup c@ T0 1+ next drop ;
 : .code cb here dumpNC ;
