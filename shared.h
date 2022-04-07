@@ -7,7 +7,7 @@
 #define ESP32_DEV    4
 #define ESP8266      5
 
-#define __BOARD__    XIAO
+#define __BOARD__    TEENSY4
 
 #ifdef _WIN32
   #undef __BOARD__
@@ -33,7 +33,7 @@
   #define STK_SZ        16
   #define LSTK_SZ        8
   #define LOCALS_SZ    160
-  #define __FILE__
+  #define __FILES__
   #define __EDITOR__
 #elif __BOARD__ == XIAO
   #define CODE_SZ      (16*1024)

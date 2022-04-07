@@ -1,4 +1,4 @@
-#ifndef __FILE__
+#ifndef __FILES__
 
 void fileInit() {}
 
