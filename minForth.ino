@@ -187,11 +187,10 @@ void setup() {
 //    fileInit();
 }
 
-void do_autoRun() {
-    int p = doFind("AUTORUN");
-    if (0 <= p) {
-      DICT_T* dp = DP_AT(p);
-      run(getXT((WORD)p, dp));
+void doAutoRun() {
+    if (doFind("AUTORUN")) {
+      pop();
+      run((WORD) pop());
     }
 }
 
@@ -221,5 +220,5 @@ void loop() {
     //    isOTA = 1;
     //    handleInput(wifiGetChar()); 
     //}
-    do_autoRun();
+    doAutoRun();
 }

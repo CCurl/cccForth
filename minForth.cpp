@@ -82,7 +82,7 @@ void printStringF(const char* fmt, ...) {
     printString(buf);
 }
 
-BOOL isTempWord(const char* nm) {
+int isTempWord(const char* nm) {
     return ((nm[0] == 'T') && betw(nm[1], '0', '9') && (nm[2] == 0));
 }
 

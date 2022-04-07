@@ -7,7 +7,7 @@
 #define ESP32_DEV    4
 #define ESP8266      5
 
-#define __BOARD__    TEENSY4
+#define __BOARD__    XIAO
 
 #ifdef _WIN32
   #undef __BOARD__
@@ -20,21 +20,28 @@
   #define VARS_SZ      (128*1024)
   #define STK_SZ        16
   #define LSTK_SZ        8
-  #define LOCALS_SZ    128
+  #define LOCALS_SZ    160
   #define __EDITOR__
 #endif
 
 #include <stdarg.h>
 #include <stdio.h>
 
-#if __BOARD__ != PC
-  // For TEENSY4
-  #define USER_SZ      (48*1024)
-  #define VARS_SZ      (48*1024)
+#if __BOARD__ == TEENSY4
+  #define CODE_SZ      (48*1024)
+  #define VARS_SZ      (96*1024)
   #define STK_SZ        16
   #define LSTK_SZ        8
-  #define LSTK_SZ      128
+  #define LOCALS_SZ    160
+  #define __FILE__
   #define __EDITOR__
+#elif __BOARD__ == XIAO
+  #define CODE_SZ      (16*1024)
+  #define VARS_SZ      ( 8*1024)
+  #define STK_SZ        16
+  #define LSTK_SZ        8
+  #define LOCALS_SZ    160
+  // #define __GAMEPAD__
 #endif
 
 #define CELL_SZ      4
