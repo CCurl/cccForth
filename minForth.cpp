@@ -209,7 +209,7 @@ int doPrim(const char* wd) {
     if (STATE) {
         for (int j = 0; vml[j]; j++) { CComma(vml[j]); }
     } else {
-        byte* x = UA(HERE + 10);
+        byte* x = CA(HERE + 10);
         for (int j = 0; vml[j]; j++) { *(x++) = vml[j]; }
         *x = ';';
         run((WORD)HERE + 10);
@@ -237,7 +237,7 @@ int doDotQuote() {
     if (STATE) {
         CComma('Z');
     } else {
-        byte* cp = UA(HERE+10);
+        byte* cp = CA(HERE+10);
         *(cp++) = 'Z';
         *(cp++) = ';';
         run((WORD)(HERE+10));
@@ -305,13 +305,13 @@ int doParseWord(char* wd) {
         CComma('J');
         push(HERE);
         WComma(0);
-        SET_WORD(UA(tgt), (WORD)HERE);
+        SET_WORD(CA(tgt), (WORD)HERE);
         return 1;
     }
 
     if (strEqI(wd, "THEN")) {
         CELL tgt = pop();
-        SET_WORD(UA(tgt), (WORD)HERE);
+        SET_WORD(CA(tgt), (WORD)HERE);
         return 1;
     }
 
@@ -325,7 +325,7 @@ int doParseWord(char* wd) {
     if (strEqI(wd, "NEXT")) {
         CComma(']');
         CELL tgt = pop();
-        SET_WORD(UA(tgt), (WORD)HERE);
+        SET_WORD(CA(tgt), (WORD)HERE);
         return 1;
     }
 
@@ -339,27 +339,27 @@ int doParseWord(char* wd) {
     if (strEqI(wd, "AGAIN")) {
         CComma('}');
         CELL tgt = pop();
-        SET_WORD(UA(tgt), (WORD)HERE);
+        SET_WORD(CA(tgt), (WORD)HERE);
         return 1;
     }
 
     if (strEqI(wd, "WHILE")) {
         CComma('v');
         CELL tgt = pop();
-        SET_WORD(UA(tgt), (WORD)HERE);
+        SET_WORD(CA(tgt), (WORD)HERE);
         return 1;
     }
 
     if (strEqI(wd, "UNTIL")) {
         CComma('u');
         CELL tgt = pop();
-        SET_WORD(UA(tgt), (WORD)HERE);
+        SET_WORD(CA(tgt), (WORD)HERE);
         return 1;
     }
 
     if (strEqI(wd, "FORGET")) {
         HERE = LAST;
-        LAST -= U(LAST);
+        LAST -= CODE(LAST);
         return 1;
     }
 
@@ -419,21 +419,20 @@ byte fpSP = 0;
 void fpPush(FILE* v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }
 FILE* fpPop() { return (fpSP) ? fpStk[fpSP--] : 0 ; }
 
-WORD doLoad(CELL ir, CELL pc) {
+void doLoad(int blk) {
     char* fn = (char*)(VHERE + 100);
-    sprintf(fn, "./block-%03d.4th", pop());
+    sprintf(fn, "./block-%03d.4th", blk);
     FILE* fp = fopen(fn, "rt");
     if (fp) {
         if (input_fp) { fpPush(input_fp); }
         input_fp = fp;
     }
-    return (WORD)pc;
 }
 
-WORD doExt(CELL ir, WORD pc) {
+byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
     case 'E': doEditor();                   break;
-    case 'L': pc = doLoad(ir, pc);          break;
+    case 'L': doLoad(pop());          break;
     case 'T': push(GetTickCount());         break;
     case 'W': Sleep(pop());                 break;
     case 'Z': isBye = 1;                    break;
@@ -457,7 +456,7 @@ void doHistory(const char* txt) {
 }
 
 void loop() {
-    char *tib = (char *)UA(HERE+32);
+    char *tib = (char *)CA(HERE+32);
     FILE* fp = (input_fp) ? input_fp : stdin;
     if (fp == stdin) { doOK(); }
     if (fgets(tib, 100, fp) == tib) {
@@ -474,8 +473,7 @@ void loop() {
 int main()
 {
     vmReset();
-    push(0);
-    doLoad(0,0);
+    doLoad(0);
     while (!isBye) { loop(); }
 }
 

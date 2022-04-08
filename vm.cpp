@@ -66,11 +66,11 @@ void doType(byte *a, int l) {
 }
 
 void run(WORD start) {
-    WORD pc = start;
+    byte *pc = CA(start);
     CELL t1, t2;
     rsp = lsp = locSP = isError = 0;
     while ((pc) && (isError == 0)) {
-        byte ir = U(pc++);
+        byte ir = *(pc++);
         switch (ir) {
         case 0: return;
         case ' ': /* NOP */                                                 break; // NOP
@@ -83,21 +83,21 @@ void run(WORD start) {
         case '*': t1 = pop(); TOS *= t1;                                    break; // MULT
         case '/': t1 = pop(); TOS /= t1;                                    break; // DIV
         case '.': printBase(pop(), BASE);                                   break; // DOT
-        case ':': rpush(pc + 2); pc = GET_WORD(UA(pc));                     break; // CALL
-        case ';': pc = (WORD)rpop();                                        break; // RETURN
-        case '1': push(U(pc++));                                            break; // BLIT
-        case '2': push(GET_WORD(UA(pc))); pc += 2;                          break; // WLIT
-        case '4': push(GET_LONG(UA(pc))); pc += 4;                          break; // LIT
+        case ':': rpush(pc-code+2); pc = CA(GET_WORD(pc));                  break; // CALL
+        case ';': pc = CA(rpop());                                          break; // RETURN
+        case '1': push(*(pc++));                                            break; // BLIT
+        case '2': push(GET_WORD(pc)); pc += 2;                              break; // WLIT
+        case '4': push(GET_LONG(pc)); pc += 4;                              break; // LIT
         case '?': push(charAvailable());                                    break; // ?KEY
         case '@': TOS = GET_LONG((byte*)TOS);                               break; // FETCH
         case '!': SET_LONG(AOS, NOS); DROP2;                                break; // STORE
         case 'A': case 'B': /* UNUSED */                                    break;
         case 'C': *AOS = (byte)NOS; DROP2;                                  break; // CSTORE
         case 'D': case 'E': case 'F':                                       break;
-        case 'G': pc = (WORD)pop();                                         break; // EXECUTE
+        case 'G': pc = CA((WORD)pop());                                         break; // EXECUTE
         case 'H': /* UNUSED */                                              break;
         case 'I': push(LOS.f);                                              break; // I
-        case 'J': pc = GET_WORD(UA(pc));                                    break; // BRANCH
+        case 'J': pc = CA(GET_WORD(pc));                                    break; // BRANCH
         case 'K': push(getChar());                                          break; // KEY
         case 'L': NOS = (NOS << TOS); pop();                                break; // LSHIFT
         case 'N': TOS = (TOS) ? 0 : 1;                                      break; // NOT (0=)
@@ -116,21 +116,20 @@ void run(WORD start) {
         case ',': printChar((char)pop());                                   break; // EMIT
         case '&': t1 = NOS; t2 = TOS; NOS = t1 / t2; TOS = t1 % t2;         break; // /MOD
         case '^': if (lsp) { pc = LOS.e; }                                  break; // BREAK
-        case '[': lpush()->e = GET_WORD(UA(pc)); pc += 2;                          // FOR
-            LOS.s = pc;
-            LOS.f = TOS < NOS ? TOS : NOS;
-            LOS.t = TOS > NOS ? TOS : NOS; DROP2;                           break;
+        case '[': lpush()->e = CA(GET_WORD(pc)); LOS.s = (pc += 2);                // FOR
+            LOS.f = (TOS < NOS) ? TOS : NOS;
+            LOS.t = (TOS > NOS) ? TOS : NOS;   DROP2;                       break;
         case ']': ++LOS.f; if (LOS.f <= LOS.t) { pc = LOS.s; }                     // NEXT
                 else { lpop(); }                                            break;
         case 'a': t1 = pop(); TOS &= t1;                                    break; // AND
         case 'b': printChar(' ');                                           break; // SPACE
         case 'c': TOS = *AOS;                                               break; // C@
         case 'd': TOS--;                                                    break; // 1-
-        case 'e': t1 = U(pc++) - '0'; ++locals[locBase + t1];               break; // incTemp
-        case 'f': t1 = U(pc++) - '0'; --locals[locBase + t1];               break; // decTemp
+        case 'e': t1 = *(pc++) - '0'; ++locals[locBase + t1];               break; // incTemp
+        case 'f': t1 = *(pc++) - '0'; --locals[locBase + t1];               break; // decTemp
         case 'g': case 'h': /* UNUSED */                                    break;
         case 'i': TOS++;                                                    break; // 1+
-        case 'j': if (pop() == 0) { pc = GET_WORD(UA(pc)); }                       // IF (0BRANCH)
+        case 'j': if (pop() == 0) { pc = CA(GET_WORD(pc)); }                       // IF (0BRANCH)
                 else { pc += 2; }                                           break;
         case 'k': case 'l': /* UNUSED */                                    break;
         case 'm': LOS.f += pop();                                           break; // +I
@@ -138,16 +137,16 @@ void run(WORD start) {
         case 'o': t1 = pop(); TOS |= t1;                                    break; // OR
         case 'p': locBase += 10;                                            break; // +tmp
         case 'q': locBase -= 10;                                            break; // -tmp
-        case 'r': t1 = U(pc++) - '0'; push(locals[locBase + t1]);           break; // readTemp
-        case 's': t1 = U(pc++) - '0'; locals[locBase + t1] = pop();         break; // setTemp
+        case 'r': t1 = *(pc++) - '0'; push(locals[locBase + t1]);           break; // readTemp
+        case 's': t1 = *(pc++) - '0'; locals[locBase + t1] = pop();         break; // setTemp
         case 't': /* UNUSED */                                              break;
         case 'u': if (pop() == 0) { pc = LOS.s; }                           break; // UNTIL
         case 'v': if (pop()) { pc = LOS.s; }                                break; // WHILE
         case 'w': TOS = GET_WORD(AOS);                                      break; // w@
         case 'x': t1 = pop(); TOS ^= t1;                                    break; // XOR
         case 'y': /* UNUSED */                                              break;
-        case 'z': pc = doExt(U(pc), pc+1);                                  break; // EXT
-        case '{': lpush()->e = GET_WORD(UA(pc)); pc += 2; LOS.s = pc;       break; // BEGIN
+        case 'z': pc = doExt(*pc, pc+1);                                    break; // EXT
+        case '{': lpush()->e = CA(GET_WORD(pc)); pc += 2; LOS.s = pc;       break; // BEGIN
         case '}': pc = LOS.s;                                               break; // AGAIN
         case '~': TOS = ~TOS;                                               break; // COM
         default: printStringF("-unk ir: %d (%c)-", ir, ir);                return;
