@@ -19,7 +19,10 @@ reset
     cb dup here + 1- for i c@ ." %d, " 
         i9 r9 10 = if 0 s9 cr then
     next ." 0]" ;
+: elapsed timer swap - ;
 
 // Screen stuff
 : ->XY #27 ." %c[%d;%dH" ;
 : CLS #27 ." %c[2J" 1 dup ->XY ;
+: C-ON  #27 ." %c[?25h" ;
+: C-OFF #27 ." %c[?25l" ;

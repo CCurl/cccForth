@@ -134,10 +134,10 @@ int doWords() {
     return 1;
 }
 
-int getWord(char* wd, char delim) {
-    while (*in && (*in == delim)) { ++in; }
+int getWord(char* wd) {
+    while (*in && (*in < 33)) { ++in; }
     int l = 0;
-    while (*in && (*in != delim)) {
+    while (*in && (32 < *in)) {
         *(wd++) = *(in++);
         ++l;
     }
@@ -257,7 +257,7 @@ int doParseWord(char* wd) {
     if (strEq(wd, "\"")) { return doQuote(); }
 
     if (strEq(wd, ":")) {
-        if (getWord(wd, ' ')) {
+        if (getWord(wd)) {
             doCreate(wd, 0);
             STATE = 1;
         }
@@ -279,7 +279,7 @@ int doParseWord(char* wd) {
     }
 
     if (strEqI(wd, "VARIABLE")) {
-        if (getWord(wd, ' ')) {
+        if (getWord(wd)) {
             doCreate(wd, 0);
             push((CELL)VHERE);
             doNumber(1);
@@ -372,13 +372,13 @@ int doParseWord(char* wd) {
 
 void doParse(const char* line) {
     in = (char*)line;
-    int len = getWord(word, ' ');
+    int len = getWord(word);
     while (0 < len) {
         if (VHERE2 < VHERE) { VHERE2 = VHERE; }
         if (strEq(word, "//")) { return; }
         if (strEq(word, "\\")) { return; }
         if (doParseWord(word) == 0) { return; }
-        len = getWord(word, ' ');
+        len = getWord(word);
     }
 }
 
