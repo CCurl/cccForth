@@ -16,8 +16,8 @@
   #define  _CRT_SECURE_NO_WARNINGS
   #include <Windows.h>
   #include <conio.h>
-  #define CODE_SZ      (64*1024)
-  #define VARS_SZ      (128*1024)
+  #define CODE_SZ      ( 64*1024)
+  #define VARS_SZ      (256*1024)
   #define STK_SZ        16
   #define LSTK_SZ        8
   #define LOCALS_SZ    160

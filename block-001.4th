@@ -21,6 +21,12 @@ reset
     next ." 0]" ;
 : elapsed timer swap - ;
 
+variable s
+: rand s @ dup 0= if drop timer then
+    dup 13 << xor
+    dup 17 >> xor
+    dup  5 << xor dup s ! ;
+
 // Screen stuff
 : ->XY #27 ." %c[%d;%dH" ;
 : CLS #27 ." %c[2J" 1 dup ->XY ;

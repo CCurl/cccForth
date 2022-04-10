@@ -2,28 +2,19 @@
 
 1 load
 
-: rows 40 ; : cols 100 ;
+: rows 50 ; : cols 250 ;
 : pop-sz rows 2 + cols * 2 + ;
 
 variable pop pop-sz allot
 variable bak pop-sz allot
+variable ln cols allot
+variable WT 0 WT !
 
-: p ( r c -- n ) swap cols * + pop + ;
-: p@ ( r c -- v ) p c@ ;
-
-: ->b ( r c -- n ) swap cols * + bak + ;
-: b+ ( a -- ) dup dup c@ 1+ swap c! 1+ ;
-: b++ ( r c -- ) ->b s0
-    r0 1- cols - b+ b+ b+ drop
-    r0 1-        b+ 1+ b+ drop
-    r0 1- cols + b+ b+ b+ drop ;
-
-variable s
-
-: rnd s @ dup 0= if drop timer then
-    dup 13 << xor
-    dup 17 >> xor
-    dup  5 << xor dup s ! ;
+: T5 ( a -- ) dup c@ 1+ over c! 1+ ;
+: b++ ( c r -- ) cols * + bak + s0
+    r0 1- cols - T5 T5 T5 drop
+    r0 1-        T5 1+ T5 drop
+    r0 1- cols + T5 T5 T5 drop ;
 
 : alive? ( a b -- c ) s1 s0
     r1 2 < if 0 leave then
@@ -31,7 +22,7 @@ variable s
     r1 3 = if 1 leave then
     r0 ;
 
-: rnd-pop 0 pop-sz for rnd $FF and #200 > i pop + c! next ;
+: rand-pop 0 pop-sz for rand $FF and #200 > i pop + c! next ;
 : clr-bak 0 pop-sz for 0 i bak + c! next ;
 : bak->pop 0 pop-sz for 
         i pop + c@ 
@@ -39,20 +30,22 @@ variable s
         i pop + c! 
     next ;
 
-: .pop C-OFF 1 1 ->XY
+: p@ ( c r -- v ) cols * + pop + c@ ;
+
+: .pop C-OFF 1 dup ->XY
     1 rows for i s1
-        1 cols for r1 i p@ if '*' else bl then emit next cr
+		ln s6 
+        1 cols for i r1 p@ if '*' else bl then r6 c! i6 next 
+		0 r6 c! ln qtype cr
     next C-ON ;
 
 : gen clr-bak
     1 rows for i s8
-        1 cols for i s9
-            r8 r9 p@ if r8 r9 b++ then
+        1 cols for
+            i r8 p@ if i r8 b++ then
         next
     next 
-    bak->pop .pop ;
+    bak->pop .pop i7 r7 . WT @ wait ;
 
 : gens 1 for gen next ;
-: go rnd-pop gens ;
-
-: rrr 111 load ;
+: go 0 s7 rand-pop gens ;

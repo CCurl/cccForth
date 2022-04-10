@@ -139,7 +139,7 @@ void run(WORD start) {
         case 'q': locBase -= 10;                                            break; // -tmp
         case 'r': t1 = *(pc++) - '0'; push(locals[locBase + t1]);           break; // readTemp
         case 's': t1 = *(pc++) - '0'; locals[locBase + t1] = pop();         break; // setTemp
-        case 't': /* UNUSED */                                              break;
+        case 't': printString((char *)pop());                               break; // QTYPE
         case 'u': if (pop() == 0) { pc = LOS.s; }                           break; // UNTIL
         case 'v': if (pop()) { pc = LOS.s; }                                break; // WHILE
         case 'w': TOS = GET_WORD(AOS);                                      break; // w@

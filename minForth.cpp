@@ -15,13 +15,14 @@ PRIM_T prims[] = {
     {"emit",","}, {"(.)","."}, {"space","b"}, {"cr","n"}, {"bl","1 "},
     {"=","="}, {"<","<"}, {">",">"}, 
     {"<=",">N"}, {"<>","=N"}, {"!=","=N"}, {">=","<N"}, {"0=","N"},
-    {"<<","L"}, {">>","R"}, {"zlen","T"}, {"ztype","Z"}, {".",".b"},
+    {"<<","L"}, {">>","R"}, {"zlen","T"}, {".",".b"},
     {"@","@"}, {"c@","c"}, {"w@","w"}, {"!","!"}, {"c!","C"}, {"w!","W"},
     {"and","a"}, {"or","o"}, {"xor","x"}, {"com","~"}, {"not","N"},
     {"1+","i"}, {"1-","d"}, {"I", "I"}, {"+I", "m"}, {"execute","G"},
     {"leave",";"}, {"timer","zT"}, {"wait","zW"}, {"reset","Y"}, {"break","^"},
     {"key","K"}, {"key?","?"}, 
     {"+tmps","p"}, {"-tmps","q"},
+    {"ztype","Z"}, {"qtype","t"},
     // Extensions
 #if __BOARD__ == PC
     { "bye","zZ" }, {"load","zL"},
@@ -432,11 +433,11 @@ void doLoad(int blk) {
 
 byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
-    case 'E': doEditor();                   break;
-    case 'L': doLoad(pop());          break;
-    case 'T': push(GetTickCount());         break;
-    case 'W': Sleep(pop());                 break;
-    case 'Z': isBye = 1;                    break;
+    case 'E': doEditor();                       break;
+    case 'L': doLoad(pop());                    break;
+    case 'T': push(GetTickCount());             break;
+    case 'W': if (TOS) { Sleep(TOS); } pop();   break;
+    case 'Z': isBye = 1;                        break;
     default: printString("-unk ext-");
     }
     return pc;
