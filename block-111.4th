@@ -2,25 +2,27 @@
 
 1 load
 
-: rows 130 ; : cols 600 ;
+variable (r) 200 (r) !
+variable (c) 500 (c) !
+: rows (r) @ ; : cols (c) @ ;
 : pop-sz rows 2 + cols 2 + * ;
 
 variable pop pop-sz allot
 variable bak pop-sz allot
 variable ln cols allot
-variable WT 0 WT !
+
+65 (r) ! 200 (c) !
 
 : T5 ( a -- ) dup c@ 1+ over c! 1+ ;
-: b++ ( -- ) r4 s0
-    r0 1- cols - T5 T5 T5 drop
-    r0 1-        T5 1+ T5 drop
-    r0 1- cols + T5 T5 T5 drop ;
+: b++ ( -- )
+    r4 1- cols - T5 T5 T5 drop
+    r4 1-        T5 1+ T5 drop
+    r4 1- cols + T5 T5 T5 drop ;
 
-: alive? ( a b -- c ) s1 s0
-    r1 2 < if 0 leave then
-    r1 3 > if 0 leave then
-    r1 3 = if 1 leave then
-    r0 ;
+: alive? ( a b -- c )
+    dup 2 = if drop leave then
+    3 = if drop 1 leave then
+    drop 0 ;
 
 : rand-pop 0 pop-sz for rand $FF and #200 > i pop + c! next ;
 : clr-bak 0 pop-sz for 0 i bak + c! next ;
@@ -33,7 +35,7 @@ variable WT 0 WT !
 
 : ->p ( c r -- v ) cols * + pop + ;
 : ->b ( c r -- v ) cols * + bak + ;
-: p@ ( c r -- v ) cols * + pop + c@ ;
+: p@ ( c r -- v ) ->p c@ ;
 
 : .pop 1 dup ->XY
     1 rows for i s1
@@ -45,7 +47,7 @@ variable WT 0 WT !
 : gen 1 1 ->b s4
     1 1 ->p cols 1- rows 1- ->p
     for i c@ if b++ then i4 next
-    bak->pop .pop i7 r7 . WT @ wait ;
+    bak->pop .pop i7 r7 . ;
 
-: gens clr-bak 1 for gen next ;
-: go CLS C-OFF 0 s7 rand-pop gens C-ON ;
+: cont C-OFF CLS begin gen key? if key drop break then again C-ON ;
+: go 0 s7 clr-bak rand-pop cont ;
