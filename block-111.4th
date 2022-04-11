@@ -11,7 +11,7 @@ variable pop pop-sz allot
 variable bak pop-sz allot
 variable ln cols allot
 
-: T5 ( a -- ) dup c@ 1+ over c! 1+ ;
+: T5 ( a -- b ) dup c@ 1+ over c! 1+ ;
 : b++ ( -- )
     r4 1- cols - T5 T5 T5 drop
     r4 1-        T5 1+ T5 drop
