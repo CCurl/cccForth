@@ -11,8 +11,6 @@ variable pop pop-sz allot
 variable bak pop-sz allot
 variable ln cols allot
 
-65 (r) ! 200 (c) !
-
 : T5 ( a -- ) dup c@ 1+ over c! 1+ ;
 : b++ ( -- )
     r4 1- cols - T5 T5 T5 drop
@@ -49,5 +47,6 @@ variable ln cols allot
     for i c@ if b++ then i4 next
     bak->pop .pop i7 r7 . ;
 
+65 (r) ! 200 (c) !
 : cont C-OFF CLS begin gen key? if key drop break then again C-ON ;
 : go 0 s7 clr-bak rand-pop cont ;
