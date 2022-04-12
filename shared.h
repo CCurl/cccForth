@@ -74,7 +74,7 @@ typedef struct {
     CELL f, t;
 } LOOP_T;
 
-extern char sp, isError;
+extern byte sp, isError;
 extern CELL BASE, STATE, LAST, HERE, tempWords[10];
 extern byte *VHERE, *VHERE2;
 extern byte code[];

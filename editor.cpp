@@ -215,7 +215,7 @@ void showFooter() {
 }
 
 void showEditor() {
-    int cp = 0, x = 1, y = 1;
+    int x = 1, y = 1;
     CursorOff();
     msg = NULL;
     for (int i = 0; i < NUM_LINES; i++) {
@@ -250,7 +250,7 @@ void insertChar(char c, int refresh) {
     }
 }
 
-void doType(int isInsert) {
+void edType(int isInsert) {
     CursorOff();
     while (1) {
         byte c = getChar();
@@ -288,8 +288,8 @@ int processEditorChar(char c) {
     case 'e': mv(0, 99);                        break;
     case 't': mv(-99, -99);                     break;
     case 'l': mv(99, 99);                       break;
-    case 'i': doType(1);                        break;
-    case 'r': doType(0);                        break;
+    case 'i': edType(1);                        break;
+    case 'r': edType(0);                        break;
     case 'x': deleteChar();                     break;
     case 'L': edRdBlk();                        break;
     case 'W': edSvBlk();                        break;

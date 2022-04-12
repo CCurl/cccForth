@@ -1,6 +1,6 @@
 #include "shared.h"
 
-char sp, rsp, lsp, locSP, locBase, isError;
+byte sp, rsp, lsp, locSP, locBase, isError;
 CELL BASE, stk[STK_SZ+1], rstk[STK_SZ+1], locals[LOCALS_SZ];
 byte code[CODE_SZ+1], vars[VARS_SZ+1];
 LOOP_T lstk[LSTK_SZ + 1];
