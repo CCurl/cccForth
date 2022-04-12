@@ -280,12 +280,16 @@ int doParseWord(char* wd) {
     }
 
     if (strEqI(wd, "VARIABLE")) {
+        push((CELL)VHERE);
+        VHERE += CELL_SZ;
+        strCpy(wd, "CONSTANT");
+    }
+
+    if (strEqI(wd, "CONSTANT")) {
         if (getWord(wd)) {
             doCreate(wd, 0);
-            push((CELL)VHERE);
             doNumber(1);
             CComma(';');
-            VHERE += CELL_SZ;
             return 1;
         }
         else { return 0; }
