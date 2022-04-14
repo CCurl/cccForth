@@ -4,7 +4,7 @@ reset
 1 load
 
 : mil 1000 dup * * ;
-: bm timer swap 1 for next timer swap - . ;
+: bm timer swap 1 for next elapsed ." %d ms" ;
 
 here s7
 

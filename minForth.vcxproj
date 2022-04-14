@@ -152,6 +152,7 @@
     <None Include="block-000.4th" />
     <None Include="block-001.4th" />
     <None Include="block-111.4th" />
+    <None Include="block-222.4th" />
     <None Include="doc\reference.md" />
     <None Include="LICENSE" />
     <None Include="minForth.ino" />

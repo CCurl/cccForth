@@ -30,5 +30,7 @@ variable s
 // Screen stuff
 : ->XY #27 ." %c[%d;%dH" ;
 : CLS #27 ." %c[2J" 1 dup ->XY ;
+: COLOR ( bg fg -- ) #27 ." %c[%d;%dm" ;
+: FG ( fg -- ) 40 swap COLOR ;
 : C-ON  #27 ." %c[?25h" ;
 : C-OFF #27 ." %c[?25l" ;
