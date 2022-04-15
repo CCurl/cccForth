@@ -111,7 +111,8 @@ void run(WORD start) {
         case 'R': NOS = (NOS >> TOS); pop();                                break; // RSHIFT
         case 'S': /* UNUSED */                                              break;
         case 'T': t1 = TOS; TOS = 0; while (BA(t1)[TOS]) { ++TOS; }         break; // ZLEN
-        case 'U': case 'V':                                                 break;
+        case 'U': t1 = pop(); if (t1 < TOS) { TOS = t1; }                   break; // MIN
+        case 'V': t1 = pop(); if (t1 > TOS) { TOS = t1; }                   break; // MAX
         case 'W': SET_WORD(AOS, (WORD)NOS); DROP2;                          break; // W!
         case 'X': /* UNUSED */                                              break;
         case 'Y': vmReset();                                               return; // RESET
