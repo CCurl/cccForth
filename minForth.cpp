@@ -9,27 +9,83 @@ typedef struct {
 
 // Words that directly map to VM operations
 PRIM_T prims[] = {
-    {"+","+"}, {"-","-"}, {"/","/"}, {"*","*"}, {"/mod","&"}, {"mod","M"},
-    {"swap","$"}, {"drop","\\"}, {"over","%"}, {"dup","#"},
-    {"nip","$\\"}, {"tuck","$%"}, {"2dup","%%"}, {"2drop","\\\\"},
-    {"emit",","}, {"(.)","."}, {"space","b"}, {"cr","n"}, {"bl","1 "},
-    {"=","="}, {"<","<"}, {">",">"}, {"abs","A"}, {"negate","_"},
-    {"<=",">N"}, {"<>","=N"}, {"!=","=N"}, {">=","<N"}, {"0=","N"},
-    {"<<","L"}, {">>","R"}, {"zlen","T"}, {".",".b"},
-    {"@","@"}, {"c@","c"}, {"w@","w"}, {"!","!"}, {"c!","C"}, {"w!","W"},
-    {"and","a"}, {"or","o"}, {"xor","x"}, {"com","~"}, {"not","N"},
-    {"1+","i"}, {"2+","ii"}, {"4+","iiii"}, {"1-","d"}, {"I", "I"}, {"+I", "m"},
-    {"execute","G"}, {"min","U"}, {"max","V"},
-    {"leave",";"}, {"timer","zT"}, {"wait","zW"}, {"reset","Y"}, {"break","^"},
-    {"key","K"}, {"key?","?"}, 
-    {"+tmps","p"}, {"-tmps","q"},
-    {"ztype","Z"}, {"qtype","t"},
+    {"+","+"},
+    {"-","-"},
+    {"/","/"},
+    {"*","*"},
+    {"/mod","&"},
+    {"mod","M"},
+    {"swap","$"},
+    {"drop","\\"},
+    {"over","%"},
+    {"dup","#"},
+    {"nip","$\\"},
+    {"tuck","$%"},
+    {"2dup","%%"},
+    {"2drop","\\\\"},
+    {"emit",","},
+    {"(.)","."},
+    {"space","b"},
+    {"cr","n"},
+    {"bl","1 "},
+    {"=","="},
+    {"<","<"},
+    {">",">"},
+    {"abs","A"},
+    {"negate","_"},
+    {"<=",">N"},
+    {"<>","=N"},
+    {"!=","=N"},
+    {">=","<N"},
+    {"0=","N"},
+    {"<<","L"},
+    {">>","R"},
+    {"zlen","T"},
+    {".",".b"},
+    {"@","@"},
+    {"c@","c"},
+    {"w@","w"},
+    {"!","!"},
+    {"c!","C"},
+    {"w!","W"},
+    {"and","a"},
+    {"or","o"},
+    {"xor","x"},
+    {"com","~"},
+    {"not","N"},
+    {"1+","i"},
+    {"2+","ii"},
+    {"4+","iiii"},
+    {"1-","d"},
+    {"I", "I"},
+    {"+I", "m"},
+    {"execute","G"},
+    {"min","U"},
+    {"max","V"},
+    {"leave",";"},
+    {"timer","zT"},
+    {"wait","zW"},
+    {"reset","Y"},
+    {"break","^"},
+    {"key","K"},
+    {"key?","?"}, 
+    {"+tmps","p"},
+    {"-tmps","q"},
+    {"ztype","Z"},
+    {"qtype","t"},
+    {"nop"," "},
     // Extensions
 #if __BOARD__ == PC
     { "bye","zZ" }, {"load","zL"},
 #else
-    { "p-i","zPO" }, { "p-o","zPI" }, { "p-u","zPU" },
-    { "a-r","zAR" }, { "a-w","zAW" }, { "d-r","zDR" }, { "d-w","zDW" },
+    // Pin operations for dev boards
+    { "pin-i","zPO" }, // open output
+    { "pin-o","zPI" }, // open input
+    { "pin-u","zPU" }, // open input-pullup
+    { "analog-read","zAR" }, // analog read
+    { "analog-write","zAW" }, // analog write
+    { "digital-read","zDR" }, // digital read
+    { "digital-write","zDW" }, // digital write
 #endif
 #ifdef __EDITOR__
     { "edit","zE" },
@@ -38,7 +94,7 @@ PRIM_T prims[] = {
     // Extensions
     { "gp-button","xGB" },
 #endif
-    {"nop"," "}, {0,0}
+    {0,0}
 };
 
 char word[32], *in;
@@ -52,12 +108,12 @@ void WComma(WORD v) { SET_WORD(&code[HERE], v); HERE += 2; }
 
 char lower(char c) { return betw(c, 'A', 'Z') ? (c + 32) : c; }
 
-byte strEq(const char* x, const char* y) {
+byte strEq(const char *x, const char *y) {
     while (*x && *y && (*x == *y)) { ++x; ++y; }
     return (*x || *y) ? 0 : 1;
 }
 
-byte strEqI(const char* x, const char* y) {
+byte strEqI(const char *x, const char *y) {
     while (*x && *y) {
         if (lower(*x) != lower(*y)) { return 0; }
         ++x; ++y;
@@ -65,20 +121,20 @@ byte strEqI(const char* x, const char* y) {
     return (*x || *y) ? 0 : 1;
 }
 
-char *strCpy(char* d, const char* s) {
+char *strCpy(char *d, const char *s) {
     while (*s) { *(d++) = *(s++); }
     *d = 0;
     return d;
 }
 
-int strLen(const char* str) {
+int strLen(const char *str) {
     int l = 0;;
     while (*(str++)) { ++l; }
     return l;
 }
 
-void printStringF(const char* fmt, ...) {
-    char* buf = (char*)&code[CODE_SZ-64];
+void printStringF(const char *fmt, ...) {
+    char *buf = (char*)&code[CODE_SZ-64];
     va_list args;
     va_start(args, fmt);
     vsnprintf(buf, 100, fmt, args);
@@ -86,11 +142,11 @@ void printStringF(const char* fmt, ...) {
     printString(buf);
 }
 
-int isTempWord(const char* nm) {
+int isTempWord(const char *nm) {
     return ((nm[0] == 'T') && betw(nm[1], '0', '9') && (nm[2] == 0));
 }
 
-void doCreate(const char* name, byte f) {
+void doCreate(const char *name, byte f) {
     if (isTempWord(name)) {
         tempWords[name[1] - '0'] = HERE;
         return;
@@ -103,13 +159,15 @@ void doCreate(const char* name, byte f) {
     HERE += strLen(name) + 3;
 }
 
-int doFind(const char* name) {
+int doFind(const char *name) {
     // Temporary word?
     if (isTempWord(name) && (tempWords[name[1] - '0'])) {
         push(tempWords[name[1] - '0']);
         push(0);
         return 1;
     }
+
+    // Regular lookup
     CELL def = (WORD)LAST;
     while (def) {
         DICT_T* dp = DP_AT(def);
@@ -136,7 +194,7 @@ int doWords() {
     return 1;
 }
 
-int getWord(char* wd) {
+int getWord(char *wd) {
     while (*in && (*in < 33)) { ++in; }
     int l = 0;
     while (*in && (32 < *in)) {
@@ -157,8 +215,8 @@ int execWord() {
     return 1;
 }
 
-int doNumber(int state) {
-    if (state) {
+int doNumber(int compile) {
+    if (compile) {
         CELL num = pop();
         if ((num & 0xFF) == num) {
             CComma('1');
@@ -176,7 +234,7 @@ int doNumber(int state) {
     return 1;
 }
 
-int isNum(const char* wd) {
+int isNum(const char *wd) {
     CELL x = 0;
     int base = BASE, isNeg = 0, lastCh = '9';
     if ((wd[0]=='\'') && (wd[2]==wd[0]) && (wd[3]==0)) { push(wd[1]); return 1; }
@@ -199,16 +257,41 @@ int isNum(const char* wd) {
     return 1;
 }
 
-int doPrim(const char* wd) {
-    const char* vml = NULL;
+char *isRegOp(const char *wd, char *out) {
+    if (betw(wd[0], 'r', 's') && betw(wd[1], '0', '9') && (!wd[2])) {
+        return (char *)wd;
+    }
+
+    // i<N> translates to e<N>
+    if ((wd[0] == 'i') && betw(wd[1], '0', '9') && (!wd[2])) {
+        strCpy(out, wd);
+        out[0] = 'e';
+        return out;
+    }
+    
+    // d<N> translates to f<N>
+    if ((wd[0] == 'd') && betw(wd[1], '0', '9') && (!wd[2])) {
+        strCpy(out, wd);
+        out[0] = 'f';
+        return out;
+    }
+
+    return 0;
+}
+
+int doPrim(const char *wd) {
+    // Words minForth can map directly into it VML (Virtual Machine Language)
+    const char *vml = NULL;
     char x[3];
-    if (betw(wd[0],'r','s') && betw(wd[1],'0','9') && (!wd[2])) { vml = wd; }
-    if ((wd[0]=='i') && betw(wd[1], '0', '9') && (!wd[2])) { strCpy(x, wd); x[0] = 'e'; vml = x; }
-    if ((wd[0]=='d') && betw(wd[1], '0', '9') && (!wd[2])) { strCpy(x, wd); x[0] = 'f'; vml = x; }
+
+    vml = isRegOp(wd, x);
+
     for (int i = 0; prims[i].op && (!vml); i++) {
         if (strEqI(prims[i].name, wd)) { vml = prims[i].op; }
     }
-    if (!vml) { return 0; }
+
+    if (!vml) { return 0; } // Not found
+
     if (STATE) {
         for (int j = 0; vml[j]; j++) { CComma(vml[j]); }
     } else {
@@ -220,7 +303,7 @@ int doPrim(const char* wd) {
     return 1;
 }
 
-int doQuote() {
+int doQuote(int isDotQ) {
     in++;
     if (STATE) { VHERE2 = VHERE; }
     push((CELL)VHERE2);
@@ -231,15 +314,14 @@ int doQuote() {
         CComma('4');
         Comma(pop());
         VHERE = VHERE2;
+        if (isDotQ) { CComma('Z'); }
     }
     return 1;
 }
 
 int doDotQuote() {
-    doQuote();
-    if (STATE) {
-        CComma('Z');
-    } else {
+    doQuote(1);
+    if (STATE == 0) {
         byte* cp = CA(HERE+10);
         *(cp++) = 'Z';
         *(cp++) = ';';
@@ -248,22 +330,20 @@ int doDotQuote() {
     return 1;
 }
 
-int doParseWord(char* wd) {
+int doParseWord(char *wd) {
     byte lwc = lastWasCall;
     lastWasCall = 0;
 
-    if (doPrim(wd)) { return 1; }
-    if (doFind(wd)) { return execWord(); }
-    if (isNum(wd)) { return doNumber(STATE); }
-    if (strEq(wd, ".\"")) { return doDotQuote(); }
-    if (strEq(wd, "\"")) { return doQuote(); }
+    if (doPrim(wd))       {  return 1; }
+    if (doFind(wd))       {  return execWord(); }
+    if (isNum(wd))        {  return doNumber(STATE); }
+    if (strEq(wd, ".\"")) {  return doDotQuote(); }
+    if (strEq(wd, "\""))  {  return doQuote(0); }
 
     if (strEq(wd, ":")) {
-        if (getWord(wd)) {
-            doCreate(wd, 0);
-            STATE = 1;
-        }
-        else { return 0; }
+        if (getWord(wd) == 0) { return 0; }
+        doCreate(wd, 0);
+        STATE = 1;
         return 1;
     }
 
@@ -275,25 +355,10 @@ int doParseWord(char* wd) {
 
     if (strEq(wd, ";")) {
         STATE = 0;
+        // Simple tail-call optimization
         if (lwc && (code[HERE - 3] == ':')) { code[HERE - 3] = 'J'; }
         else { CComma(';'); }
         return 1;
-    }
-
-    if (strEqI(wd, "VARIABLE")) {
-        push((CELL)VHERE);
-        VHERE += CELL_SZ;
-        strCpy(wd, "CONSTANT");
-    }
-
-    if (strEqI(wd, "CONSTANT")) {
-        if (getWord(wd)) {
-            doCreate(wd, 0);
-            doNumber(1);
-            CComma(';');
-            return 1;
-        }
-        else { return 0; }
     }
 
     if (strEqI(wd, "IMMEDIATE")) { DP_AT(LAST)->flags |= 1; return 1; }
@@ -364,7 +429,25 @@ int doParseWord(char* wd) {
         return 1;
     }
 
+    if (strEqI(wd, "VARIABLE")) {
+        // NOTE: variable is just a CONSTANT to VHERE
+        push((CELL)VHERE);
+        VHERE += CELL_SZ;
+        strCpy(wd, "CONSTANT");
+    }
+
+    if (strEqI(wd, "CONSTANT")) {
+        if (getWord(wd)) {
+            doCreate(wd, 0);
+            doNumber(1);
+            CComma(';');
+            return 1;
+        }
+        else { return 0; }
+    }
+
     if (strEqI(wd, "FORGET")) {
+        // Forget the last word
         HERE = LAST;
         LAST -= CODE(LAST);
         return 1;
@@ -376,7 +459,7 @@ int doParseWord(char* wd) {
     return 0;
 }
 
-void doParse(const char* line) {
+void doParse(const char *line) {
     in = (char*)line;
     int len = getWord(word);
     while (0 < len) {
@@ -398,8 +481,8 @@ void doOK() {
     printString(")>");
 }
 
-char *rtrim(char* str) {
-    char* cp = str;
+char *rtrim(char *str) {
+    char *cp = str;
     while (*cp) { ++cp; }
     --cp;
     while ((str <= cp) && (*cp <= ' ')) { *(cp--) = 0; }
@@ -407,7 +490,7 @@ char *rtrim(char* str) {
 }
 
 void systemWords() {
-    char* cp = (char*)(VHERE + 6);
+    char *cp = (char*)(VHERE + 6);
     sprintf(cp, ": cb %lu ;", (UCELL)code);     doParse(cp);
     sprintf(cp, ": vb %lu ;", (UCELL)vars);     doParse(cp);
     sprintf(cp, ": csz %d ;", CODE_SZ);         doParse(cp);
@@ -427,7 +510,7 @@ void fpPush(FILE* v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }
 FILE* fpPop() { return (fpSP) ? fpStk[fpSP--] : 0 ; }
 
 void doLoad(int blk) {
-    char* fn = (char*)(VHERE + 100);
+    char *fn = (char*)(VHERE + 100);
     sprintf(fn, "./block-%03d.4th", blk);
     FILE* fp = fopen(fn, "rt");
     if (fp) {
@@ -448,13 +531,13 @@ byte *doExt(CELL ir, byte *pc) {
     return pc;
 }
 
-void printString(const char* cp) { printf("%s", cp); }
+void printString(const char *cp) { printf("%s", cp); }
 void printChar(char c) { printf("%c", c); }
 int charAvailable(void) { return _kbhit(); }
 int getChar(void) { return _getch(); }
 
 
-void doHistory(const char* txt) {
+void doHistory(const char *txt) {
     FILE* fp = fopen("history.txt", "at");
     if (fp) {
         fputs(txt, fp);
@@ -465,20 +548,28 @@ void doHistory(const char* txt) {
 void loop() {
     char *tib = (char *)CA(HERE+32);
     FILE* fp = (input_fp) ? input_fp : stdin;
-    if (fp == stdin) { doOK(); }
-    if (fgets(tib, 100, fp) == tib) {
-        if (fp == stdin) { doHistory(tib); }
+    if (input_fp) {
+        if (fgets(tib, 128, fp) == tib) {
+            doParse(rtrim(tib));
+        } else {
+            fclose(input_fp);
+            input_fp = fpPop();
+        }
+    } else {
+        doOK();
+        fgets(tib, 128, stdin);
+        doHistory(tib);
         doParse(rtrim(tib));
         return;
-    }
-    if (input_fp) {
-        fclose(input_fp);
-        input_fp = fpPop();
     }
 }
 
 int main()
 {
+    if (sizeof(&HERE) > CELL_SZ) {
+        printf("ERROR: CELL cannot support pointer!");
+        exit(1);
+    }
     vmReset();
     doLoad(0);
     while (!isBye) { loop(); }

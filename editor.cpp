@@ -215,7 +215,6 @@ void showFooter() {
 }
 
 void showEditor() {
-    int x = 1, y = 1;
     CursorOff();
     msg = NULL;
     for (int i = 0; i < NUM_LINES; i++) {
