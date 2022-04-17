@@ -31,13 +31,13 @@ PRIM_T prims[] = {
     {"=","="},
     {"<","<"},
     {">",">"},
-    {"abs","A"},
-    {"negate","_"},
     {"<=",">N"},
+    {">=","<N"},
     {"<>","=N"},
     {"!=","=N"},
-    {">=","<N"},
     {"0=","N"},
+    {"abs","A"},
+    {"negate","_"},
     {"<<","L"},
     {">>","R"},
     {"zlen","T"},
@@ -79,9 +79,9 @@ PRIM_T prims[] = {
     { "bye","zZ" }, {"load","zL"},
 #else
     // Pin operations for dev boards
-    { "pin-i","zPO" }, // open output
-    { "pin-o","zPI" }, // open input
-    { "pin-u","zPU" }, // open input-pullup
+    { "pin-output","zPO" }, // open output
+    { "pin-input","zPI" }, // open input
+    { "pin-pullup","zPU" }, // open input-pullup
     { "analog-read","zAR" }, // analog read
     { "analog-write","zAW" }, // analog write
     { "digital-read","zDR" }, // digital read
