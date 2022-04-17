@@ -94,7 +94,7 @@ void run(WORD start) {
         case 'A': if (TOS < 0) { TOS = -TOS; }                              break; // ABS
         case 'B': /* UNUSED */                                              break;
         case 'C': *AOS = (byte)NOS; DROP2;                                  break; // CSTORE
-        case 'D': /* UNUSED */                                              break;
+        case 'D': --TOS;                                                    break;
         case 'E': /* UNUSED */                                              break;
         case 'F': /* UNUSED */                                              break;
         case 'G': pc = CA((WORD)pop());                                     break; // EXECUTE
@@ -106,7 +106,7 @@ void run(WORD start) {
         case 'M': NOS %= TOS; pop();                                        break; // MOD
         case 'N': TOS = (TOS) ? 0 : 1;                                      break; // NOT (0=)
         case 'O': /* UNUSED */                                              break;
-        case 'P': /* UNUSED */                                              break;
+        case 'P': ++TOS;                                                    break;
         case 'Q': /* UNUSED */                                              break;
         case 'R': NOS = (NOS >> TOS); pop();                                break; // RSHIFT
         case 'S': /* UNUSED */                                              break;
@@ -131,12 +131,12 @@ void run(WORD start) {
         case 'a': t1 = pop(); TOS &= t1;                                    break; // AND
         case 'b': printChar(' ');                                           break; // SPACE
         case 'c': TOS = *AOS;                                               break; // C@
-        case 'd': TOS--;                                                    break; // 1-
-        case 'e': t1 = *(pc++) - '0'; ++locals[locBase + t1];               break; // incTemp
+        case 'd': t1 = *(pc++) - '0'; ++locals[locBase + t1];               break; // incTemp
+        case 'e': /* UNUSED */                                              break; //
         case 'f': t1 = *(pc++) - '0'; --locals[locBase + t1];               break; // decTemp
         case 'g': /* UNUSED */                                              break;
         case 'h': /* UNUSED */                                              break;
-        case 'i': TOS++;                                                    break; // 1+
+        case 'i': t1 = *(pc++) - '0'; --locals[locBase + t1];               break; // decTemp
         case 'j': if (pop() == 0) { pc = CA(GET_WORD(pc)); }                       // IF (0BRANCH)
                 else { pc += 2; }                                           break;
         case 'k': /* UNUSED */                                              break;

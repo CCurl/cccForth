@@ -53,10 +53,10 @@ PRIM_T prims[] = {
     {"xor","x"},
     {"com","~"},
     {"not","N"},
-    {"1+","i"},
-    {"2+","ii"},
-    {"4+","iiii"},
-    {"1-","d"},
+    {"1+","P"},
+    {"2+","PP"},
+    {"4+","PPPP"},
+    {"1-","D"},
     {"I", "I"},
     {"+I", "m"},
     {"execute","G"},
@@ -258,33 +258,17 @@ int isNum(const char *wd) {
 }
 
 char *isRegOp(const char *wd, char *out) {
-    if (betw(wd[0], 'r', 's') && betw(wd[1], '0', '9') && (!wd[2])) {
-        return (char *)wd;
-    }
-
-    // i<N> translates to e<N>
-    if ((wd[0] == 'i') && betw(wd[1], '0', '9') && (!wd[2])) {
-        strCpy(out, wd);
-        out[0] = 'e';
-        return out;
-    }
-    
-    // d<N> translates to f<N>
-    if ((wd[0] == 'd') && betw(wd[1], '0', '9') && (!wd[2])) {
-        strCpy(out, wd);
-        out[0] = 'f';
-        return out;
-    }
+    if (betw(wd[0], 'r', 's') && betw(wd[1], '0', '9') && (!wd[2])) { return (char *)wd; }
+    if ((wd[0] == 'i')        && betw(wd[1], '0', '9') && (!wd[2])) { return (char *)wd; }
+    if ((wd[0] == 'd')        && betw(wd[1], '0', '9') && (!wd[2])) { return (char *)wd; }
 
     return 0;
 }
 
 int doPrim(const char *wd) {
-    // Words minForth can map directly into it VML (Virtual Machine Language)
-    const char *vml = NULL;
+    // Words minForth can map directly into its VML (Virtual Machine Language)
     char x[3];
-
-    vml = isRegOp(wd, x);
+    const char *vml = vml = isRegOp(wd, x);
 
     for (int i = 0; prims[i].op && (!vml); i++) {
         if (strEqI(prims[i].name, wd)) { vml = prims[i].op; }

@@ -6,6 +6,8 @@
 #define XIAO         3
 #define ESP32_DEV    4
 #define ESP8266      5
+#define APPLE_MAC    6
+#define LINUX        7
 
 #define __BOARD__    TEENSY4
 
