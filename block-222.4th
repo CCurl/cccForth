@@ -4,7 +4,7 @@
 
 100 constant maxC
  40 constant maxR
-maxX 1+ maxR 1+ * constant world-sz
+maxC 1+ maxR 1+ * constant world-sz
 variable world world-sz allot
 
 100 constant #crits
@@ -12,7 +12,7 @@ variable world world-sz allot
 
 : fill ( c f t-- ) for dup i c! next drop ;
 : fill-n ( c f n-- ) over + fill ;
-: worldClr bl world world-sz fill-n ;
+: worldClr 0 world world-sz fill-n ;
 : T0 ( c r--a ) maxC * + world + ;
 : worldSet ( n c r--) T0 c! ;
 : worldGet ( c r--n ) T0 c@ ;
@@ -44,12 +44,12 @@ variable critters #crits 1+ critter-sz * allot
 	getCLR 7 mod 31 + setCLR ;
 : randCrits 1 #crits for i setCrit randCrit next ;
 
-: crit->World getCLR getXY worldSet ;
-: paintCrits worldClr 1 #crits for i setCrit crit->world next worldPaint ;
+: crit->World getCLR getCR worldSet ;
+: paintCrits worldClr 1 #crits for i setCrit crit->World next worldPaint ;
 
 : normC ( a--b ) maxC min 1 max ;
 : normR ( a--b ) maxR min 1 max ;
-: normCR ( c c--c r ) normR swap normC swp ;
+: normCR ( c c--c r ) normR swap normC swap ;
 : up    getCR 1- normR setCR ;
 : down  getCR 1+ normR setCR ;
 : left  getCR swap 1- normC swap setCR ;
@@ -64,7 +64,7 @@ variable critters #crits 1+ critter-sz * allot
 : workCrits 1 #crits for i setCrit workCrit next ;
 : oneDay workCrits paintCrits ;
 
-: dumpCrit getXY swap i ." %d: (%d,%d)%n" ;
+: dumpCrit getCLR getCR swap i ." %d: (%d,%d) %d%n" ;
 : dumpCrits 1 #crits for i setCrit dumpCrit next ;
 
 : live 1 10 for oneDay next ;
