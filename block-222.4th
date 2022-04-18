@@ -30,9 +30,9 @@ variable world world-sz allot
 
 : tid ( -- t id ) $ff and $80 /mod $1f and ;
 
-// A very crude approximation of tanh
-: tanH 79 * 100 / 99 min -99 max ;
-: fire? tanH rand abs 100 mod >= ;
+// A crude approximation of tanh(x)
+: tanh dup 82 < if 85 * 100 / else 25 * 100 / 51 + then 99 min -99 max ;
+: fire? tanh rand abs 100 mod >= ;
 
 // critter:
 // [c:1][r:1][color:1][unused:1][connections:?]
