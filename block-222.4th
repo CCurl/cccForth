@@ -2,12 +2,12 @@
 
 1 load
 
-100 constant maxC
- 40 constant maxR
+150 constant maxC
+ 55 constant maxR
 maxC 1+ maxR 1+ * constant world-sz
 variable world world-sz allot
 
-100 constant #crits
+500 constant #crits
   8 constant #conns
 
 : fill ( c f t-- ) for dup i c! next drop ;
@@ -23,7 +23,16 @@ variable world world-sz allot
 
 // connection
 // [from:1][to:1][weight:2]
+// from: [type:1][id:7] - type: 0=>input, 1=>hidden
+// to:   [type:1][id:7] - type: 0=>output, 1=>hidden
+// weight: normalized to -400 to 400
 4 constant conn-sz
+
+: tid ( -- t id ) $ff and $80 /mod $1f and ;
+
+// A very crude approximation of tanh
+: tanH 79 * 100 / 99 min -99 max ;
+: fire? tanH rand abs 100 mod >= ;
 
 // critter:
 // [c:1][r:1][color:1][unused:1][connections:?]
@@ -34,40 +43,47 @@ variable critters #crits 1+ critter-sz * allot
 // r6: the current critter
 : setCrit ( n--r6 ) critter-sz * critters + s6 ;
 
-: setCR ( c r-- ) r6 1+ c! r6 c! ;
-: getCR ( --c r ) r6 c@ r6 1+ c@ ;
+: getC  ( --c ) r6 c@ ;
+: setC  ( c-- ) r6 c! ;
+: getR  ( --r ) r6 1+ c@ ;
+: setR  ( r-- ) r6 1+ c! ;
+: getCR ( --c r ) getC getR ;
+: setCR ( c r-- ) setR setC ;
+
 : setCLR ( n-- ) r6 2+ c! ;
 : getCLR ( --n ) r6 2+ c@ ;
 
 : randCrit r6 0 #conns for rand over ! 4+ next drop 
-	getCR maxC mod 1+ swap maxR mod 1+ setCR
+	getC maxC mod 1+ setC getR maxR mod 1+ setR
 	getCLR 7 mod 31 + setCLR ;
 : randCrits 1 #crits for i setCrit randCrit next ;
 
-: crit->World getCLR getCR worldSet ;
-: paintCrits worldClr 1 #crits for i setCrit crit->World next worldPaint ;
+: normC ( c--c1 ) maxC min 1 max ;
+: normR ( r--r1 ) maxR min 1 max ;
+: normCR ( c r--c1 r1 ) normR swap normC swap ;
 
-: normC ( a--b ) maxC min 1 max ;
-: normR ( a--b ) maxR min 1 max ;
-: normCR ( c c--c r ) normR swap normC swap ;
-: up    getCR 1- normR setCR ;
-: down  getCR 1+ normR setCR ;
-: left  getCR swap 1- normC swap setCR ;
-: right getCR swap 1+ normC swap setCR ;
-: randOdd? rand 1 and ;
-: up? randOdd? dup if up drop 1 then ;
-: down?  if 1 leave then randOdd? dup if down drop 1 then ;
-: left?  if 1 leave then randOdd? dup if left drop 1 then ;
-: right? if leave then randOdd? if right then ;
+: up    getR 1- normR setR ;
+: down  getR 1+ normR setR ;
+: left  getC 1- normC setC ;
+: right getC 1+ normC setC ;
 
-: workCrit up? down? left? right? ;
+: up?    dup 0 = if up    then ;
+: down?  dup 1 = if down  then ;
+: left?  dup 2 = if left  then ;
+: right?     3 = if right then ;
+
+: crit-Unpaint getCR ->XY space ;
+: crit-Paint getCLR FG getCR ->XY '*' emit ;
+
+: move rand 3 and up? down? left? right? ;
+: workCrit crit-Unpaint move crit-Paint ;
 : workCrits 1 #crits for i setCrit workCrit next ;
-: oneDay workCrits paintCrits ;
+: oneDay workCrits ;
 
 : dumpCrit getCLR getCR swap i ." %d: (%d,%d) %d%n" ;
 : dumpCrits 1 #crits for i setCrit dumpCrit next ;
 
-: live 1 10 for oneDay next ;
+: live CLS 1 50 for oneDay key? if break then next ;
 : die ;
 : regen randCrits ;
-: go randCrits C-OFF 1 100 for live die regen next 37 FG C-ON ;
+: go randCrits C-OFF begin live die regen key? until key drop 37 FG C-ON 1 maxR ->XY ;
