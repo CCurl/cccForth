@@ -7,6 +7,8 @@ reset
 : vhere va @ ;
 : here ha @ ;
 
+: cells 4 * ;
+
 ( n a b -betw- f )
 : betw +tmps s3 s2 s1  r2 r1 <=  r1 r3 <=  and -tmps ;
 
@@ -20,12 +22,8 @@ reset
         i9 r9 10 = if 0 s9 cr then
     next ." 0]" ;
 : elapsed timer swap - ;
-
-variable s
-: rand s @ dup 0= if drop timer then
-    dup 13 << xor
-    dup 17 >> xor
-    dup  5 << xor dup s ! ;
+: fill ( c f t-- ) for dup i c! next drop ;
+: fill-n ( c a n-- ) over + 1- fill ;
 
 // Screen stuff
 : ->XY #27 ." %c[%d;%dH" ;
