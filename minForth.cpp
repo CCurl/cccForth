@@ -56,12 +56,14 @@ PRIM_T prims[] = {
     {"1+","P"},
     {"2+","PP"},
     {"4+","PPPP"},
+    {"+!","$%@+$!"},
     {"1-","D"},
     {"I", "I"},
     {"+I", "m"},
     {"execute","G"},
     {"min","U"},
     {"max","V"},
+    {"rand","zR"},
     {"leave",";"},
     {"timer","zT"},
     {"wait","zW"},
@@ -241,6 +243,7 @@ int isNum(const char *wd) {
     if (*wd == '#') { base = 10;  ++wd; }
     if (*wd == '$') { base = 16;  ++wd; }
     if (*wd == '%') { base = 2;  ++wd; lastCh = '1'; }
+    if (base < 10) { lastCh = '0' + base - 1; }
     if ((*wd == '-') && (base == 10)) { isNeg = 1;  ++wd; }
     if (*wd == 0) { return 0; }
     while (*wd) {
@@ -503,10 +506,19 @@ void doLoad(int blk) {
     }
 }
 
+long doRand() {
+    static long seed = GetTickCount();
+    seed ^= (seed << 13);
+    seed ^= (seed >> 17);
+    seed ^= (seed <<  5);
+    return seed;
+}
+
 byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
     case 'E': doEditor();                       break;
     case 'L': doLoad(pop());                    break;
+    case 'R': push(doRand());                   break;
     case 'T': push(GetTickCount());             break;
     case 'W': if (TOS) { Sleep(TOS); } pop();   break;
     case 'Z': isBye = 1;                        break;
