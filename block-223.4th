@@ -22,18 +22,28 @@ variable output #output cells allot
 : wt ( a--wt ) 2+ w@ normWT ;
 
 : rand-neu ( --n ) rand normID 8 << rand normID or 16 << rand 400 mod $ffff and or ;
-: .neuron ( n-- ) dup 24 >> normID id-t . . dup 16 >> normID id-t . . $ffff and normWT . ;
+: .tid normID id-t ." (%d,%d) " ;
+: .neuron ( n-- ) dup 24 >> .tid dup 16 >> .tid $ffff and normWT . ;
 
 : wipe 0 hidden #hidden cells fill 0 output #output cells fill ;
 : ->hidden ( n--a ) cells hidden + ;
 : ->output ( n--a ) cells output + ;
-: get-input ( n1--n2 ) rand abs 100 mod ;
+: get-input ( id--n ) 
+	// id == 1: ??
+	// id == 2: ??
+	// id == 3: ??
+	// id == 4: ??
+	drop rand abs 100 mod ;
 : get-hidden ( n1--n2 ) ->hidden @ tanh ;
 : input ( --n ) r1 c@ id-t if get-hidden else get-input then r1 wt * 100 / ;
 : output ( n-- ) r1 1+ c@ id-t if ->hidden else ->output then +! ;
-: do-output ( n-- ) drop ;
-: work-conns ( ca-- ) +tmps s1 wipe
+: do-output ( id-- r0 is critter ) 
+	// id == 1: move up
+	// id == 2: move down
+	// id == 3: move left
+	// id == 4: move right
+	drop ;
+: work-conns ( ca-- ) +tmps dup s0 4+ s1 wipe
 	1 #conns for input output r1 4+ s1 next
 	1 #output for i ->output @ fire? if i do-output then next
 	-tmps ;
-
