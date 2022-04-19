@@ -515,11 +515,10 @@ byte *doExt(CELL ir, byte *pc) {
     return pc;
 }
 
-void printString(const char *cp) { printf("%s", cp); }
-void printChar(char c) { printf("%c", c); }
+void printString(const char *cp) { fputs(cp, stdout); }
+void printChar(char c) { putc(c, stdout); }
 int charAvailable(void) { return _kbhit(); }
 int getChar(void) { return _getch(); }
-
 
 void doHistory(const char *txt) {
     FILE* fp = fopen("history.txt", "at");
