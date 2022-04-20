@@ -27,11 +27,11 @@ variable world world-sz allot
 // weight: normalized to -400 to 400
 4 constant conn-sz
 
-
 // critter:
 // [c:1][r:1][color:1][unused:1][connections:?]
-#conns conn-sz * 4+ constant critter-sz
-
+#conns conn-sz * 4+      constant critter-sz
+#crits 1+ critter-sz *   constant critters-sz
+: critters-end critters critters-sz + ;
 variable critters #crits 1+ critter-sz * allot
 
 // r6: the current critter
@@ -77,7 +77,21 @@ variable critters #crits 1+ critter-sz * allot
 : dumpCrit getCLR getCR swap i ." %d: (%d,%d) %d%n" ;
 : dumpCrits 1 #crits for i setCrit dumpCrit next ;
 
-: live CLS 1 1000 for oneDay key? if break then next ;
-: die ;
-: regen randCrits ;
+: live CLS 1 365 for oneDay key? if break then next ;
+: T0 maxC getC - 10 <= r6 3 + c! ;
+: die 1 #crits for i setCrit T0 next ;
+: next-alive ( --a ) begin 
+		r7 critter-sz + s7
+		r7 critters-end > if critters s7 then
+		r7 3 + c@ if break then
+	while ;
+: copy-mutate ( n1--n2 ) ;
+: copy-cr rand-cr r6 4+ s9
+	s7 4+ s8
+	1 #conns for 
+		r8 @ copy-mutate r9 !
+		r8 4+ s8 r9 4+ s9
+	next ;
+: T1 r6 3 + c@ if rand-cr else next-alive copy-cr then ;
+: regen critters s7 1 #crits for i setCrit T1 next ;
 : go randCrits C-OFF begin live die regen key? until key drop 37 FG C-ON 1 maxR ->XY ;
