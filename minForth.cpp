@@ -40,6 +40,9 @@ PRIM_T prims[] = {
     {"negate","_"},
     {"<<","L"},
     {">>","R"},
+    {">R","Q<"},
+    {"R>","Q>"},
+    {"R@","Q@"},
     {"zlen","T"},
     {".",".b"},
     {"@","@"},
@@ -562,8 +565,9 @@ void loop() {
 
 int main()
 {
+    printf("MinForth v0.0.1 - Chris Curl\n");
     if (sizeof(&HERE) > CELL_SZ) {
-        printf("ERROR: CELL cannot support pointer!");
+        printf("ERROR: CELL cannot support a pointer!");
         exit(1);
     }
     vmReset();

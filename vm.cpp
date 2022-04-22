@@ -115,7 +115,9 @@ void run(WORD start) {
         case 'N': TOS = (TOS) ? 0 : 1;                                      break; // NOT (0=)
         case 'O': /* UNUSED */                                              break;
         case 'P': ++TOS;                                                    break; // 1+
-        case 'Q': /* UNUSED */                                              break;
+        case 'Q': ir = *(pc++); if (ir == '<') { rpush(pop()); }                   // >R, R@, R>
+                if (ir == '>') { push(rpop()); }
+                if (ir == '@') { push(rstk[rsp]); }                         break;
         case 'R': NOS = (NOS >> TOS); pop();                                break; // RSHIFT
         case 'S': /* UNUSED */                                              break;
         case 'T': t1 = TOS; TOS = 0; while (BA(t1)[TOS]) { ++TOS; }         break; // ZLEN
