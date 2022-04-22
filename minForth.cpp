@@ -25,9 +25,9 @@ PRIM_T prims[] = {
     {"2drop","\\\\"},
     {"emit",","},
     {"(.)","."},
-    {"space","b"},
-    {"cr","n"},
-    {"bl","1 "},
+    {"space","32,"},
+    {"cr","13,10,"},
+    {"bl","32 "},
     {"=","="},
     {"<","<"},
     {">",">"},
@@ -36,7 +36,7 @@ PRIM_T prims[] = {
     {"<>","=N"},
     {"!=","=N"},
     {"0=","N"},
-    {"abs","A"},
+    {"abs","#0<(_)"},
     {"negate","_"},
     {"<<","L"},
     {">>","R"},
@@ -61,8 +61,8 @@ PRIM_T prims[] = {
     {"I", "I"},
     {"+I", "m"},
     {"execute","G"},
-    {"min","U"},
-    {"max","V"},
+    {"min","%%>($)\\"},
+    {"max","%%<($)\\"},
     {"rand","zR"},
     {"exit",";"},
     {"timer","zT"},
@@ -81,6 +81,8 @@ PRIM_T prims[] = {
     {"R@","Q@"},
     {"rot","Q<$Q>$"},
     {"-rot","$Q<$Q>"},
+    {".if","("},
+    {".then",")"},
     {"nop"," "},
     // Extensions
 #if __BOARD__ == PC
@@ -227,17 +229,27 @@ int doNumber(int compile) {
     if (compile) {
         CELL num = pop();
         if ((num & 0xFF) == num) {
-            CComma('1');
+            CComma(1);
             CComma(num & 0xff);
         }
         else if ((num & 0xFFFF) == num) {
-            CComma('2');
+            CComma(2);
             WComma((WORD)num);
         }
         else {
-            CComma('4');
+            CComma(4);
             Comma(num);
         }
+    }
+    return 1;
+}
+
+int doNumber2(int compile) {
+    if (compile) {
+        if (betw(code[HERE-1],'0','9')) { CComma(' '); }
+        char buf[16];
+        sprintf(buf, "%d", pop());
+        for (int i=0; buf[i]; i++) { CComma(buf[i]); }
     }
     return 1;
 }
@@ -304,8 +316,7 @@ int doQuote(int isDotQ) {
     *(VHERE2++) = 0;
     if (*in) { ++in; }
     if (STATE) {
-        CComma('4');
-        Comma(pop());
+        doNumber(STATE);
         VHERE = VHERE2;
         if (isDotQ) { CComma('Z'); }
     }
