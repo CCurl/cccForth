@@ -131,7 +131,7 @@ void run(WORD start) {
         case '\\': pop();                                                   break; // DROP
         case ']': ++LOS.f; if (LOS.f <= LOS.t) { pc = LOS.s; }                     // NEXT
                 else { lpop(); }                                            break;
-        case '^': if (lsp) { pc = LOS.e; }                                  break; // BREAK
+        case '^': /* UNUSED */                                              break;
         case '_': TOS = -TOS;                                               break; // NEGATE
         case '`': /* UNUSED */                                              break;
         case 'a': t1 = pop(); TOS &= t1;                                    break; // AND
@@ -145,8 +145,8 @@ void run(WORD start) {
         case 'i': t1 = *(pc++) - '0'; ++locals[locBase + t1];               break; // incTemp
         case 'j': if (pop() == 0) { pc = CA(GET_WORD(pc)); }                       // IF (0BRANCH)
                 else { pc += 2; }                                           break;
-        case 'k': /* UNUSED */                                              break;
-        case 'l': /* UNUSED */                                              break;
+        case 'k': if (lsp) { --lsp; }                                       break; // UNLOOP
+        case 'l': if (lsp) { pc = LOS.e; --lsp;  }                          break; // LEAVE
         case 'm': LOS.f += pop();                                           break; // +I
         case 'n': printString("\r\n");                                      break; // CR
         case 'o': t1 = pop(); TOS |= t1;                                    break; // OR
