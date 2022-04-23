@@ -13,21 +13,21 @@ PRIM_T prims[] = {
     {"-","-"},
     {"/","/"},
     {"*","*"},
-    {"/mod","&"},
-    {"mod","M"},
-    {"swap","$"},
-    {"drop","\\"},
-    {"over","%"},
-    {"dup","#"},
-    {"nip","$\\"},
-    {"tuck","$%"},
-    {"2dup","%%"},
-    {"2drop","\\\\"},
-    {"emit",","},
+    {"/MOD","&"},
+    {"MOD","M"},
+    {"SWAP","$"},
+    {"DROP","\\"},
+    {"OVER","%"},
+    {"DUP","#"},
+    {"NIP","$\\"},
+    {"TUCK","$%"},
+    {"2DUP","%%"},
+    {"2DROP","\\\\"},
+    {"EMIT",","},
     {"(.)","."},
-    {"space","32,"},
-    {"cr","13,10,"},
-    {"bl","32 "},
+    {"SPACE","32,"},
+    {"CR","13,10,"},
+    {"BL","32 "},
     {"=","="},
     {"<","<"},
     {">",">"},
@@ -36,59 +36,61 @@ PRIM_T prims[] = {
     {"<>","=N"},
     {"!=","=N"},
     {"0=","N"},
-    {"abs","#0<(_)"},
-    {"negate","_"},
+    {"ABS","#0<(_)"},
+    {"NEGATE","_"},
     {"<<","L"},
     {">>","R"},
-    {"zlen","T"},
-    {".",".b"},
+    {"ZLEN","T"},
+    {".",".32,"},
     {"@","@"},
-    {"c@","c"},
-    {"w@","w"},
+    {"C@","c"},
+    {"W@","w"},
     {"!","!"},
-    {"c!","C"},
-    {"w!","W"},
-    {"and","a"},
-    {"or","o"},
-    {"xor","x"},
-    {"com","~"},
-    {"not","N"},
+    {"C!","C"},
+    {"W!","W"},
+    {"AND","a"},
+    {"OR","o"},
+    {"XOR","x"},
+    {"COM","~"},
+    {"NOT","N"},
     {"1+","P"},
     {"2+","PP"},
     {"4+","PPPP"},
     {"+!","$%@+$!"},
     {"1-","D"},
-    {"I", "I"},
-    {"+I", "m"},
-    {"execute","G"},
-    {"min","%%>($)\\"},
-    {"max","%%<($)\\"},
-    {"rand","zR"},
-    {"exit",";"},
-    {"timer","zT"},
-    {"wait","zW"},
-    {"reset","Y"},
-    {"unloop","k"},
-    {"leave","l"},
-    {"key","K"},
-    {"key?","?"}, 
-    {"+tmps","p"},
-    {"-tmps","q"},
-    {"ztype","Z"},
-    {"qtype","t"},
+    {"I","I"},
+    {"+I","m"},
+    {"EXECUTE","G"},
+    {"MIN","%%>($)\\"},
+    {"MAX","%%<($)\\"},
+    {"RAND","zR"},
+    {"EXIT",";"},
+    {"TIMER","zT"},
+    {"WAIT","zW"},
+    {"RESET","Y"},
+    {"UNLOOP","k"},
+    {"LEAVE","l"},
+    {"KEY","K"},
+    {"KEY?","?"},
+    {"+TMPS","p"},
+    {"-TMPS","q"},
+    {"ZTYPE","Z"},
+    {"QTYPE","t"},
     {">R","Q<"},
     {"R>","Q>"},
     {"R@","Q@"},
-    {"rot","Q<$Q>$"},
-    {"-rot","$Q<$Q>"},
-    {".if","("},
-    {".then",")"},
-    {"nop"," "},
+    {"ROT","Q<$Q>$"},
+    {"-ROT","$Q<$Q>"},
+    {".IF","("},
+    {".THEN",")"},
+    {".S","zS"},
+    {"NOP"," "},
     // Extensions
 #if __BOARD__ == PC
-    { "bye","zZ" }, {"load","zL"},
+    {"BYE","zZ"},
+    {"LOAD","zL"},
 #else
-    // Pin operations for dev boards
+        // Pin operations for dev boards
     { "pin-output","zPO" }, // open output
     { "pin-input","zPI" }, // open input
     { "pin-pullup","zPU" }, // open input-pullup
@@ -98,7 +100,7 @@ PRIM_T prims[] = {
     { "digital-write","zDW" }, // digital write
 #endif
 #ifdef __EDITOR__
-    { "edit","zE" },
+    { "EDIT","zE" },
 #endif
 #ifdef __GAMEPAD__
     // Extensions
@@ -475,14 +477,20 @@ void doParse(const char *line) {
     }
 }
 
-void doOK() {
-    if (STATE) { printString(" ... "); return; }
-    printString("\r\nOK (");
+void doDotS() {
+    printString("(");
     for (int d = 1; d <= sp; d++) {
         if (1 < d) { printChar(' '); }
         printBase(stk[d], BASE);
     }
-    printString(")>");
+    printString(")");
+}
+
+void doOK() {
+    if (STATE) { printString(" ... "); return; }
+    printString("\r\nOK ");
+    doDotS();
+    printString(">");
 }
 
 char *rtrim(char *str) {
@@ -536,6 +544,7 @@ byte *doExt(CELL ir, byte *pc) {
     case 'E': doEditor();                       break;
     case 'L': doLoad(pop());                    break;
     case 'R': push(doRand());                   break;
+    case 'S': doDotS();                         break;
     case 'T': push(GetTickCount());             break;
     case 'W': if (TOS) { Sleep(TOS); } pop();   break;
     case 'Z': isBye = 1;                        break;

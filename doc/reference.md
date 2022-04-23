@@ -36,7 +36,7 @@ NOTES:
 |."|Z|(a--)|Type - NOT FORTH standard (1)|
 |"|(none)|(--a)|String - NOT FORTH standard(1)|
 |FOR|\[|(F T--)|For loop (2)|
-|I|i|(--n)|Current index|
+|I|I|(--n)|Current index|
 |+I|m|(n--)|Add n to index (I)|
 |NEXT|\]|(--)|Next: I += 1, if I <= T, jump to FOR|
 |BEGIN|{|(--)|Start of BEGIN loop|
@@ -59,11 +59,16 @@ NOTES:
 |+tmp|p|(--)|TempVars: allocate new|
 |-tmp|q|(--)|TempVars: destroy last allocated|
 |r0..r9|r|(--n)|TempVar(0..9): read|
-|s0..s9|r|(--n)|TempVar(0..9): set|
-|i0..i9|r|(--n)|TempVar(0..9): increment|
-|d0..d9|s|(n--)|TempVar(0..9): decrement|
+|s0..s9|s|(n--)|TempVar(0..9): set|
+|i0..i9|i|(--)|TempVar(0..9): increment|
+|d0..d9|d|(--)|TempVar(0..9): decrement|
 |TIMER|t|(--n)|Push current MS|
 |RESET|Y|(--)||
+|IF||(f--)|FORTH CORE|
+|ELSE||(--)|FORTH CORE|
+|THEN||(--)|FORTH CORE|
+|.IF|(|(f--)|Simple IF, no ELSE or nesting (smaller footprint)|
+|.THEN|)|(--)|Simple THEN|
 
 ```
 (1) Notes on " and .":
