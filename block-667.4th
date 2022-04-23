@@ -13,7 +13,7 @@ here s7
 : T3 cr 20 s1 begin r1 . d1 r1 while ;
 : T4 cr +tmps 123 445 s2 s1 r1 . r2 . -tmps ;
 : T5 cr +tmps 666 777 s2 s1 r1 . r2 . T4 r1 . r2 . -tmps ;
-: T6 cr 211 245  ;
+: T6 cr 211 245 for i dup . 223 = if leave then next ." -out0" ;
 
 cr 1 T1 0 T1 
 T2 T3 T4 T5 T6

@@ -18,8 +18,8 @@ variable ln cols allot
     r4 1- cols + T5 T5 T5 drop ;
 
 : alive? ( a b -- c )
-    dup 2 = if drop leave then
-    3 = if drop 1 leave then
+    dup 2 = if drop exit then
+    3 = if drop 1 exit then
     drop 0 ;
 
 : rand-pop 0 pop-sz for rand $FF and #200 > i pop + c! next ;
@@ -49,5 +49,5 @@ variable ln cols allot
 
 // 65 (r) ! 200 (c) !
 30 (r) ! 100 (c) !
-: cont C-OFF CLS begin gen key? if key drop break then again C-ON ;
+: cont C-OFF CLS begin gen key? if key drop leave then again C-ON ;
 : go 0 s7 clr-bak rand-pop cont ;
