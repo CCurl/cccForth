@@ -53,7 +53,6 @@
 #define AOS           (byte*)TOS
 #define LOS           lstk[lsp]
 #define DROP2         pop(); pop()
-#define CODE(l)          code[l]
 #define CA(l)         (code+l)
 #define DP_AT(l)      ((DICT_T *)(&code[l]))
 #define betw(x, a, b) ((a<=x)&&(x<=b))
