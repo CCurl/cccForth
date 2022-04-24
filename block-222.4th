@@ -2,6 +2,8 @@
 
 1 load
 223 load
+// : rand-neu ;
+// : work-conns ;
 
 200 constant maxC
  55 constant maxR
@@ -31,8 +33,8 @@ variable world world-sz allot
 // [c:1][r:1][color:1][unused:1][connections:?]
 #conns conn-sz * 4+      constant critter-sz
 #crits 1+ critter-sz *   constant critters-sz
-: critters-end critters critters-sz + ;
 variable critters #crits 1+ critter-sz * allot
+: critters-end critters critters-sz + ;
 
 // r6: the current critter
 : setCrit ( n--r6 ) critter-sz * critters + s6 ;
@@ -77,13 +79,13 @@ variable critters #crits 1+ critter-sz * allot
 : dumpCrit getCLR getCR swap i ." %d: (%d,%d) %d%n" ;
 : dumpCrits 1 #crits for i setCrit dumpCrit next ;
 
-: live CLS 1 365 for oneDay key? if break then next ;
+: live CLS 1 365 for oneDay key? if leave then next ;
 : T0 maxC getC - 10 <= r6 3 + c! ;
 : die 1 #crits for i setCrit T0 next ;
 : next-alive ( --a ) begin 
 		r7 critter-sz + s7
 		r7 critters-end > if critters s7 then
-		r7 3 + c@ if break then
+		r7 3 + c@ if unloop exit then
 	while ;
 : copy-mutate ( n1--n2 ) ;
 : copy-cr rand-cr r6 4+ s9

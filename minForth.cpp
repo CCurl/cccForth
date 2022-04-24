@@ -9,104 +9,104 @@ typedef struct {
 
 // Words that directly map to VM operations
 PRIM_T prims[] = {
-    {"+","+"},
-    {"-","-"},
-    {"/","/"},
-    {"*","*"},
-    {"/MOD","&"},
-    {"MOD","M"},
-    {"SWAP","$"},
-    {"DROP","\\"},
-    {"OVER","%"},
-    {"DUP","#"},
-    {"NIP","$\\"},
-    {"TUCK","$%"},
-    {"2DUP","%%"},
-    {"2DROP","\\\\"},
-    {"EMIT",","},
-    {"(.)","."},
-    {"SPACE","32,"},
-    {"CR","13,10,"},
-    {"BL","32 "},
-    {"=","="},
-    {"<","<"},
-    {">",">"},
-    {"<=",">N"},
-    {">=","<N"},
-    {"<>","=N"},
-    {"!=","=N"},
-    {"0=","N"},
-    {"ABS","#0<(_)"},
-    {"NEGATE","_"},
-    {"<<","L"},
-    {">>","R"},
-    {"ZLEN","T"},
-    {".",".32,"},
-    {"@","@"},
-    {"C@","c"},
-    {"W@","w"},
-    {"!","!"},
-    {"C!","C"},
-    {"W!","W"},
-    {"AND","a"},
-    {"OR","o"},
-    {"XOR","x"},
-    {"COM","~"},
-    {"NOT","N"},
-    {"1+","P"},
-    {"2+","PP"},
-    {"4+","PPPP"},
-    {"+!","$%@+$!"},
-    {"1-","D"},
-    {"I","I"},
-    {"+I","m"},
-    {"EXECUTE","G"},
-    {"MIN","%%>($)\\"},
-    {"MAX","%%<($)\\"},
-    {"RAND","zR"},
-    {"EXIT",";"},
-    {"TIMER","zT"},
-    {"WAIT","zW"},
-    {"RESET","Y"},
-    {"UNLOOP","k"},
-    {"LEAVE","l"},
-    {"KEY","K"},
-    {"KEY?","?"},
-    {"+TMPS","p"},
-    {"-TMPS","q"},
-    {"ZTYPE","Z"},
-    {"QTYPE","t"},
-    {">R","Q<"},
-    {"R>","Q>"},
-    {"R@","Q@"},
-    {"ROT","Q<$Q>$"},
-    {"-ROT","$Q<$Q>"},
-    {".IF","("},
-    {".THEN",")"},
-    {".S","zS"},
-    {"NOP"," "},
+    { "+", "+" }          // |+|+|(a b--c)|FORTH CORE|
+    , { "-", "-" }          // |-|-|(a b--c)|FORTH CORE|
+    , { "/", "/" }          // |/|/|(a b--c)|FORTH CORE|
+    , { "*", "*" }          // |*|*|(a b--c)|FORTH CORE|
+    , { "/MOD", "&" }          // |/MOD|&|(a b--c)|FORTH CORE|
+    , { "MOD", "M" }          // |MOD|M|(a b--c)|FORTH CORE|
+    , { "SWAP", "$" }          // |SWAP|$|(a b--c)|FORTH CORE|
+    , { "DROP", "\\" }          // |DROP|\\|(a b--c)|FORTH CORE|
+    , { "OVER", "%" }          // |OVER|%|(a b--c)|FORTH CORE|
+    , { "DUP", "#" }          // |DUP|#|(a b--c)|FORTH CORE|
+    , { "NIP", "$\\" }          // |NIP|$\\|(a b--c)|FORTH CORE|
+    , { "TUCK", "$%" }          // |TUCK|$%|(a b--c)|FORTH CORE|
+    , { "2DUP", "%%" }          // |2DUP|%%|(a b--c)|FORTH CORE|
+    , { "2DROP", "\\\\" }          // |2DROP|\\\\|(a b--c)|FORTH CORE|
+    , { "EMIT", "," }          // |EMIT|,|(a b--c)|FORTH CORE|
+    , { "(.)", "." }          // |(.)|.|(a b--c)|FORTH CORE|
+    , { "SPACE", "32," }          // |SPACE|32,|(a b--c)|FORTH CORE|
+    , { "CR", "13,10," }          // |CR|13,10,|(a b--c)|FORTH CORE|
+    , { "BL", "32" }          // |BL|32|(a b--c)|FORTH CORE|
+    , { "=", "=" }          // |=|=|(a b--c)|FORTH CORE|
+    , { "<", "<" }          // |<|<|(a b--c)|FORTH CORE|
+    , { ">", ">" }          // |>|>|(a b--c)|FORTH CORE|
+    , { "<=", ">N" }          // |<=|>N|(a b--c)|FORTH CORE|
+    , { ">=", "<N" }          // |>=|<N|(a b--c)|FORTH CORE|
+    , { "<>", "=N" }          // |<>|=N|(a b--c)|FORTH CORE|
+    , { "!=", "=N" }          // |!=|=N|(a b--c)|FORTH CORE|
+    , { "0=", "N" }          // |0=|N|(a b--c)|FORTH CORE|
+    , { "ABS", "#0<(_)" }          // |ABS|#0<(_)|(a b--c)|FORTH CORE|
+    , { "NEGATE", "_" }          // |NEGATE|_|(a b--c)|FORTH CORE|
+    , { "<<", "L" }          // |<<|L|(a b--c)|FORTH CORE|
+    , { ">>", "R" }          // |>>|R|(a b--c)|FORTH CORE|
+    , { "ZLEN", "T" }          // |ZLEN|T|(a b--c)|FORTH CORE|
+    , { ".", ".32," }          // |.|.32,|(a b--c)|FORTH CORE|
+    , { "@", "@" }          // |@|@|(a b--c)|FORTH CORE|
+    , { "C@", "c" }          // |C@|c|(a b--c)|FORTH CORE|
+    , { "W@", "w" }          // |W@|w|(a b--c)|FORTH CORE|
+    , { "!", "!" }          // |!|!|(a b--c)|FORTH CORE|
+    , { "C!", "C" }          // |C!|C|(a b--c)|FORTH CORE|
+    , { "W!", "W" }          // |W!|W|(a b--c)|FORTH CORE|
+    , { "AND", "a" }          // |AND|a|(a b--c)|FORTH CORE|
+    , { "OR", "o" }          // |OR|o|(a b--c)|FORTH CORE|
+    , { "XOR", "x" }          // |XOR|x|(a b--c)|FORTH CORE|
+    , { "COM", "~" }          // |COM|~|(a b--c)|FORTH CORE|
+    , { "NOT", "N" }          // |NOT|N|(a b--c)|FORTH CORE|
+    , { "1+", "P" }          // |1+|P|(a b--c)|FORTH CORE|
+    , { "2+", "PP" }          // |2+|PP|(a b--c)|FORTH CORE|
+    , { "4+", "PPPP" }          // |4+|PPPP|(a b--c)|FORTH CORE|
+    , { "+!", "$%@+$!" }          // |+!|$%@+$!|(a b--c)|FORTH CORE|
+    , { "1-", "D" }          // |1-|D|(a b--c)|FORTH CORE|
+    , { "I", "I" }          // |I|I|(a b--c)|FORTH CORE|
+    , { "+I", "m" }          // |+I|m|(a b--c)|FORTH CORE|
+    , { "EXECUTE", "G" }          // |EXECUTE|G|(a b--c)|FORTH CORE|
+    , { "MIN", "%%>($)\\" }          // |MIN|%%>($)\\|(a b--c)|FORTH CORE|
+    , { "MAX", "%%<($)\\" }          // |MAX|%%<($)\\|(a b--c)|FORTH CORE|
+    , { "RAND", "zR" }          // |RAND|zR|(a b--c)|FORTH CORE|
+    , { "EXIT", ";" }          // |EXIT|;|(a b--c)|FORTH CORE|
+    , { "TIMER", "zT" }          // |TIMER|zT|(a b--c)|FORTH CORE|
+    , { "WAIT", "zW" }          // |WAIT|zW|(a b--c)|FORTH CORE|
+    , { "RESET", "Y" }          // |RESET|Y|(a b--c)|FORTH CORE|
+    , { "UNLOOP", "k" }          // |UNLOOP|k|(a b--c)|FORTH CORE|
+    , { "LEAVE", "l" }          // |LEAVE|l|(a b--c)|FORTH CORE|
+    , { "KEY", "K" }          // |KEY|K|(a b--c)|FORTH CORE|
+    , { "KEY?", "?" }          // |KEY?|?|(a b--c)|FORTH CORE|
+    , { "+TMPS", "p" }          // |+TMPS|p|(a b--c)|FORTH CORE|
+    , { "-TMPS", "q" }          // |-TMPS|q|(a b--c)|FORTH CORE|
+    , { "ZTYPE", "Z" }          // |ZTYPE|Z|(a b--c)|FORTH CORE|
+    , { "QTYPE", "t" }          // |QTYPE|t|(a b--c)|FORTH CORE|
+    , { ">R", "Q<" }          // |>R|Q<|(a b--c)|FORTH CORE|
+    , { "R>", "Q>" }          // |R>|Q>|(a b--c)|FORTH CORE|
+    , { "R@", "Q@" }          // |R@|Q@|(a b--c)|FORTH CORE|
+    , { "ROT", "Q<$Q>$" }          // |ROT|Q<$Q>$|(a b--c)|FORTH CORE|
+    , { "-ROT", "$Q<$Q>" }          // |-ROT|$Q<$Q>|(a b--c)|FORTH CORE|
+    , { ".IF", "(" }          // |.IF|(|(a b--c)|FORTH CORE|
+    , { ".THEN", ")" }          // |.THEN|)|(a b--c)|FORTH CORE|
+    , { ".S", "zS" }          // |.S|zS|(a b--c)|FORTH CORE|
+    , { "NOP", "" }          // |NOP||(a b--c)|FORTH CORE|
     // Extensions
 #if __BOARD__ == PC
-    {"BYE","zZ"},
-    {"LOAD","zL"},
+    , {"BYE","zZ"}
+    , {"LOAD","zL"}
 #else
         // Pin operations for dev boards
-    { "pin-output","zPO" }, // open output
-    { "pin-input","zPI" }, // open input
-    { "pin-pullup","zPU" }, // open input-pullup
-    { "analog-read","zAR" }, // analog read
-    { "analog-write","zAW" }, // analog write
-    { "digital-read","zDR" }, // digital read
-    { "digital-write","zDW" }, // digital write
+    , { "pin-output","zPO" } // open output
+    , { "pin-input","zPI" } // open input
+    , { "pin-pullup","zPU" } // open input-pullup
+    , { "analog-read","zAR" } // analog read
+    , { "analog-write","zAW" } // analog write
+    , { "digital-read","zDR" } // digital read
+    , { "digital-write","zDW" } // digital write
 #endif
 #ifdef __EDITOR__
-    { "EDIT","zE" },
+    , { "EDIT","zE" }
 #endif
 #ifdef __GAMEPAD__
     // Extensions
-    { "gp-button","xGB" },
+    , { "gp-button","xGB" }
 #endif
-    {0,0}
+    , {0,0}
 };
 
 char word[32], *in;

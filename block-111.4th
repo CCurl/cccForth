@@ -48,6 +48,6 @@ variable ln cols allot
     bak->pop .pop i7 r7 . ;
 
 // 65 (r) ! 200 (c) !
-30 (r) ! 100 (c) !
+40 (r) ! 150 (c) !
 : cont C-OFF CLS begin gen key? if key drop leave then again C-ON ;
 : go 0 s7 clr-bak rand-pop cont ;

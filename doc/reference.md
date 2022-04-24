@@ -6,69 +6,84 @@ NOTES:
 1. Built-in words are not case sensitive
 2. They do not show up in WORDS, and are not in the dictionary.
 
-|Word|opcode|stack|notes|
+|Word|macro|stack|notes|
 |-|-|-|-|
-|DUP|#|(a--a a)|FORTH CORE|
-|OVER|%|(a b--a b a)|FORTH CORE|
-|SWAP|$|(a b--b a)|FORTH CORE|
-|DROP|\\ |(a b--a)|FORTH CORE|
-|@ |@|(a--n)|FETCH (long)|
-|! |!|(n a----)|STORE (long)|
-|W@|w|(a--n)|FETCH (word)|
-|W!|W|(n a----)|STORE (word)|
-|C@|c|(a--n)|FETCH (byte)|
-|C!|C|(n a----)|STORE (byte)|
-|IF|j|(f--)|FORTH CORE (0BRANCH)|
-|ELSE|(none)|(--)|FORTH CORE|
-|THEN|(none)|(--)|FORTH CORE|
-|EMIT|,|(n--)|FORTH CORE|
-|BL|k|(--n)|FORTH CORE|
-|SPACE|b|(--)|FORTH CORE|
-|CR|n|(--)|FORTH CORE|
-|KEY?|?|(--n)|FORTH CORE|
-|KEY|K|(--n)|FORTH CORE|
-|+,-,*,/|+,-,*,/|(a b--n)|FORTH CORE|
-|/MOD|&|(a b--q r)|FORTH CORE|
-|AND,OR,XOR|A,O,X|(a b--n)|FORTH CORE|
-|COM|~|(a--b)|FORTH CORE|
-|1+,1-|I,D|(a--b)|FORTH CORE|
-|<,=,>,0=|<,=,>,N|(a b--f)|FORTH CORE|
-|."|Z|(a--)|Type - NOT FORTH standard (1)|
-|"|(none)|(--a)|String - NOT FORTH standard(1)|
-|FOR|\[|(F T--)|For loop (2)|
-|I|I|(--n)|Current index|
-|+I|m|(n--)|Add n to index (I)|
-|NEXT|\]|(--)|Next: I += 1, if I <= T, jump to FOR|
-|BEGIN|{|(--)|Start of BEGIN loop|
-|WHILE|v|(n--)|If n != 0, jump to BEGIN|
-|UNTIL|u|(n--)|If n == 0, jump to BEGIN|
-|AGAIN|}|(--)|Jump to BEGIN|
-|BREAK|^|(--)|Break out of FOR or BEGIN loop|
-|(.)|.|(--)|Internal: used by .|
-|CALL|:|(--)|Internal|
-|;,LEAVE|;|(--)|FORTH CORE|
-|BLIT|1|(--n)|Internal: byte literal|
-|WLIT|2|(--n)|Internal: word literal|
-|LIT|4|(--n)|Internal: long literal|
-|EXECUTE|G|(a--)|FORTH CORE|
-|<<|L|(a n--b)|LSHIFT|
-|>>|R|(a n--b)|RSHIFT|
-|EDIT|zE|(n--)|Extension: __EDITOR__|
-|LOAD|zL|(n--)|Extension: __FILE__|
-|BYE|zZ|(--)|Extension: PC only|
-|+tmp|p|(--)|TempVars: allocate new|
-|-tmp|q|(--)|TempVars: destroy last allocated|
-|r0..r9|r|(--n)|TempVar(0..9): read|
-|s0..s9|s|(n--)|TempVar(0..9): set|
-|i0..i9|i|(--)|TempVar(0..9): increment|
-|d0..d9|d|(--)|TempVar(0..9): decrement|
-|TIMER|t|(--n)|Push current MS|
-|RESET|Y|(--)||
-|IF||(f--)|FORTH CORE|
-|ELSE||(--)|FORTH CORE|
-|THEN||(--)|FORTH CORE|
-|.IF|(|(f--)|Simple IF, no ELSE or nesting (smaller footprint)|
-|.THEN|)|(--)|Simple THEN|
+|+|+|(a b--c)|FORTH CORE|
+|-|-|(a b--c)|FORTH CORE|
+|/|/|(a b--c)|FORTH CORE|
+|*|*|(a b--c)|FORTH CORE|
+|/MOD|&|(a b--c)|FORTH CORE|
+|MOD|M|(a b--c)|FORTH CORE|
+|SWAP|$|(a b--c)|FORTH CORE|
+|DROP|`\`|(a b--c)|FORTH CORE|
+|OVER|%|(a b--c)|FORTH CORE|
+|DUP|#|(a b--c)|FORTH CORE|
+|NIP|`$`|(a b--c)|FORTH CORE|
+|TUCK|$%|(a b--c)|FORTH CORE|
+|2DUP|%%|(a b--c)|FORTH CORE|
+|2DROP|`\\`|(a b--c)|FORTH CORE|
+|EMIT|,|(a b--c)|FORTH CORE|
+|(.)|.|(a b--c)|FORTH CORE|
+|SPACE|32,|(a b--c)|FORTH CORE|
+|CR|13,10,|(a b--c)|FORTH CORE|
+|BL|32|(a b--c)|FORTH CORE|
+|=|=|(a b--c)|FORTH CORE|
+|<|<|(a b--c)|FORTH CORE|
+|>|>|(a b--c)|FORTH CORE|
+|<=|>N|(a b--c)|FORTH CORE|
+|>=|<N|(a b--c)|FORTH CORE|
+|<>|=N|(a b--c)|FORTH CORE|
+|!=|=N|(a b--c)|FORTH CORE|
+|0=|N|(a b--c)|FORTH CORE|
+|ABS|#0<(\_)|(a b--c)|FORTH CORE|
+|NEGATE|\_|(a b--c)|FORTH CORE|
+|<<|L|(a b--c)|FORTH CORE|
+|>>|R|(a b--c)|FORTH CORE|
+|ZLEN|T|(a b--c)|FORTH CORE|
+|.|.32,|(a b--c)|FORTH CORE|
+|@|@|(a b--c)|FORTH CORE|
+|C@|c|(a b--c)|FORTH CORE|
+|W@|w|(a b--c)|FORTH CORE|
+|!|!|(a b--c)|FORTH CORE|
+|C!|C|(a b--c)|FORTH CORE|
+|W!|W|(a b--c)|FORTH CORE|
+|AND|a|(a b--c)|FORTH CORE|
+|OR|o|(a b--c)|FORTH CORE|
+|XOR|x|(a b--c)|FORTH CORE|
+|COM|~|(a b--c)|FORTH CORE|
+|NOT|N|(a b--c)|FORTH CORE|
+|1+|P|(a b--c)|FORTH CORE|
+|2+|PP|(a b--c)|FORTH CORE|
+|4+|PPPP|(a b--c)|FORTH CORE|
+|+!|$%@+$!|(a b--c)|FORTH CORE|
+|1-|D|(a b--c)|FORTH CORE|
+|I|I|(a b--c)|FORTH CORE|
+|+I|m|(a b--c)|FORTH CORE|
+|EXECUTE|G|(a b--c)|FORTH CORE|
+|MIN|`%%>($)\`|(a b--c)|FORTH CORE|
+|MAX|`%%<($)\`|(a b--c)|FORTH CORE|
+|RAND|zR|(a b--c)|FORTH CORE|
+|EXIT|;|(a b--c)|FORTH CORE|
+|TIMER|zT|(a b--c)|FORTH CORE|
+|WAIT|zW|(a b--c)|FORTH CORE|
+|RESET|Y|(a b--c)|FORTH CORE|
+|UNLOOP|k|(a b--c)|FORTH CORE|
+|LEAVE|l|(a b--c)|FORTH CORE|
+|KEY|K|(a b--c)|FORTH CORE|
+|KEY?|?|(a b--c)|FORTH CORE|
+|+TMPS|p|(a b--c)|FORTH CORE|
+|-TMPS|q|(a b--c)|FORTH CORE|
+|ZTYPE|Z|(a b--c)|FORTH CORE|
+|QTYPE|t|(a b--c)|FORTH CORE|
+|>R|Q<|(a b--c)|FORTH CORE|
+|R>|Q>|(a b--c)|FORTH CORE|
+|R@|Q@|(a b--c)|FORTH CORE|
+|ROT|Q<$Q>$|(a b--c)|FORTH CORE|
+|-ROT|$Q<$Q>|(a b--c)|FORTH CORE|
+|.IF|(|(a b--c)|FORTH CORE|
+|.THEN|)|(a b--c)|FORTH CORE|
+|.S|zS|(a b--c)|FORTH CORE|
+|NOP|(space)|(a b--c)|FORTH CORE|
 
 ```
 (1) Notes on " and .":
