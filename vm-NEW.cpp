@@ -4,22 +4,22 @@
 #define TOS st.i[s]
 #define NOS st.i[s-1]
 FIB_T st;
-char* y;
+char *y, yy[80];
 int base=10, h, s, r, p, u, t, v, isBye=0;
 
 void pc(int c) { putc(c, stdout); }
 void ps(const char *x) { while (*x) pc(*(x++)); }
 void pn(CELL num, CELL b) {
     UCELL n = (UCELL)num;
-    char x[32], * cp = &x[31];
+    y = &yy[31];
     if ((b == 10) && (num < 0)) { pc('-'); n = -num; }
-    *(cp) = 0;
+    *(y) = 0;
     do {
         int x = (n % b) + '0';
         n = n / b;
-        *(--cp) = ('9' < x) ? (x + 7) : x;
+        *(--y) = ('9' < x) ? (x + 7) : x;
     } while (n);
-    ps(cp);
+    ps(y);
 }
 
 /*   */ void X() { if (u) { pc(u); pc('?'); } p=0; }
@@ -42,9 +42,9 @@ void pn(CELL num, CELL b) {
 /* 0 */ void fN() { ++s; TOS=u-'0'; while (BTW(st.b[p],'0','9')) { TOS=(TOS*10)+(st.b[p++]-'0'); } }
 /* : */ void f58() { ; }
 /* ; */ void f59() { if (RB<r) { p=0; r=RB+1; } else { p=st.i[r++]; } }
-/* < */ void f60() { NOS=(NOS <TOS)?-1:0; --s; }
+/* < */ void f60() { if (st.b[p]=='=') { ++p; NOS=(NOS<=TOS)?-1:0; } else { NOS=(NOS<TOS)?-1:0; } --s; }
 /* = */ void f61() { NOS=(NOS==TOS)?-1:0; --s; }
-/* > */ void f62() { NOS=(NOS >TOS)?-1:0; --s; }
+/* > */ void f62() { if (st.b[p]=='=') { ++p; NOS=(NOS>=TOS)?-1:0; } else { NOS=(NOS>TOS)?-1:0; } --s; }
 /* ? */ void f63() { ; }
 /* @ */ void f64() { ps("[@]"); }
 /* I */ void fI() { st.i[++s]=st.i[r]; }
@@ -53,7 +53,7 @@ void pn(CELL num, CELL b) {
 /* ] */ void f93() { ++st.i[r]; if (st.i[r]<=st.i[r+1]) { p=st.i[r+2]; } else { r+=3; } }
 /* ^ */ void f94() { ; }
 /* _ */ void f95() { TOS=-TOS; }
-/* ` */ void f96() { ; }
+/* ` */ void f96() { y=yy; while (st.b[p]!='`') { *(y++)=st.b[p++]; } *y=0; ++p; system(yy); }
 /* d */ void fd() { --TOS; }
 /* b */ void fb() { u=st.b[p++];
         if (u=='&') { NOS=NOS&TOS; --s; }
@@ -66,11 +66,13 @@ void pn(CELL num, CELL b) {
         if (u=='!') { ps("[c!]"); } }
 /* i */ void fi() { ++TOS; }
 /* x */ void fx() { u=st.b[p++];
-        if (u=='Q') { isBye=1; }
-        else if (u=='T') { st.i[++s]=clock(); } }
-/* { */ void f123() { ; }
-/* | */ void f124() { ; }
-/* } */ void f125() { ; }
+        if (u=='U') { ++r; }
+        else if (u=='S') { y=&st.b[st.i[s--]]; system(y); }
+        else if (u=='T') { st.i[++s]=clock(); }
+        else if (u=='Q') { isBye=1; } }
+/* { */ void f123() { st.i[--r]=p; if (TOS==0) while (st.b[p]!='}') { ++p; } }
+/* | */ void f124() { while (st.b[p]!='|') { st.b[TOS++]=st.b[p++]; } st.b[TOS++]=0; ++p; }
+/* } */ void f125() { if (TOS) { p=st.i[r]; } else { ++r; --s; } }
 /* ~ */ void f126() { TOS=(TOS)?0:-1; }
 void (*q[127])() = { X,X,X,X,X,X,X,X,X,X,N,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,N,
     f33,f34,f35,f36,f37,f38,f39,f40,f41,f42,f43,f44,f45,f46,f47,fN,fN,fN,fN,fN,fN,fN,fN,fN,fN,
