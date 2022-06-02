@@ -15,19 +15,24 @@
   #undef __BOARD__
   #define __BOARD__ PC
   #define __WINDOWS__
-  #define  _CRT_SECURE_NO_WARNINGS
-  #include <Windows.h>
   #include <conio.h>
-  #define CODE_SZ      ( 64*1024)
-  #define VARS_SZ      (256*1024)
+  #define CODE_SZ      (48*1024)
+  #define VARS_SZ      (96*1024)
   #define STK_SZ        16
   #define LSTK_SZ        8
   #define LOCALS_SZ    160
+  #define VMSZ         (64*1024)
+  #define CB           ( 1*1024)
+  #define VB           ( 8*1024)
+  #define SB             8
+  #define RB            64
   #define __EDITOR__
 #endif
 
-#include <stdarg.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
+#include <time.h>
 
 #if __BOARD__ == TEENSY4
   #define CODE_SZ      (48*1024)
@@ -56,6 +61,7 @@
 #define CA(l)         (code+l)
 #define DP_AT(l)      ((DICT_T *)(&code[l]))
 #define betw(x, a, b) ((a<=x)&&(x<=b))
+#define BTW(x, a, b) ((a<=x)&&(x<=b))
 #define BA(a)         ((byte *)a)
 
 typedef unsigned char byte;
@@ -63,6 +69,12 @@ typedef unsigned short WORD;
 typedef long CELL;
 typedef unsigned long UCELL;
 typedef unsigned short USHORT;
+
+typedef union {
+    float f[VMSZ / 4];
+    int i[VMSZ / 4];
+    char b[VMSZ];
+} FIB_T;
 
 typedef struct {
     byte prev;

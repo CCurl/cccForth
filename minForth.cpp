@@ -1,6 +1,9 @@
 // MinForth.cpp : An extremely memory conscious Forth interpreter
 
 #include "Shared.h"
+#include <time.h>
+
+extern int isBye;
 
 typedef struct {
     const char *name;
@@ -111,7 +114,7 @@ PRIM_T prims[] = {
 };
 
 char word[32], *in;
-byte lastWasCall = 0, isBye = 0;
+byte lastWasCall = 0;
 byte *VHERE, *VHERE2;
 CELL HERE, LAST, STATE, tempWords[10];
 
@@ -467,7 +470,25 @@ int doParseWord(char *wd) {
     return 0;
 }
 
+extern FIB_T st;
+extern void R(int);
+int doS2(const char *l) {
+    if (l[0]!='s') return 0;
+    if (l[1]!='2') return 0;
+    if (l[2]!=':') return 0;
+    if (l[3]!=' ') return 0;
+    l += 4;
+    int x = 1000, y=x;
+    while (*l) {
+        st.b[y++]=*(l++);
+    }
+    st.b[y]=0;
+    R(x);
+    return 1;
+}
+
 void doParse(const char *line) {
+    if (doS2(line)) { return; }
     in = (char*)line;
     int len = getWord(word);
     while (0 < len) {
@@ -534,7 +555,8 @@ void doLoad(int blk) {
 }
 
 long doRand() {
-    static long seed = GetTickCount();
+    static long seed = 0;
+    if (seed==0) { seed = clock(); }
     seed ^= (seed << 13);
     seed ^= (seed >> 17);
     seed ^= (seed <<  5);
@@ -547,8 +569,8 @@ byte *doExt(CELL ir, byte *pc) {
     case 'L': doLoad(pop());                    break;
     case 'R': push(doRand());                   break;
     case 'S': doDotS();                         break;
-    case 'T': push(GetTickCount());             break;
-    case 'W': if (TOS) { Sleep(TOS); } pop();   break;
+    case 'T': push(clock());             break;
+    // case 'W': if (TOS) { Sleep(TOS); } pop();   break;
     case 'Z': isBye = 1;                        break;
     default: printString("-unk ext-");
     }
@@ -587,6 +609,7 @@ void loop() {
     }
 }
 
+extern void I();
 int main()
 {
     printf("MinForth v0.0.1 - Chris Curl\n");
@@ -594,6 +617,7 @@ int main()
         printf("ERROR: CELL cannot support a pointer!");
         exit(1);
     }
+    I();
     vmReset();
     doLoad(0);
     while (!isBye) { loop(); }
