@@ -142,7 +142,6 @@
   <ItemGroup>
     <ClCompile Include="editor.cpp" />
     <ClCompile Include="minForth.cpp" />
-    <ClCompile Include="vm-NEW.cpp" />
     <ClCompile Include="vm.cpp" />
   </ItemGroup>
   <ItemGroup>

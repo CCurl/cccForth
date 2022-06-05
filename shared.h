@@ -22,11 +22,7 @@
   #define LSTK_SZ        8
   #define LOCALS_SZ    160
   #define VMSZ         (64*1024)
-  #define CB           ( 1*1024)
-  #define VB           ( 8*1024)
-  #define SB             8
-  #define RB            64
-  #define __EDITOR__
+  // #define __EDITOR__
 #endif
 
 #include <stdlib.h>
@@ -66,7 +62,7 @@
 
 typedef unsigned char byte;
 typedef unsigned short WORD;
-typedef long CELL;
+typedef int CELL;
 typedef unsigned long UCELL;
 typedef unsigned short USHORT;
 
@@ -77,38 +73,25 @@ typedef union {
 } FIB_T;
 
 typedef struct {
-    byte prev;
     byte flags;
-    char name[32];
+    USHORT xt;
+    char name[12];
 } DICT_T;
 
-typedef struct {
-    byte *s, *e;
-    CELL f, t;
-} LOOP_T;
-
 extern byte sp, isError;
-extern CELL BASE, STATE, LAST, HERE, tempWords[10];
-extern byte *VHERE, *VHERE2;
-extern byte code[];
-extern byte vars[];
-extern CELL stk[];
-extern CELL rstk[];
+extern CELL base, state, last, here;
 
-extern void vmReset();
+extern void ps(const char*);
 extern void systemWords();
 extern void push(CELL);
 extern CELL pop();
-extern void SET_WORD(byte *l, WORD v);
-extern void SET_LONG(byte *l, long v);
-extern void printString(const char*);
 extern void printStringF(const char*, ...);
-extern void printChar(char);
-extern void printBase(CELL, CELL);
+extern void pc(int);
+extern void pn(CELL, CELL);
 extern int strLen(const char *);
 extern void run(WORD);
 extern void doOK();
-extern byte *doExt(CELL, byte *);
+extern int doExt(CELL, int);
 extern void doEditor();
 extern int doFind(const char *);
 extern void doParse(const char *);

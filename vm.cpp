@@ -1,176 +1,115 @@
 #include "shared.h"
+#undef TOS
+#undef NOS
+#define TOS st.i[s]
+#define NOS st.i[s-1]
+#define FN ((u-'A')*26)+st.b[p++]-'A'
 
-byte sp, rsp, lsp, locSP, locBase, isError;
-CELL BASE, stk[STK_SZ+1], rstk[STK_SZ+1], locals[LOCALS_SZ];
-byte code[CODE_SZ+1], vars[VARS_SZ+1];
-LOOP_T lstk[LSTK_SZ + 1];
+FIB_T st;
+char *y, yy[80];
+int base=10, state=0, cb, here, sb, s, rb, r, vb, v, p, u, t, isBye=0;
 
-void vmReset() {
-    sp = rsp = lsp = locSP = locBase = 0;
-    BASE = 10;
-    HERE = LAST = 0;
-    VHERE = VHERE2 = &vars[0];
-    HERE = 2;
-    for (int i = 0; i < CODE_SZ; i++) { code[i] = 0; }
-    for (int i = 0; i < VARS_SZ; i++) { vars[i] = 0; }
-    for (int i = 0; i < 10; i++) { tempWords[i] = 0; }
-    systemWords();
-}
+void push(CELL x) { st.i[++s] = x; }
+CELL pop() { return st.i[s--]; }
+void ps(const char *x) { while (*x) pc(*(x++)); }
 
-void push(CELL v) { if (sp < STK_SZ) { stk[++sp] = v; } }
-CELL pop() { return sp ? stk[sp--] : 0; }
-
-void rpush(CELL v) { if (rsp < STK_SZ) { rstk[++rsp] = v; } }
-CELL rpop() { return rsp ? rstk[rsp--] : 0; }
-
-LOOP_T *lpush() { return (lsp < LSTK_SZ) ? &lstk[++lsp] : 0; }
-LOOP_T *lpop() { return (lsp) ? &lstk[--lsp] : 0; }
-
-WORD GET_WORD(byte *l) { return *l | (*(l+1) << 8); }
-long GET_LONG(byte *l) { return GET_WORD(l) | GET_WORD(l + 2) << 16; }
-
-void SET_WORD(byte *l, WORD v) { *l = (v & 0xff); *(l+1) = (byte)(v >> 8); }
-void SET_LONG(byte *l, long v) { SET_WORD(l, v & 0xFFFF); SET_WORD(l + 2, (WORD)(v >> 16)); }
-
-void printBase(CELL num, CELL base) {
-    UCELL n = (UCELL) num, isNeg = 0;
-    if ((base == 10) && (num < 0)) { isNeg = 1; n = -num; }
-    char* cp = (char *)&code[CODE_SZ];
-    *(cp--) = 0;
+void pn(CELL num, CELL b) {
+    UCELL n = (UCELL)num;
+    y = &yy[31];
+    if ((b == 10) && (num < 0)) { pc('-'); n = -num; }
+    *(y) = 0;
     do {
-        int x = (n % base) + '0';
-        n = n / base;
-        *(cp--) = ('9' < x) ? (x+7) : x;
+        int x = (n % b) + '0';
+        n = n / b;
+        *(--y) = ('9' < x) ? (x + 7) : x;
     } while (n);
-    if (isNeg) { printChar('-'); }
-    printString(cp+1);
+    ps(y);
 }
 
-void doType(byte *a, int l) {
-    if (l < 0) { l = 0; while (a[l]) { ++l; } }
-    byte* e = a+l;
-    while (a < e) {
-        byte c = *(a++);
-        if (c == '%') {
-            c = *(a++);
-            if (c == 'b') { printBase(pop(), 2); }
-            else if (c == 'c') { printChar((char)pop()); }
-            else if (c == 'd') { printBase(pop(), 10); }
-            else if (c == 'n') { printString("\r\n"); }
-            else if (c == 'q') { printChar('"'); }
-            else if (c == 'x') { printBase(pop(), 16); }
-            else printChar((char)c);
-        }
-        else { printChar((char)c); }
+void doDotS() {
+    pc('(');
+    for (int d = sb; d <= s; d++) {
+        if (sb<d) { pc(' '); }
+        pn(st.i[d], base);
     }
+    pc(')');
 }
 
-void run(WORD start) {
-    byte *pc = CA(start);
-    CELL t1, t2;
-    rsp = lsp = locSP = isError = 0;
-    while ((pc) && (isError == 0)) {
-        byte ir = *(pc++);
-        switch (ir) {
-        case 0: return;
-        case 1: push(*(pc++));                                              break; // BLIT
-        case 2: push(GET_WORD(pc)); pc += 2;                                break; // WLIT
-        case 4: push(GET_LONG(pc)); pc += 4;                                break; // LIT
-        case ' ': /* NOP */                                                 break; // NOP
-        case '!': SET_LONG(AOS, NOS); DROP2;                                break; // STORE
-        case '"': /* UNUSED */                                              break;
-        case '#': push(TOS);                                                break; // DUP
-        case '$': t1 = TOS; TOS = NOS; NOS = t1;                            break; // SWAP
-        case '%': push(NOS);                                                break; // OVER
-        case '&': t1 = NOS; t2 = TOS; NOS = t1 / t2; TOS = t1 % t2;         break; // /MOD
-        case '\'': /* UNUSED */                                             break;
-        case '(': if (pop() == 0) { while (*pc != ')') { ++pc; } }          break; // Simple IF (NO ELSE)
-        case ')': /* Simple THEN */                                         break; // Simple THEN
-        case '*': t1 = pop(); TOS *= t1;                                    break; // MULT
-        case '+': t1 = pop(); TOS += t1;                                    break; // ADD
-        case ',': printChar((char)pop());                                   break; // EMIT
-        case '-': t1 = pop(); TOS -= t1;                                    break; // SUB
-        case '.': printBase(pop(), BASE);                                   break; // DOT
-        case '/': t1 = pop(); TOS /= t1;                                    break; // DIV
-        case '0': case '1': case '2': case '3': case '4':
-        case '5': case '6': case '7': case '8': case '9': push(ir-'0');
-            while (betw(*pc,'0','9')) { TOS = (TOS*10) + *(pc++) - '0'; }
-            break;                                                                 // NUMBER
-        case ':': rpush(pc - code + 2); pc = CA(GET_WORD(pc));              break; // CALL
-        case ';': pc = CA(rpop());                                          break; // RETURN
-        case '>': NOS = (NOS > TOS) ? 1 : 0; pop();                         break; // >
-        case '=': NOS = (NOS == TOS) ? 1 : 0; pop();                        break; // =
-        case '<': NOS = (NOS < TOS) ? 1 : 0; pop();                         break; // <
-        case '?': push(charAvailable());                                    break; // ?KEY
-        case '@': TOS = GET_LONG((byte*)TOS);                               break; // FETCH
-        case 'A': /* UNUSED */                                              break;
-        case 'B': /* UNUSED */                                              break;
-        case 'C': *AOS = (byte)NOS; DROP2;                                  break; // CSTORE
-        case 'D': --TOS;                                                    break; // 1-
-        case 'E': /* UNUSED */                                              break;
-        case 'F': /* UNUSED */                                              break;
-        case 'G': pc = CA((WORD)pop());                                     break; // EXECUTE
-        case 'H': /* UNUSED */                                              break;
-        case 'I': push(LOS.f);                                              break; // I
-        case 'J': pc = CA(GET_WORD(pc));                                    break; // BRANCH
-        case 'K': push(getChar());                                          break; // KEY
-        case 'L': NOS = (NOS << TOS); pop();                                break; // LSHIFT
-        case 'M': NOS %= TOS; pop();                                        break; // MOD
-        case 'N': TOS = (TOS) ? 0 : 1;                                      break; // NOT (0=)
-        case 'O': /* UNUSED */                                              break;
-        case 'P': ++TOS;                                                    break; // 1+
-        case 'Q': ir = *(pc++); if (ir == '<') { rpush(pop()); }                   // >R, R@, R>
-                if (ir == '>') { push(rpop()); }
-                if (ir == '@') { push(rstk[rsp]); }                         break;
-        case 'R': NOS = (NOS >> TOS); pop();                                break; // RSHIFT
-        case 'S': /* UNUSED */                                              break;
-        case 'T': t1 = TOS; TOS = 0; while (BA(t1)[TOS]) { ++TOS; }         break; // ZLEN
-        case 'U': /* UNUSED */                                              break;
-        case 'V': /* UNUSED */                                              break;
-        case 'W': SET_WORD(AOS, (WORD)NOS); DROP2;                          break; // W!
-        case 'X': /* UNUSED */                                              break;
-        case 'Y': vmReset();                                               return; // RESET
-        case 'Z': doType((byte *)pop(),-1);                                 break; // ZTYPE
-        case '[': lpush()->e = CA(GET_WORD(pc)); LOS.s = (pc += 2);                // FOR
-            LOS.f = (TOS < NOS) ? TOS : NOS;
-            LOS.t = (TOS > NOS) ? TOS : NOS;   DROP2;                       break;
-        case '\\': pop();                                                   break; // DROP
-        case ']': ++LOS.f; if (LOS.f <= LOS.t) { pc = LOS.s; }                     // NEXT
-                else { lpop(); }                                            break;
-        case '^': /* UNUSED */                                              break;
-        case '_': TOS = -TOS;                                               break; // NEGATE
-        case '`': /* UNUSED */                                              break;
-        case 'a': t1 = pop(); TOS &= t1;                                    break; // AND
-        case 'b': /* UNUSED */                                              break; // SPACE
-        case 'c': TOS = *AOS;                                               break; // C@
-        case 'd': t1 = *(pc++) - '0'; --locals[locBase + t1];               break; // decTemp
-        case 'e': /* UNUSED */                                              break;
-        case 'f': /* UNUSED */                                              break;
-        case 'g': /* UNUSED */                                              break;
-        case 'h': /* UNUSED */                                              break;
-        case 'i': t1 = *(pc++) - '0'; ++locals[locBase + t1];               break; // incTemp
-        case 'j': if (pop() == 0) { pc = CA(GET_WORD(pc)); }                       // IF (0BRANCH)
-                else { pc += 2; }                                           break;
-        case 'k': if (lsp) { --lsp; }                                       break; // UNLOOP
-        case 'l': if (lsp) { pc = LOS.e; --lsp;  }                          break; // LEAVE
-        case 'm': LOS.f += pop();                                           break; // +I
-        case 'n': /* UNUSED */                                              break;
-        case 'o': t1 = pop(); TOS |= t1;                                    break; // OR
-        case 'p': locBase += 10;                                            break; // +tmp
-        case 'q': locBase -= 10;                                            break; // -tmp
-        case 'r': t1 = *(pc++) - '0'; push(locals[locBase + t1]);           break; // readTemp
-        case 's': t1 = *(pc++) - '0'; locals[locBase + t1] = pop();         break; // setTemp
-        case 't': printString((char *)pop());                               break; // QTYPE
-        case 'u': if (pop() == 0) { pc = LOS.s; } else { lpop(); }          break; // UNTIL
-        case 'v': if (pop()) { pc = LOS.s; } else { lpop(); }               break; // WHILE
-        case 'w': TOS = GET_WORD(AOS);                                      break; // w@
-        case 'x': t1 = pop(); TOS ^= t1;                                    break; // XOR
-        case 'y': /* UNUSED */                                              break;
-        case 'z': pc = doExt(*pc, pc+1);                                    break; // EXT
-        case '{': lpush()->e = CA(GET_WORD(pc)); pc += 2; LOS.s = pc;       break; // BEGIN
-        case '}': pc = LOS.s;                                               break; // AGAIN
-        case '~': TOS = ~TOS;                                               break; // COM
-        default: printStringF("-unk ir: %d (%c)-", ir, ir);                return;
+/*     */ void X() { if (u) { pc(u); pc('?'); } p=0; }
+/*     */ void N() { }
+/*  ~  */ void f33() { ps("[!]"); }
+/*  "  */ void f34() { while (st.b[p] != '"') pc(st.b[p++]); ++p; }
+/*  #  */ void f35() { t=TOS; st.i[++s]=t; }
+/*  $  */ void f36() { t=TOS; TOS=NOS; NOS=t; }
+/*  %  */ void f37() { t=NOS; st.i[++s]=t; }
+/*  &  */ void f38() { u=NOS; t=TOS; NOS=u/t; TOS=u/t; }
+/*  '  */ void f39() { st.i[++s]=st.b[p++]; }
+/*  (  */ void f40() { if (TOS==0) { while (st.b[p]!=')') ++p; } }
+/*  )  */ void f41() { ; }
+/*  *  */ void f42() { NOS; NOS *= TOS; --s; }
+/*  +  */ void f43() { NOS; NOS += TOS; --s; }
+/*  ,  */ void f44() { t=st.i[s--]; pc(t); }
+/*  -  */ void f45() { NOS; NOS -= TOS; --s; }
+/*  .  */ void f46() { t=st.i[s--]; pn(t,base); }
+/*  /  */ void f47() { NOS; NOS /= TOS; --s; }
+/*  0  */ void fN() { ++s; TOS=u-'0'; while (BTW(st.b[p],'0','9')) { TOS=(TOS*10)+(st.b[p++]-'0'); } }
+/*  :  */ void f58() { u=st.b[p++]; t=FN; if (sb<=t) {  ps("-fn-"); return; } here=st.i[t]=p; state=1; }
+/*  ;  */ void f59() { if (rb<r) { p=0; r=rb+1; } else { p=st.i[r++]; } }
+/*  <  */ void f60() { if (st.b[p]=='=') { ++p; NOS=(NOS<=TOS)?-1:0; } else { NOS=(NOS<TOS)?-1:0; } --s; }
+/*  =  */ void f61() { NOS=(NOS==TOS)?-1:0; --s; }
+/*  >  */ void f62() { if (st.b[p]=='=') { ++p; NOS=(NOS>=TOS)?-1:0; } else { NOS=(NOS>TOS)?-1:0; } --s; }
+/*  ?  */ void f63() { ; }
+/*  @  */ void f64() { ps("[@]"); }
+/* A-Z */ void fAZ() { t=FN; if (sb<=t) { ps("-fn-"); return; }
+        if (st.i[t]) { if (st.b[p]!=';') { st.i[--r]=p; } p=st.i[t]; } }
+/*  [  */ void f91() { st.i[--r]=p; st.i[--r]=st.i[s--]; st.i[--r]=st.i[s--]; }
+/*  \  */ void f92() { --s; }
+/*  ]  */ void f93() { ++st.i[r]; if (st.i[r]<=st.i[r+1]) { p=st.i[r+2]; } else { r+=3; } }
+/*  ^  */ void f94() { ; }
+/*  _  */ void f95() { TOS=-TOS; }
+/*  `  */ void f96() { y=yy; while (st.b[p]!='`') { *(y++)=st.b[p++]; } *y=0; ++p; system(yy); }
+/*  d  */ void fd() { --TOS; }
+/*  b  */ void fb() { u=st.b[p++];
+        if (u=='&') { NOS=NOS&TOS; --s; }
+        if (u=='|') { NOS=NOS|TOS; --s; }
+        if (u=='^') { NOS=NOS^TOS; --s; }
+        if (u=='~') { TOS=~TOS; }
+        else { --p; pc(32); } }
+/*  c  */ void fc() { u=st.b[p++];
+        if (u=='@') { ps("[c@]"); }
+        if (u=='!') { ps("[c!]"); } }
+/*  i  */ void fi() { ++TOS; }
+/*  x  */ void fx() { u=st.b[p++];
+        if (u=='I') { st.i[++s]=st.i[r]; }
+        else if (u=='U') { ++r; }
+        else if (u=='S') { y=&st.b[st.i[s--]]; system(y); }
+        else if (u=='T') { st.i[++s]=clock(); }
+        else if (u=='Q') { isBye=1; } 
+        else p=doExt(u,p);
         }
+/*  {  */ void f123() { st.i[--r]=p; if (TOS==0) while (st.b[p]!='}') { ++p; } }
+/*  |  */ void f124() { while (st.b[p]!='|') { st.b[TOS++]=st.b[p++]; } st.b[TOS++]=0; ++p; }
+/*  }  */ void f125() { if (TOS) { p=st.i[r]; } else { ++r; --s; } }
+/*  ~  */ void f126() { TOS=(TOS)?0:-1; }
+void (*q[127])() = { X,X,X,X,X,X,X,X,X,X,N,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,N,
+    f33,f34,f35,f36,f37,f38,f39,f40,f41,f42,f43,f44,f45,f46,f47,fN,fN,fN,fN,fN,fN,fN,fN,fN,fN,f58,f59,f60,f61,f62,f63,f64,
+    fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,
+    f91,f92,f93,f94,f95,f96,X,fb,fc,fd,X,X,X,X,fi,X,X,X,X,X,X,X,X,X,X,X,X,X,X,fx,X,X,f123,f124,f125,f126 };
+void I(int b1, int b2, int b3, int b4) {
+    base = 10;
+    s=sb=b1; r=rb=b2; here=cb=b3; v=vb=b4;
+    isBye = last = 0;
+    for (t = 0; t < (VMSZ/4); t++) { st.i[t] = 0; }
+}
+void R(int x) {
+    s = (s<sb) ? (sb-1) : s;
+    r = (rb<r) ? (rb+1) : r;
+    p = x;
+    while (p) {
+        u = st.b[p++];
+        if (state == 1) { 
+            if (u < 32) { return; }
+            here=p; 
+        } else { q[u](); }
     }
 }
