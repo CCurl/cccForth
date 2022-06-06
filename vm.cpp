@@ -37,8 +37,17 @@ void doDotS() {
 
 /*     */ void X() { if (u) { pc(u); pc('?'); } p=0; }
 /*     */ void N() { }
-/*  ~  */ void f33() { ps("[!]"); }
-/*  "  */ void f34() { while (st.b[p] != '"') pc(st.b[p++]); ++p; }
+/*  !  */ void f33() { ps("[!]"); }
+/*  "  */ void f34() { while (st.b[p]!='"') { u = st.b[p++];
+                if (u=='%') { u = st.b[p++];
+                    if (u=='d') { pn(st.i[s--], 10); }
+                    else if (u=='x') { pn(st.i[s--], 16); }
+                    else if (u=='b') { pn(st.i[s--], 2); }
+                    else if (u=='c') { pc(st.i[s--]); }
+                    else if (u=='q') { pc('"'); }
+                    else { pc(u); }
+                } else { pc(u); }
+            } ++p; }
 /*  #  */ void f35() { t=TOS; st.i[++s]=t; }
 /*  $  */ void f36() { t=TOS; TOS=NOS; NOS=t; }
 /*  %  */ void f37() { t=NOS; st.i[++s]=t; }
@@ -76,14 +85,18 @@ void doDotS() {
         if (u=='~') { TOS=~TOS; }
         else { --p; pc(32); } }
 /*  c  */ void fc() { u=st.b[p++];
-        if (u=='@') { ps("[c@]"); }
-        if (u=='!') { ps("[c!]"); } }
+        if (u=='@') { TOS=st.b[TOS]; }
+        if (u=='!') { st.b[TOS]=(char)NOS; } }
 /*  i  */ void fi() { ++TOS; }
+/*  k  */ void fk() { u=st.b[p++];
+        if (u=='?') { st.i[++s]=charAvailable(); }
+        if (u=='@') { st.i[++s]=getChar(); } }
 /*  x  */ void fx() { u=st.b[p++];
         if (u=='I') { st.i[++s]=st.i[r]; }
         else if (u=='U') { ++r; }
         else if (u=='S') { y=&st.b[st.i[s--]]; system(y); }
         else if (u=='T') { st.i[++s]=clock(); }
+        else if (u=='D') { doDotS(); } 
         else if (u=='Q') { isBye=1; } 
         else p=doExt(u,p);
         }
@@ -94,10 +107,10 @@ void doDotS() {
 void (*q[127])() = { X,X,X,X,X,X,X,X,X,X,N,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,N,
     f33,f34,f35,f36,f37,f38,f39,f40,f41,f42,f43,f44,f45,f46,f47,fN,fN,fN,fN,fN,fN,fN,fN,fN,fN,f58,f59,f60,f61,f62,f63,f64,
     fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,
-    f91,f92,f93,f94,f95,f96,X,fb,fc,fd,X,X,X,X,fi,X,X,X,X,X,X,X,X,X,X,X,X,X,X,fx,X,X,f123,f124,f125,f126 };
+    f91,f92,f93,f94,f95,f96,X,fb,fc,fd,X,X,X,X,fi,X,fk,X,X,X,X,X,X,X,X,X,X,X,X,fx,X,X,f123,f124,f125,f126 };
 void I(int b1, int b2, int b3, int b4) {
     base = 10;
-    s=sb=b1; r=rb=b2; here=cb=b3; v=vb=b4;
+    s = sb = b1; r = rb = b2; here = cb = b3; v = vb = b4; --s;
     isBye = last = 0;
     for (t = 0; t < (VMSZ/4); t++) { st.i[t] = 0; }
 }

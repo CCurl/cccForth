@@ -91,7 +91,7 @@ PRIM_T prims[] = {
     , { "-ROT", "$r<$r>" }    // |-ROT|$Q<$Q>|(a b c--c a b)|FORTH CORE|
     , { "IF", "(" }           // |IF|(|(f--)|FORTH CORE|
     , { "THEN", ")" }         // |THEN|)|(--)|FORTH CORE|
-    , { ".S", "xS" }          // |.S|xS|(--)|FORTH CORE|
+    , { ".S", "xD" }          // |.S|xS|(--)|FORTH CORE|
     , { "NOP", " " }          // |NOP| |(--)|FORTH CORE|
     // Extensions
 #if __BOARD__ == PC
