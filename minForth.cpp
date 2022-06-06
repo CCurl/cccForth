@@ -56,33 +56,31 @@ PRIM_T prims[] = {
     , { "XOR", "b^" }         // |XOR|x|(a b--c)|FORTH CORE|
     , { "COM", "b~" }         // |COM|~|(a--b)|FORTH CORE|
     , { "NOT", "~" }          // |NOT|N|(a--b)|FORTH CORE|
-    , { "1+", "i" }           // |1+|P|(a--b)|FORTH CORE|
-    , { "2+", "ii" }          // |2+|PP|(a--b)|FORTH CORE|
-    , { "4+", "iiii" }        // |4+|PPPP|(a--b)|FORTH CORE|
+    , { "1+", "1+" }          // |1+||(a--b)|FORTH CORE|
+    , { "1-", "1-" }          // |1-||(a--b)|FORTH CORE|
     , { "+!", "$%@+$!" }      // |+!|$%@+$!|(n a--)|FORTH CORE|
-    , { "1-", "d" }           // |1-|D|(a--b)|FORTH CORE|
-    , { "EXECUTE", "E" }      // |EXECUTE|G|(a--)|FORTH CORE|
+    , { "EXECUTE", "e" }      // |EXECUTE|e|(a--)|FORTH CORE|
     , { "MIN", "%%>($)\\" }   // |MIN|%%>($)\\|(a b--c)|FORTH CORE|
     , { "MAX", "%%<($)\\" }   // |MAX|%%<($)\\|(a b--c)|FORTH CORE|
-    , { "RAND", "zR" }        // |RAND|zR|(--n)|FORTH CORE|
+    , { "RAND", "xR" }        // |RAND|xR|(--n)||
     , { "EXIT", ";" }         // |EXIT|;|(--)|FORTH CORE|
     , { "TIMER", "t" }        // |TIMER|zT|(--n)|FORTH CORE|
     , { "WAIT", "zW" }        // |WAIT|zW|(n--)|FORTH CORE|
-    , { "RESET", "x" }        // |RESET|Y|(--)|FORTH CORE|
+    , { "RESET", "xX" }       // |RESET|xX|(--)||
     , { "FOR", "[" }          // |FOR|[|(--)|FORTH CORE|
-    , { "I", "xI" }           // |I|xI|(--)|FORTH CORE|
-    , { "+I", "xP" }          // |+I|m|(n--)|FORTH CORE|
+    , { "I", "i" }            // |I|i|(--)|FORTH CORE|
+    , { "+I", "xI" }          // |+I|xI|(n--)|FORTH CORE|
+    , { "LEAVE", "xF" }       // |LEAVE|xF|(--)|FORTH CORE|
     , { "NEXT", "]" }         // |NEXT|]|(--)|FORTH CORE|
     , { "BEGIN", "{" }        // |BEGIN|{|(--)|FORTH CORE|
+    , { "UNLOOP", "xU" }      // |UNLOOP|uU|(--)|FORTH CORE|
     , { "WHILE", "}" }        // |WHILE|}|(--)|FORTH CORE|
     , { "UNTIL", "~}" }       // |UNTIL|~}|(--)|FORTH CORE|
-    , { "UNLOOP", "xU" }      // |UNLOOP|uU|(--)|FORTH CORE|
-    , { "LEAVE", "xF" }       // |LEAVE|xF|(--)|FORTH CORE|
     , { "KEY", "k@" }         // |KEY|K|(--c)|FORTH CORE|
     , { "KEY?", "k?" }        // |KEY?|?|(--f)|FORTH CORE|
     , { "+TMPS", "l+" }       // |+TMPS|p|(--)|FORTH CORE|
     , { "-TMPS", "l-" }       // |-TMPS|q|(--)|FORTH CORE|
-    , { "ZTYPE", "Z" }        // |ZTYPE|Z|(a--)|FORTH CORE|
+    , { "ZTYPE", "z" }        // |ZTYPE|z|(a--)|FORTH CORE|
     , { "QTYPE", "t" }        // |QTYPE|t|(a--)|FORTH CORE|
     , { ">R", "r<" }          // |>R|Q<|(n--)|FORTH CORE|
     , { "R>", "r>" }          // |R>|Q>|(--n)|FORTH CORE|
@@ -92,6 +90,9 @@ PRIM_T prims[] = {
     , { "IF", "(" }           // |IF|(|(f--)|FORTH CORE|
     , { "THEN", ")" }         // |THEN|)|(--)|FORTH CORE|
     , { ".S", "xD" }          // |.S|xS|(--)|FORTH CORE|
+    , { "HERE", "xH" }        // |HERE|xH|(--n)|FORTH CORE|
+    , { "BASE@", "xB" }       // |BASE@|xB|(n--)||
+    , { "BASE!", "xb" }       // |BASE!|xb|(--n)||
     , { "NOP", " " }          // |NOP| |(--)|FORTH CORE|
     // Extensions
 #if __BOARD__ == PC
@@ -119,7 +120,6 @@ PRIM_T prims[] = {
 
 char word[32], *in, exBuf[256];
 byte lastWasCall = 0;
-CELL LAST, tempWords[10];
 #define STATE state
 
 char lower(char c) { return betw(c, 'A', 'Z') ? (c + 32) : c; }
@@ -169,18 +169,13 @@ int isTempWord(const char *nm) {
 }
 
 extern FIB_T st;
-extern void R(int);
+extern void E(char *);
 CELL xt=0, last=0;
 DICT_T dict[100];
 
 void exec() {
-    if (exBuf[0]) {
-        // ps("\nexec:["); ps(exBuf); ps("]");
-        int x=here, i=0;
-        while (exBuf[i]) { st.b[x++]=exBuf[i++]; }
-        if (i) { st.b[x]=0; R(here); }
-        exBuf[0]=0;
-    }
+    if (exBuf[0]) { E(exBuf); }
+    exBuf[0] = 0;
 }
 
 void doCreate(const char *name, byte f) {
@@ -285,18 +280,16 @@ int doPrim(const char *wd) {
     return 1;
 }
 
-int doQuote(int isDotQ) {
-    //in++;
-    //if (STATE) { VHERE2 = VHERE; }
-    //push((CELL)VHERE2);
-    //while (*in && (*in != '"')) { *(VHERE2++) = *(in++); }
-    //*(VHERE2++) = 0;
-    //if (*in) { ++in; }
-    //if (STATE) {
-    //    doNumber();
-    //    VHERE = VHERE2;
-        // if (isDotQ) { CComma('Z'); }
-    //}
+int doQuote() {
+    char buf[2] = { 0,0 };
+    strCat(exBuf, "|");
+    in++;
+    while (*in && (*in != '"')) {
+        buf[0] = *(in++);
+        strCat(exBuf, buf);
+    }
+    ++in;
+    strCat(exBuf, "|");
     return 1;
 }
 
@@ -321,7 +314,7 @@ int doParseWord(char *wd) {
     if (doFind(wd))       {  return execWord(); }
     if (isNum(wd))        {  return doNumber(); }
     if (strEq(wd, ".\"")) {  return doDotQuote(); }
-    if (strEq(wd, "\""))  {  return doQuote(0); }
+    if (strEq(wd, "\""))  {  return doQuote(); }
 
     if (strEq(wd, ":")) {
         if (getWord(wd) == 0) { return 0; }
@@ -410,14 +403,9 @@ char *rtrim(char *str) {
 
 void systemWords() {
     char cp[32];
-    // sprintf(cp, ": cb %lu ;", (UCELL)code);     doParse(cp);
-    // sprintf(cp, ": vb %lu ;", (UCELL)vars);     doParse(cp);
-    sprintf(cp, ": vmsz %d ;", VMSZ);            doParse(cp);
-    // sprintf(cp, ": vsz %d ;", VARS_SZ);         doParse(cp);
-    // sprintf(cp, ": ha %lu ;", (UCELL)&here);    doParse(cp);
-    // sprintf(cp, ": la %lu ;", (UCELL)&LAST);    doParse(cp);
-    // sprintf(cp, ": va %lu ;", (UCELL)&VHERE);   doParse(cp);
-    // sprintf(cp, ": base %lu ;", (UCELL)&BASE);  doParse(cp);
+    exBuf[0] = 0;
+    sprintf(cp, ": cb %lu ;", cb);       doParse(cp);
+    sprintf(cp, ": vmsz %d ;", VMSZ);    doParse(cp);
 }
 
 #if __BOARD__ == PC
@@ -492,7 +480,6 @@ void loop() {
     exec();
 }
 
-extern void I(int,int,int,int);
 int main()
 {
     printf("MinForth v0.0.1 - Chris Curl\n");
@@ -501,7 +488,6 @@ int main()
         exit(1);
     }
     I(500,549,550,4000);
-    // vmReset();
     doLoad(0);
     while (!isBye) { loop(); }
 }

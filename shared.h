@@ -79,9 +79,10 @@ typedef struct {
 } DICT_T;
 
 extern byte sp, isError;
-extern CELL base, state, last, here;
+extern CELL base, state, last, here, cb, xt;
 
 extern void ps(const char*);
+extern void I(int, int, int, int);
 extern void systemWords();
 extern void push(CELL);
 extern CELL pop();
