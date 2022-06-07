@@ -62,7 +62,7 @@ int T(char *x, char d) {
 /*  %  */ void f37() { t=NOS; st.i[++s]=t; }
 /*  &  */ void f38() { u=NOS; t=TOS; NOS=u/t; TOS=u/t; }
 /*  '  */ void f39() { st.i[++s]=st.b[p++]; }
-/*  (  */ void f40() { if (TOS==0) { while (st.b[p]!=')') ++p; } }
+/*  (  */ void f40() { if (st.i[s--]==0) { while (st.b[p]!=')') ++p; } }
 /*  *  */ void f42() { NOS; NOS *= TOS; --s; }
 /*  +  */ void f43() { NOS; NOS += TOS; --s; }
 /*  ,  */ void f44() { t=st.i[s--]; pc(t); }
@@ -99,12 +99,12 @@ int T(char *x, char d) {
         if (u=='@') { st.i[++s]=getChar(); } }
 /*  x  */ void fx() { u=st.b[p++]; if (u=='U') { ++r; }
         else if (u=='I') { st.i[r]+=st.i[s--]; }
-        else if (u=='S') { y=&st.b[st.i[s--]]; system(y); }
         else if (u=='T') { st.i[++s]=clock(); }
-        else if (u=='D') { doDotS(); } 
+        else if (u=='S') { doDotS(); } 
         else if (u=='H') { st.i[++s]=here; }
         else if (u=='B') { st.i[++s]=base; }
         else if (u=='b') { base=st.i[s--]; }
+        else if (u=='Y') { y=&st.b[st.i[s--]]; system(y); }
         else if (u=='X') { I(sb,rb,cb,vb); }
         else if (u=='Q') { isBye=1; }
         else p=doExt(u,p); }
