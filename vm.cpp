@@ -103,9 +103,8 @@ int T(char *x, char d) {
         else if (u=='S') { doDotS(); } 
         else if (u=='H') { st.i[++s]=here; }
         else if (u=='B') { st.i[++s]=base; }
-        else if (u=='b') { base=st.i[s--]; }
         else if (u=='Y') { y=&st.b[st.i[s--]]; system(y); }
-        else if (u=='X') { I(sb,rb,cb,vb); }
+        else if (u=='X') { I(sb,rb-sb,vb-cb); }
         else if (u=='Q') { isBye=1; }
         else p=doExt(u,p); }
 /*  z  */ void fz() { y=&st.b[st.i[s--]]; T(y,0); }
@@ -117,11 +116,13 @@ void (*q[127])() = { X,X,X,X,X,X,X,X,X,X,N,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
     f33,f34,f35,f36,f37,f38,f39,f40,N,f42,f43,f44,f45,f46,f47,fN,fN,fN,fN,fN,fN,fN,fN,fN,fN,f58,f59,f60,f61,f62,X,f64,
     fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,
     f91,f92,f93,X,f95,f96,X,fb,fc,X,fe,X,X,X,fi,X,fk,X,X,X,X,X,X,X,X,X,X,X,X,fx,X,fz,f123,f124,f125,f126 };
-void I(int b1, int b2, int b3, int b4) {
+void I(int nf, int ss, int cs) {
+    // [funcs][stacks][code][vars]
     base = 10;
-    s = sb = b1; r = rb = b2; here = cb = b3; v = vb = b4; --s;
+    s=sb=nf; r=rb=(sb+ss); here=cb=(rb*4); v=vb=cb+cs;
+    --s;
     isBye = last = xt = 0;
-    for (t = 0; t < (VMSZ/4); t++) { st.i[t] = 0; }
+    for (t=0; t<(VMSZ/4); t++) { st.i[t]=0; }
     systemWords();
 }
 void R(int x) {
@@ -138,7 +139,7 @@ void R(int x) {
 }
 void E(char* b) {
     if (*b) {
-        // ps("\nexec:["); ps(b); ps("]");
+        // ps("\nexec:["); ps(b); pc(']');
         t=here; while (*b) { st.b[t++]=*(b++); }
         st.b[t]=0; R(here);
     }

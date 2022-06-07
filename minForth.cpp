@@ -156,6 +156,14 @@ char *strCat(char *dst, const char *src) {
     return dst;
 }
 
+char *stringF(char *buf, const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    va_end(args);
+    return buf;
+}
+
 void printStringF(const char *fmt, ...) {
     char buf[100];
     va_list args;
@@ -388,10 +396,7 @@ void doParse(const char *line) {
 
 extern void doDotS();
 void doOK() {
-    if (STATE) { ps(" ... "); return; }
-    ps("\r\nOK ");
-    doDotS();
-    pc('>');
+    if (STATE) { ps(" ... "); } else { ps("\r\nOK "); doDotS(); pc('>'); }
 }
 
 char *rtrim(char *str) {
@@ -403,10 +408,12 @@ char *rtrim(char *str) {
 }
 
 void systemWords() {
-    char cp[32];
+    char cp[96];
     exBuf[0] = 0;
     sprintf(cp, ": cb %lu ;", cb);       doParse(cp);
     sprintf(cp, ": vmsz %d ;", VMSZ);    doParse(cp);
+    sprintf(cp, "cb %d + constant v", CODE_SZ);    doParse(cp);
+    sprintf(cp, ": code cb here 1- for i c@ dup ':' = if cr then emit next ;"); doParse(cp);
 }
 
 #if __BOARD__ == PC
@@ -441,10 +448,7 @@ int doExt(CELL ir, int pc) {
     case 'E': doEditor();                break;
     case 'L': doLoad(pop());             break;
     case 'R': push(doRand());            break;
-    case 'S': doDotS();                  break;
-    case 'T': push(clock());             break;
     // case 'W': if (TOS) { Sleep(TOS); } pop();   break;
-    case 'Z': isBye = 1;                 break;
     default: ps("-unk ext-");
     }
     return pc;
@@ -488,7 +492,9 @@ int main()
         printf("ERROR: CELL cannot support a pointer!");
         exit(1);
     }
-    I(500, 549, (550*4), (550*4)+8000);
+    int fs=500, ss=fs+50, cs=(ss)*4+8000;
+
+    I(500,STK_SZ*2,CODE_SZ);
     doLoad(0);
     while (!isBye) { loop(); }
 }

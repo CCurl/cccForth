@@ -8,7 +8,7 @@ reset
 ( : here ha @ ; )
 
 : cells 4 * ;
-: code cb here 1- for i c@ dup emit ';' = if cr then next ;
+: code cb here 1- for i c@ dup ':' = if cr then emit next ;
 
 ( n a b -betw- f )
 ( : betw +tmps s3 s2 s1  r2 r1 <=  r1 r3 <=  and -tmps ; )

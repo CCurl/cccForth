@@ -16,9 +16,9 @@
   #define __BOARD__ PC
   #define __WINDOWS__
   #include <conio.h>
-  #define CODE_SZ      (48*1024)
-  #define VARS_SZ      (96*1024)
-  #define STK_SZ        16
+  #define CODE_SZ      (16*1024)
+  #define VARS_SZ      (48*1024)
+  #define STK_SZ        25
   #define LSTK_SZ        8
   #define LOCALS_SZ    160
   #define VMSZ         (64*1024)
@@ -82,7 +82,7 @@ extern byte sp, isError;
 extern CELL base, state, last, here, cb, xt;
 
 extern void ps(const char*);
-extern void I(int, int, int, int);
+extern void I(int, int, int);
 extern void systemWords();
 extern void push(CELL);
 extern CELL pop();
