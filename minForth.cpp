@@ -415,7 +415,7 @@ void systemWords() {
     doParse(stringF(cp, ": cb %lu ;", cb));
     doParse(stringF(cp, ": vmsz %d ;", VMSZ));
     doParse(stringF(cp, "cb %d + constant v", CODE_SZ));
-    doParse(stringF(cp, ": code cb here 1- for i c@ dup ':' = if cr then emit next ;"));
+    doParse(stringF(cp, ": code cb here 1- for i c@ dup emit ';' = if i 1+ c@ ':' = if cr then next ;"));
 }
 
 #if __BOARD__ == PC
