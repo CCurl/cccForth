@@ -85,14 +85,21 @@ int T(char *x, char d) {
 /*  `  */ void f96() { y=yy; while (st.b[p]!='`') { *(y++)=st.b[p++]; } *y=0; ++p; system(yy); }
 /*  b  */ void fb() { u=st.b[p++];
         if (u=='&') { NOS=NOS&TOS; --s; }
-        if (u=='|') { NOS=NOS|TOS; --s; }
-        if (u=='^') { NOS=NOS^TOS; --s; }
-        if (u=='~') { TOS=~TOS; }
+        else if (u=='|') { NOS=NOS|TOS; --s; }
+        else if (u=='^') { NOS=NOS^TOS; --s; }
+        else if (u=='~') { TOS=~TOS; }
         else { --p; pc(32); } }
 /*  c  */ void fc() { u=st.b[p++];
         if (u=='@') { TOS=st.b[TOS]; }
-        if (u=='!') { st.b[TOS]=(char)NOS; } }
+        else if (u=='!') { st.b[TOS]=(char)NOS; } }
 /*  e  */ void fe() { p=st.i[s--]; }
+/*  f  */ void ff() { u=st.b[p++]; if (u=='.') { ps(stringF(yy, "%f", st.f[s--])); }
+        else if (u=='f') { st.f[s]=(float)st.i[s]; }
+        else if (u=='i') { st.i[s]=(int)st.f[s]; }
+        else if (u=='+') { st.f[s-1]+=st.f[s]; s--; }
+        else if (u=='-') { st.f[s-1]-=st.f[s]; s--; }
+        else if (u=='*') { st.f[s-1]*=st.f[s]; s--; }
+        else if (u=='/') { st.f[s-1]/=st.f[s]; s--; } }
 /*  i  */ void fi() { st.i[++s]=st.i[r]; }
 /*  k  */ void fk() { u=st.b[p++];
         if (u=='?') { st.i[++s]=charAvailable(); }
@@ -115,7 +122,7 @@ int T(char *x, char d) {
 void (*q[127])() = { X,X,X,X,X,X,X,X,X,X,N,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,N,
     f33,f34,f35,f36,f37,f38,f39,f40,N,f42,f43,f44,f45,f46,f47,fN,fN,fN,fN,fN,fN,fN,fN,fN,fN,f58,f59,f60,f61,f62,X,f64,
     fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,
-    f91,f92,f93,X,f95,f96,X,fb,fc,X,fe,X,X,X,fi,X,fk,X,X,X,X,X,X,X,X,X,X,X,X,fx,X,fz,f123,f124,f125,f126 };
+    f91,f92,f93,X,f95,f96,X,fb,fc,X,fe,ff,X,X,fi,X,fk,X,X,X,X,X,X,X,X,X,X,X,X,fx,X,fz,f123,f124,f125,f126 };
 void I(int nf, int ss, int cs) {
     // [funcs][stacks][code][vars]
     base = 10;

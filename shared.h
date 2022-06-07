@@ -16,9 +16,10 @@
   #define __BOARD__ PC
   #define __WINDOWS__
   #include <conio.h>
+  #define NUM_FUNCS    (500)
   #define CODE_SZ      (16*1024)
   #define VARS_SZ      (48*1024)
-  #define STK_SZ        25
+  #define STK_SZ        16
   #define LSTK_SZ        8
   #define LOCALS_SZ    160
   #define VMSZ         (64*1024)
@@ -86,7 +87,7 @@ extern void I(int, int, int);
 extern void systemWords();
 extern void push(CELL);
 extern CELL pop();
-extern void printStringF(const char*, ...);
+extern char *stringF(char *, const char*, ...);
 extern void pc(int);
 extern void pn(CELL, CELL);
 extern int strLen(const char *);

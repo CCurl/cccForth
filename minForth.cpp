@@ -64,8 +64,8 @@ PRIM_T prims[] = {
     , { "MAX", "%%<($)\\" }   // |MAX|%%<($)\\|(a b--c)|FORTH CORE|
     , { "RAND", "xR" }        // |RAND|xR|(--n)||
     , { "EXIT", ";" }         // |EXIT|;|(--)|FORTH CORE|
-    , { "TIMER", "t" }        // |TIMER|zT|(--n)|FORTH CORE|
-    , { "WAIT", "zW" }        // |WAIT|zW|(n--)|FORTH CORE|
+    , { "TIMER", "xT" }       // |TIMER|xT|(--n)|FORTH CORE|
+    , { "WAIT", "xW" }        // |WAIT|zW|(n--)|FORTH CORE|
     , { "RESET", "xX" }       // |RESET|xX|(--)||
     , { "FOR", "[" }          // |FOR|[|(--)|FORTH CORE|
     , { "I", "i" }            // |I|i|(--)|FORTH CORE|
@@ -94,6 +94,13 @@ PRIM_T prims[] = {
     , { "BASE@", "xB" }       // |BASE@|xB|(n--)||
     , { "BASE!", "xb" }       // |BASE!|xb|(--n)||
     , { "SYSTEM", "xY" }      // |SYSTEM|xY|(n--)||
+    , { ">F", "ff" }          // |>F|ff|(n--f)|CELL TOS to FLOAT|
+    , { "F>", "fi" }          // |F>|fi|(F--n)|FLOAT TOS to CELL|
+    , { "F.", "f." }          // |F.|f.|(F--f)|Print FLOAT|
+    , { "F+", "f+" }          // |F+|f+|(a b--f)|Add FLOATs|
+    , { "F-", "f-" }          // |F-|f-|(a b--f)|Subtract FLOATs|
+    , { "F*", "f*" }          // |F*|f*|(a b--f)|Multiply FLOATs|
+    , { "F/", "f/" }          // |F/|f/|(a b--f)|Divide FLOATs|
     , { "NOP", " " }          // |NOP| |(--)|FORTH CORE|
     // Extensions
 #if __BOARD__ == PC
@@ -121,7 +128,11 @@ PRIM_T prims[] = {
 
 char word[32], *in, exBuf[256];
 byte lastWasCall = 0;
-#define STATE state
+extern FIB_T st;
+extern void E(char*);
+CELL xt = 0, last = 0;
+DICT_T dict[100];
+
 
 char lower(char c) { return betw(c, 'A', 'Z') ? (c + 32) : c; }
 
@@ -164,23 +175,13 @@ char *stringF(char *buf, const char *fmt, ...) {
     return buf;
 }
 
-void printStringF(const char *fmt, ...) {
+void psF(const char *fmt, ...) {
     char buf[100];
     va_list args;
     va_start(args, fmt);
-    vsnprintf(buf, 100, fmt, args);
+    vsprintf(buf, fmt, args);
     va_end(args);
-    ps(buf);
 }
-
-int isTempWord(const char *nm) {
-    return ((nm[0] == 'T') && betw(nm[1], '0', '9') && (nm[2] == 0));
-}
-
-extern FIB_T st;
-extern void E(char *);
-CELL xt=0, last=0;
-DICT_T dict[100];
 
 void exec() {
     if (exBuf[0]) { E(exBuf); }
@@ -242,11 +243,12 @@ int execWord() {
 }
 
 int doNumber() {
-    int l = strLen(exBuf);
+    CELL l = strLen(exBuf), x = pop();
     char c = (l) ? exBuf[l-1] : 0;
     if (betw(c,'0','9')) { strCat(exBuf, " "); }
     char buf[16];
-    sprintf(buf, "%d", pop());
+    if (x<0) { sprintf(buf, "%d_", -x); }
+    else { sprintf(buf, "%d", x); }
     strCat(exBuf, buf);
     return 1;
 }
@@ -340,7 +342,7 @@ int doParseWord(char *wd) {
     if (strEq(wd, ";")) {
         strCat(exBuf, ";");
         exec();
-        STATE = 0;
+        state = 0;
         return 1;
     }
 
@@ -358,14 +360,14 @@ int doParseWord(char *wd) {
             doNumber();
             strCat(exBuf, ";");
             exec();
-            STATE = 0;
+            state = 0;
             return 1;
         }
         else { return 0; }
     }
 
-    STATE = 0;
-    printStringF("[%s]??", wd);
+    state = 0;
+    pc('['); ps(wd); ps("]??");
     return 0;
 }
 
@@ -396,7 +398,7 @@ void doParse(const char *line) {
 
 extern void doDotS();
 void doOK() {
-    if (STATE) { ps(" ... "); } else { ps("\r\nOK "); doDotS(); pc('>'); }
+    if (state) { ps(" ... "); } else { ps("\r\nOK "); doDotS(); pc('>'); }
 }
 
 char *rtrim(char *str) {
@@ -410,10 +412,10 @@ char *rtrim(char *str) {
 void systemWords() {
     char cp[96];
     exBuf[0] = 0;
-    sprintf(cp, ": cb %lu ;", cb);       doParse(cp);
-    sprintf(cp, ": vmsz %d ;", VMSZ);    doParse(cp);
-    sprintf(cp, "cb %d + constant v", CODE_SZ);    doParse(cp);
-    sprintf(cp, ": code cb here 1- for i c@ dup ':' = if cr then emit next ;"); doParse(cp);
+    doParse(stringF(cp, ": cb %lu ;", cb));
+    doParse(stringF(cp, ": vmsz %d ;", VMSZ));
+    doParse(stringF(cp, "cb %d + constant v", CODE_SZ));
+    doParse(stringF(cp, ": code cb here 1- for i c@ dup ':' = if cr then emit next ;"));
 }
 
 #if __BOARD__ == PC
@@ -492,9 +494,9 @@ int main()
         printf("ERROR: CELL cannot support a pointer!");
         exit(1);
     }
-    int fs=500, ss=fs+50, cs=(ss)*4+8000;
 
-    I(500,STK_SZ*2,CODE_SZ);
+    I(NUM_FUNCS,STK_SZ*2,CODE_SZ);
+
     doLoad(0);
     while (!isBye) { loop(); }
 }
