@@ -110,6 +110,7 @@ int T(char *x, char d) {
         else if (u=='S') { doDotS(); } 
         else if (u=='H') { st.i[++s]=here; }
         else if (u=='B') { st.i[++s]=base; }
+        else if (u=='b') { base=st.i[s--]; }
         else if (u=='Y') { y=&st.b[st.i[s--]]; system(y); }
         else if (u=='X') { I(sb,rb-sb,vb-cb); }
         else if (u=='Q') { isBye=1; }
