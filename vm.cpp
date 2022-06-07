@@ -69,7 +69,8 @@ int T(char *x, char d) {
 /*  -  */ void f45() { NOS; NOS -= TOS; --s; }
 /*  .  */ void f46() { t=st.i[s--]; pn(t,base); }
 /*  /  */ void f47() { NOS; NOS /= TOS; --s; }
-/*  0  */ void fN() { ++s; TOS=u-'0'; while (BTW(st.b[p],'0','9')) { TOS=(TOS*10)+(st.b[p++]-'0'); } }
+/*  0  */ void fN() { ++s; TOS=u-'0'; while (BTW(st.b[p],'0','9')) { TOS=(TOS*10)+(st.b[p++]-'0'); } 
+        if (st.b[p]=='e') { ++p; st.f[s]=(float)st.i[s]; } }
 /*  :  */ void f58() { u=st.b[p++]; t=FN; if (sb<=t) {  ps("-fn(1)-"); return; } here=st.i[t]=p; state=1; }
 /*  ;  */ void f59() { if (rb<r) { p=0; r=rb+1; } else { p=st.i[r++]; } }
 /*  <  */ void f60() { if (st.b[p]=='=') { ++p; NOS=(NOS<=TOS)?-1:0; } else { NOS=(NOS<TOS)?-1:0; } --s; }
