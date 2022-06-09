@@ -21,7 +21,7 @@
   #define VARS_SZ      (48*1024)
   #define STK_SZ        16
   #define LSTK_SZ        8
-  #define LOCALS_SZ    160
+  #define LOCALS_SZ    100
   #define VMSZ         (64*1024)
   // #define __EDITOR__
 #endif
@@ -83,7 +83,7 @@ extern byte sp, isError;
 extern CELL base, state, last, here, cb, xt;
 
 extern void ps(const char*);
-extern void I(int, int, int);
+extern void I(int, int, int, int);
 extern void systemWords();
 extern void push(CELL);
 extern CELL pop();

@@ -101,6 +101,18 @@ PRIM_T prims[] = {
     , { "F-", "f-" }          // |F-|f-|(a b--f)|Subtract FLOATs|
     , { "F*", "f*" }          // |F*|f*|(a b--f)|Multiply FLOATs|
     , { "F/", "f/" }          // |F/|f/|(a b--f)|Divide FLOATs|
+    , { "l+", "l+" }          // |l+| |(--)|Allocate new locals (l0-l9)|
+    , { "l-", "l-" }          // |l+| |(--)|De-allocate current locals|
+    , { "l0", "l0" }          // |l0| |(--a)|Local #0|
+    , { "l1", "l1" }          // |l1| |(--a)|Local #1|
+    , { "l2", "l2" }          // |l0| |(--a)|Local #2|
+    , { "l3", "l3" }          // |l1| |(--a)|Local #3|
+    , { "l4", "l4" }          // |l0| |(--a)|Local #4|
+    , { "l5", "l5" }          // |l1| |(--a)|Local #5|
+    , { "l6", "l6" }          // |l0| |(--a)|Local #6|
+    , { "l7", "l7" }          // |l1| |(--a)|Local #7|
+    , { "l8", "l8" }          // |l0| |(--a)|Local #8|
+    , { "l9", "l9" }          // |l1| |(--a)|Local #9|
     , { "NOP", " " }          // |NOP| |(--)|FORTH CORE|
     // Extensions
 #if __BOARD__ == PC
@@ -495,7 +507,7 @@ int main()
         exit(1);
     }
 
-    I(NUM_FUNCS,STK_SZ*2,CODE_SZ);
+    I(NUM_FUNCS,STK_SZ*2,CODE_SZ,LOCALS_SZ);
 
     doLoad(0);
     while (!isBye) { loop(); }

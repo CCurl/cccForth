@@ -7,7 +7,7 @@
 
 FIB_T st;
 char *y, yy[80];
-int base=10, state=0, cb, here, sb, s, rb, r, vb, v, p, u, t, isBye=0;
+int base=10, state=0, cb, here, sb, s, rb, r, vb, v, l, le, p, u, t, isBye=0;
 
 void push(CELL x) { st.i[++s] = x; }
 CELL pop() { return st.i[s--]; }
@@ -105,6 +105,10 @@ int T(char *x, char d) {
 /*  k  */ void fk() { u=st.b[p++];
         if (u=='?') { st.i[++s]=charAvailable(); }
         if (u=='@') { st.i[++s]=getChar(); } }
+/*  l  */ void fl() { u=st.b[p++];
+        if (BTW(u,'0','9')) { st.i[++s]=l+u-'0'; }
+        if (u=='+') { l+=10; if (le<=l) l-=10; }
+        if (u=='-') { l-=10; if (l<rb) l=rb; } }
 /*  x  */ void fx() { u=st.b[p++]; if (u=='U') { ++r; }
         else if (u=='I') { st.i[r]+=st.i[s--]; }
         else if (u=='T') { st.i[++s]=clock(); }
@@ -113,7 +117,7 @@ int T(char *x, char d) {
         else if (u=='B') { st.i[++s]=base; }
         else if (u=='b') { base=st.i[s--]; }
         else if (u=='Y') { y=&st.b[st.i[s--]]; system(y); }
-        else if (u=='X') { I(sb,rb-sb,vb-cb); }
+        else if (u=='X') { I(sb,rb-sb,vb-cb,(cb/4)-rb); }
         else if (u=='Q') { isBye=1; }
         else p=doExt(u,p); }
 /*  z  */ void fz() { y=&st.b[st.i[s--]]; T(y,0); }
@@ -124,12 +128,16 @@ int T(char *x, char d) {
 void (*q[127])() = { X,X,X,X,X,X,X,X,X,X,N,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,N,
     f33,f34,f35,f36,f37,f38,f39,f40,N,f42,f43,f44,f45,f46,f47,fN,fN,fN,fN,fN,fN,fN,fN,fN,fN,f58,f59,f60,f61,f62,X,f64,
     fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,
-    f91,f92,f93,X,f95,f96,X,fb,fc,X,fe,ff,X,X,fi,X,fk,X,X,X,X,X,X,X,X,X,X,X,X,fx,X,fz,f123,f124,f125,f126 };
-void I(int nf, int ss, int cs) {
-    // [funcs][stacks][code][vars]
+    f91,f92,f93,X,f95,f96,X,fb,fc,X,fe,ff,X,X,fi,X,fk,fl,X,X,X,X,X,X,X,X,X,X,X,fx,X,fz,f123,f124,f125,f126 };
+void I(int nf, int ss, int cs, int ls) {
+    // [funcs][stacks][locals][code][vars]
     base = 10;
-    s=sb=nf; r=rb=(sb+ss); here=cb=(rb*4); v=vb=cb+cs;
-    --s;
+    sb = nf;
+    l = r = rb = (sb+ss);
+    le = l+ls-1;
+    here = cb = (le+1)*4;
+    v = vb = cb+cs;
+    s = sb-1;
     isBye = last = xt = 0;
     for (t=0; t<(VMSZ/4); t++) { st.i[t]=0; }
     systemWords();
