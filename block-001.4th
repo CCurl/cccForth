@@ -10,13 +10,13 @@ reset
 : cells 4 * ;
 : code cb here 1- for i c@ dup ':' = if cr then emit next ;
 
-( n a b -betw- f )
-( : betw +tmps s3 s2 s1  r2 r1 <=  r1 r3 <=  and -tmps ; )
+( n a b -btw- f )
+: btw r+ s3 s2 s1 r2 r1 <= r1 r3 <= and r- ;
 
-( : .c dup BL $7E betw if emit exit then ." [%d]" ; )
-( : dumpN   1 for dup c@ .  1+ next drop ;		    )
-( : dumpNC  1 for dup c@ T0 1+ next drop ;		    )
-( : elapsed timer swap - ;							)
+: .c dup BL $7E btw if emit exit then ." [%d]" ;
+: dumpN  1 for dup  @ .  1+ next drop ;
+: dumpNC 1 for dup c@ .c 1+ next drop ;
+: elapsed timer swap - ;
 ( : fill for dup i c! next drop ;				    )
 ( : fill-n over + 1- fill ;					        )
 

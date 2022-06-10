@@ -78,8 +78,6 @@ PRIM_T prims[] = {
     , { "UNTIL", "~}" }       // |UNTIL|~}|(--)|FORTH CORE|
     , { "KEY", "k@" }         // |KEY|K|(--c)|FORTH CORE|
     , { "KEY?", "k?" }        // |KEY?|?|(--f)|FORTH CORE|
-    , { "+TMPS", "l+" }       // |+TMPS|p|(--)|FORTH CORE|
-    , { "-TMPS", "l-" }       // |-TMPS|q|(--)|FORTH CORE|
     , { "ZTYPE", "z" }        // |ZTYPE|z|(a--)|FORTH CORE|
     , { "QTYPE", "t" }        // |QTYPE|t|(a--)|FORTH CORE|
     , { ">R", "r<" }          // |>R|Q<|(n--)|FORTH CORE|
@@ -101,18 +99,28 @@ PRIM_T prims[] = {
     , { "F-", "f-" }          // |F-|f-|(a b--f)|Subtract FLOATs|
     , { "F*", "f*" }          // |F*|f*|(a b--f)|Multiply FLOATs|
     , { "F/", "f/" }          // |F/|f/|(a b--f)|Divide FLOATs|
-    , { "l+", "l+" }          // |l+| |(--)|Allocate new locals (l0-l9)|
-    , { "l-", "l-" }          // |l+| |(--)|De-allocate current locals|
-    , { "l0", "l0" }          // |l0| |(--a)|Local #0|
-    , { "l1", "l1" }          // |l1| |(--a)|Local #1|
-    , { "l2", "l2" }          // |l0| |(--a)|Local #2|
-    , { "l3", "l3" }          // |l1| |(--a)|Local #3|
-    , { "l4", "l4" }          // |l0| |(--a)|Local #4|
-    , { "l5", "l5" }          // |l1| |(--a)|Local #5|
-    , { "l6", "l6" }          // |l0| |(--a)|Local #6|
-    , { "l7", "l7" }          // |l1| |(--a)|Local #7|
-    , { "l8", "l8" }          // |l0| |(--a)|Local #8|
-    , { "l9", "l9" }          // |l1| |(--a)|Local #9|
+    , { "r+", "r+" }          // |r+| |(--)|Allocate new register set (l0-l9)|
+    , { "r-", "r-" }          // |r+| |(--)|De-allocate current register set|
+    , { "r0", "r0" }          // |r0| |(--a)|Register #0 value|
+    , { "r1", "r1" }          // |r1| |(--a)|Register #1 value|
+    , { "r2", "r2" }          // |r0| |(--a)|Register #2 value|
+    , { "r3", "r3" }          // |r1| |(--a)|Register #3 value|
+    , { "r4", "r4" }          // |r0| |(--a)|Register #4 value|
+    , { "r5", "r5" }          // |r1| |(--a)|Register #5 value|
+    , { "r6", "r6" }          // |r0| |(--a)|Register #6 value|
+    , { "r7", "r7" }          // |r1| |(--a)|Register #7 value|
+    , { "r8", "r8" }          // |r0| |(--a)|Register #8 value|
+    , { "r9", "r9" }          // |r1| |(--a)|Register #9 value|
+    , { "s0", "s0" }          // |s0| |(--a)|Set register #0|
+    , { "s1", "s1" }          // |s1| |(--a)|Set register #1|
+    , { "s2", "s2" }          // |s0| |(--a)|Set register #2|
+    , { "s3", "s3" }          // |s1| |(--a)|Set register #3|
+    , { "s4", "s4" }          // |s0| |(--a)|Set register #4|
+    , { "s5", "s5" }          // |s1| |(--a)|Set register #5|
+    , { "s6", "s6" }          // |s0| |(--a)|Set register #6|
+    , { "s7", "s7" }          // |s1| |(--a)|Set register #7|
+    , { "s8", "s8" }          // |s0| |(--a)|Set register #8|
+    , { "s9", "s9" }          // |s1| |(--a)|Set register #9|
     , { "NOP", " " }          // |NOP| |(--)|FORTH CORE|
     // Extensions
 #if __BOARD__ == PC

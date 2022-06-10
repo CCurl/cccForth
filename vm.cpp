@@ -79,19 +79,17 @@ int T(char *x, char d) {
 /*  @  */ void f64() { TOS=st.i[TOS]; }
 /* A-Z */ void fAZ() { t=FN; if (sb<=t) { ps("-fn(2)-"); return; }
         if (st.i[t]) { if (st.b[p]!=';') { st.i[--r]=p; } p=st.i[t]; } }
-/*  [  */ void f91() { st.i[--r]=p; st.i[--r]=st.i[s--]; st.i[--r]=st.i[s--]; }
+/*  [  */ void f91() { st.i[--r]=p; st.i[--r]=(TOS>NOS)?TOS:NOS; st.i[--r]=(TOS<NOS)?TOS:NOS; s-=2; }
 /*  \  */ void f92() { --s; }
 /*  ]  */ void f93() { ++st.i[r]; if (st.i[r]<=st.i[r+1]) { p=st.i[r+2]; } else { r+=3; } }
 /*  _  */ void f95() { TOS=-TOS; }
 /*  `  */ void f96() { y=yy; while (st.b[p]!='`') { *(y++)=st.b[p++]; } *y=0; ++p; system(yy); }
-/*  b  */ void fb() { u=st.b[p++];
-        if (u=='&') { NOS=NOS&TOS; --s; }
+/*  b  */ void fb() { u=st.b[p++]; if (u=='&') { NOS=NOS&TOS; --s; }
         else if (u=='|') { NOS=NOS|TOS; --s; }
         else if (u=='^') { NOS=NOS^TOS; --s; }
         else if (u=='~') { TOS=~TOS; }
         else { --p; pc(32); } }
-/*  c  */ void fc() { u=st.b[p++];
-        if (u=='@') { TOS=st.b[TOS]; }
+/*  c  */ void fc() { u=st.b[p++]; if (u=='@') { TOS=st.b[TOS]; }
         else if (u=='!') { st.b[TOS]=(char)NOS; } }
 /*  e  */ void fe() { p=st.i[s--]; }
 /*  f  */ void ff() { u=st.b[p++]; if (u=='.') { ps(stringF(yy, "%f", st.f[s--])); }
@@ -102,13 +100,15 @@ int T(char *x, char d) {
         else if (u=='*') { st.f[s-1]*=st.f[s]; s--; }
         else if (u=='/') { st.f[s-1]/=st.f[s]; s--; } }
 /*  i  */ void fi() { st.i[++s]=st.i[r]; }
-/*  k  */ void fk() { u=st.b[p++];
-        if (u=='?') { st.i[++s]=charAvailable(); }
-        if (u=='@') { st.i[++s]=getChar(); } }
-/*  l  */ void fl() { u=st.b[p++];
-        if (BTW(u,'0','9')) { st.i[++s]=l+u-'0'; }
-        if (u=='+') { l+=10; if (le<=l) l-=10; }
-        if (u=='-') { l-=10; if (l<rb) l=rb; } }
+/*  k  */ void fk() { u=st.b[p++]; if (u=='?') { st.i[++s]=charAvailable(); }
+        else if (u=='@') { st.i[++s]=getChar(); } }
+/*  r  */ void fr() { u=st.b[p++]; if (BTW(u,'0','9')) { st.i[++s]=st.i[l+u-'0']; }
+        else if (u=='+') { l+=10; if (le<=l) l-=10; }
+        else if (u=='-') { l-=10; if (l<rb) l=rb; }
+        else if (u=='<') { st.i[--r]=st.i[s--]; if (le<=l) l-=10; }
+        else if (u=='>') { st.i[++s]=st.i[r++]; }
+        else if (u=='@') { st.i[++s]=st.i[r]; } }
+/*  s  */ void fs() { u=st.b[p++]; if (BTW(u,'0','9')) { st.i[l+u-'0']=st.i[s--]; } }
 /*  x  */ void fx() { u=st.b[p++]; if (u=='U') { ++r; }
         else if (u=='I') { st.i[r]+=st.i[s--]; }
         else if (u=='T') { st.i[++s]=clock(); }
@@ -128,7 +128,7 @@ int T(char *x, char d) {
 void (*q[127])() = { X,X,X,X,X,X,X,X,X,X,N,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,N,
     f33,f34,f35,f36,f37,f38,f39,f40,N,f42,f43,f44,f45,f46,f47,fN,fN,fN,fN,fN,fN,fN,fN,fN,fN,f58,f59,f60,f61,f62,X,f64,
     fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,fAZ,
-    f91,f92,f93,X,f95,f96,X,fb,fc,X,fe,ff,X,X,fi,X,fk,fl,X,X,X,X,X,X,X,X,X,X,X,fx,X,fz,f123,f124,f125,f126 };
+    f91,f92,f93,X,f95,f96,X,fb,fc,X,fe,ff,X,X,fi,X,fk,X,X,X,X,X,X,fr,fs,X,X,X,X,fx,X,fz,f123,f124,f125,f126 };
 void I(int nf, int ss, int cs, int ls) {
     // [funcs][stacks][locals][code][vars]
     base = 10;
