@@ -53,8 +53,8 @@ int T(char *x, char d) {
     return l+1;
 }
 
-/*     */ void X() { if (u) { pc(u); pc('?'); } p=0; }
-/*     */ void N() { }
+/* ??? */ void X() { if (u) { pc(u); pc('?'); } p=0; }
+/* NOP */ void N() { }
 /*  !  */ void f33() { st.i[TOS]=NOS; s-=2; }
 /*  "  */ void f34() { y=&st.b[p]; p+=T(y,'"'); }
 /*  #  */ void f35() { t=TOS; st.i[++s]=t; }
