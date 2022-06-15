@@ -116,7 +116,7 @@ void run(WORD start) {
         case '/': t1 = pop(); TOS /= t1;                                     break; // DIV
         case '0': case '1': case '2': case '3': case '4': case '5':                 // NUMBER
         case '6': case '7': case '8': case '9': push(ir-'0');
-            while (betw(*pc,'0','9')) { TOS = (TOS*10) + *(pc++) - '0'; }    break;
+            while (BTW(*pc,'0','9')) { TOS = (TOS*10) + *(pc++) - '0'; }     break;
         case ':': if (*(pc+2) != ';') { rpush(pc - code + 2); }                     // CALL (w/tail-call optimization)
             pc = CA(GET_WORD(pc));                                           break;
         case ';': if (rsp>rb) { pc=0; rsp=rb+1; } else { pc=CA(rpop()); }    break; // RETURN
@@ -157,12 +157,12 @@ void run(WORD start) {
                 else { --pc; printChar(32); } break;
         case 'c': ir = *(pc++); if (ir=='@') { TOS = *AOS; }
                 else if(ir=='!') { *AOS = (byte)NOS; DROP2; }                break; // c@, c!
-        case 'd': t1=*(pc++)-'0'; if (betw(t1,0,9)) { --locals[lb+t1]; }     break; // decLocal
-        case 'i': t1=*(pc++)-'0'; if (betw(t1,0,9)) { ++locals[lb+t1]; }     break; // incLocal
+        case 'd': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { --locals[lb+t1]; }      break; // decLocal
+        case 'i': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { ++locals[lb+t1]; }      break; // incLocal
         case 'l': ir=*(pc++); if (ir=='+') { lb+=((lb+10)<LOCALS_SZ)?10:0; }        // locals
                 else if (ir=='-') { lb-=(lb<10)?0:10; }                      break;
-        case 'r': t1=*(pc++)-'0'; if (betw(t1,0,9)) { push(locals[lb+t1]); } break; // readLocal
-        case 's': t1=*(pc++)-'0'; if (betw(t1,0,9)) { locals[lb+t1]=pop(); } break; // setLocal
+        case 'r': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { push(locals[lb+t1]); }  break; // readLocal
+        case 's': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]=pop(); }  break; // setLocal
         case 't': printString((char *)pop());                                break; // QTYPE
         case 'u': if (pop() == 0) { pc = LOS.s; } else { lpop(); }           break; // UNTIL
         case 'v': if (pop()) { pc = LOS.s; } else { lpop(); }                break; // WHILE

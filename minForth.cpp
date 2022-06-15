@@ -1,6 +1,7 @@
 // MinForth.cpp : An extremely memory conscious Forth interpreter
 
 #include "Shared.h"
+#include <time.h>
 
 typedef struct {
     const char *name;
@@ -91,6 +92,7 @@ PRIM_T prims[] = {
     , { ".IF", "(" }          // |.IF|(|(f--)|FORTH CORE|
     , { ".THEN", ")" }        // |.THEN|)|(--)|FORTH CORE|
     , { ".S", "zS" }          // |.S|zS|(--)|FORTH CORE|
+    , { "WORDS", "zD" }       // |WORDS|zD|(--)|FORTH CORE|
     , { "NOP", "" }           // |NOP||(--)|FORTH CORE|
     // Extensions
 #if __BOARD__ == PC
@@ -125,7 +127,7 @@ void CComma(CELL v) { code[HERE++] = (byte)v; }
 void Comma(CELL v) { SET_LONG(&code[HERE], v); HERE += CELL_SZ; }
 void WComma(WORD v) { SET_WORD(&code[HERE], v); HERE += 2; }
 
-char lower(char c) { return betw(c, 'A', 'Z') ? (c + 32) : c; }
+char lower(char c) { return BTW(c, 'A', 'Z') ? (c + 32) : c; }
 
 byte strEq(const char *x, const char *y) {
     while (*x && *y && (*x == *y)) { ++x; ++y; }
@@ -162,7 +164,7 @@ void printStringF(const char *fmt, ...) {
 }
 
 int isTempWord(const char *nm) {
-    return ((nm[0] == 'T') && betw(nm[1], '0', '9') && (nm[2] == 0));
+    return ((nm[0] == 'T') && BTW(nm[1], '0', '9') && (nm[2] == 0));
 }
 
 void doCreate(const char *name, byte f) {
@@ -255,7 +257,7 @@ int doNumber(int compile) {
 
 int doNumber2(int compile) {
     if (compile) {
-        if (betw(code[HERE-1],'0','9')) { CComma(' '); }
+        if (BTW(code[HERE-1],'0','9')) { CComma(' '); }
         char buf[16];
         sprintf(buf, "%d", pop());
         for (int i=0; buf[i]; i++) { CComma(buf[i]); }
@@ -276,9 +278,9 @@ int isNum(const char *wd) {
     while (*wd) {
         char c = *(wd++);
         int t = -1;
-        if (betw(c, '0', lastCh)) { t = c - '0'; }
-        if ((base == 16) && (betw(c, 'A', 'F'))) { t = c - 'A' + 10; }
-        if ((base == 16) && (betw(c, 'a', 'f'))) { t = c - 'a' + 10; }
+        if (BTW(c, '0', lastCh)) { t = c - '0'; }
+        if ((base == 16) && (BTW(c, 'A', 'F'))) { t = c - 'A' + 10; }
+        if ((base == 16) && (BTW(c, 'a', 'f'))) { t = c - 'a' + 10; }
         if (t < 0) { return 0; }
         x = (x * base) + t;
     }
@@ -288,10 +290,10 @@ int isNum(const char *wd) {
 }
 
 char *isRegOp(const char *wd, char *out) {
-    if ((wd[0] == 'r') && betw(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
-    if ((wd[0] == 's') && betw(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
-    if ((wd[0] == 'i') && betw(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
-    if ((wd[0] == 'd') && betw(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
+    if ((wd[0] == 'r') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
+    if ((wd[0] == 's') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
+    if ((wd[0] == 'i') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
+    if ((wd[0] == 'd') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
     return 0;
 }
 
@@ -307,7 +309,7 @@ int doPrim(const char *wd) {
     if (!vml) { return 0; } // Not found
 
     if (STATE) {
-        if (betw(vml[0],'0','9') && betw(code[HERE-1],'0','9')) { CComma(' '); }
+        if (BTW(vml[0],'0','9') && BTW(code[HERE-1],'0','9')) { CComma(' '); }
         for (int j = 0; vml[j]; j++) { CComma(vml[j]); }
     } else {
         byte* x = CA(HERE + 10);
@@ -375,7 +377,6 @@ int doParseWord(char *wd) {
 
     if (strEqI(wd, "IMMEDIATE")) { DP_AT(LAST)->flags |= 1; return 1; }
     if (strEqI(wd, "ALLOT")) { VHERE += pop();              return 1; }
-    if (strEqI(wd, "WORDS")) { return doWords(); }
 
     if (strEqI(wd, "IF")) {
         CComma('?');
@@ -496,7 +497,7 @@ void doLoad(int blk) {
 }
 
 long doRand() {
-    static long seed = GetTickCount();
+    static long seed = clock();
     seed ^= (seed << 13);
     seed ^= (seed >> 17);
     seed ^= (seed <<  5);
@@ -505,11 +506,12 @@ long doRand() {
 
 byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
+    case 'D': doWords();                        break;
     case 'E': doEditor();                       break;
     case 'L': doLoad(pop());                    break;
     case 'R': push(doRand());                   break;
     case 'S': doDotS();                         break;
-    case 'T': push(GetTickCount());             break;
+    case 'T': push(clock());                    break;
     case 'W': if (TOS) { Sleep(TOS); } pop();   break;
     case 'Z': isBye = 1;                        break;
     default: printString("-unk ext-");

@@ -15,6 +15,7 @@ reset
 : T0 ( c-- ) dup BL $7E betw .if emit exit .then ." (%d)" ;
 : dumpN  ( a n-- ) 1 for dup c@ .  1+ next drop ;
 : dumpNC ( a n-- ) 1 for dup c@ T0 1+ next drop ;
+: code cb here dumpNC ;
 : elapsed timer swap - ;
 : fill ( c f t-- ) for dup i c! next drop ;
 : fill-n ( c a n-- ) over + 1- fill ;

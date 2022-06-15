@@ -23,7 +23,7 @@
   #define STK_SZ        64
   #define LSTK_SZ        8
   #define LOCALS_SZ    100
-  #define __EDITOR__
+  // #define __EDITOR__
 #endif
 
 #include <stdarg.h>
@@ -56,7 +56,7 @@
 #define DROP2         sp-=2
 #define CA(l)         (code+l)
 #define DP_AT(l)      ((DICT_T *)(&code[l]))
-#define betw(x, a, b) ((a<=x)&&(x<=b))
+#define BTW(x, a, b)  ((a<=x)&&(x<=b))
 #define BA(a)         ((byte *)a)
 
 typedef unsigned char byte;
