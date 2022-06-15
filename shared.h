@@ -15,19 +15,20 @@
   #undef __BOARD__
   #define __BOARD__ PC
   #define __WINDOWS__
-  #define  _CRT_SECURE_NO_WARNINGS
-  #include <Windows.h>
   #include <conio.h>
   #define CODE_SZ      ( 64*1024)
   #define VARS_SZ      (128*1024)
   #define STK_SZ        16
   #define LSTK_SZ        8
-  #define LOCALS_SZ    160
-  #define __EDITOR__
+  #define LOCALS_SZ    100
+  #define VMSZ         (64*1024)
+  // #define __EDITOR__
 #endif
 
-#include <stdarg.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
+#include <time.h>
 
 #if __BOARD__ == TEENSY4
   #define CODE_SZ      (48*1024)
@@ -56,47 +57,42 @@
 #define CA(l)         (code+l)
 #define DP_AT(l)      ((DICT_T *)(&code[l]))
 #define betw(x, a, b) ((a<=x)&&(x<=b))
+#define BTW(x, a, b) ((a<=x)&&(x<=b))
 #define BA(a)         ((byte *)a)
 
 typedef unsigned char byte;
 typedef unsigned short WORD;
-typedef long CELL;
+typedef int CELL;
 typedef unsigned long UCELL;
 typedef unsigned short USHORT;
 
+typedef union {
+    float f[VMSZ / 4];
+    int i[VMSZ / 4];
+    char b[VMSZ];
+} FIB_T;
+
 typedef struct {
-    byte prev;
     byte flags;
-    char name[32];
+    USHORT xt;
+    char name[12];
 } DICT_T;
 
-typedef struct {
-    byte *s, *e;
-    CELL f, t;
-} LOOP_T;
-
 extern byte sp, isError;
-extern CELL BASE, STATE, LAST, HERE, tempWords[10];
-extern byte *VHERE, *VHERE2;
-extern byte code[];
-extern byte vars[];
-extern CELL stk[];
-extern CELL rstk[];
+extern CELL base, state, last, here, cb, xt;
 
-extern void vmReset();
+extern void ps(const char*);
+extern void I(int, int, int, int);
 extern void systemWords();
 extern void push(CELL);
 extern CELL pop();
-extern void SET_WORD(byte *l, WORD v);
-extern void SET_LONG(byte *l, long v);
-extern void printString(const char*);
-extern void printStringF(const char*, ...);
-extern void printChar(char);
-extern void printBase(CELL, CELL);
+extern char *stringF(char *, const char*, ...);
+extern void pc(int);
+extern void pn(CELL, CELL);
 extern int strLen(const char *);
 extern void run(WORD);
 extern void doOK();
-extern byte *doExt(CELL, byte *);
+extern int doExt(CELL, int);
 extern void doEditor();
 extern int doFind(const char *);
 extern void doParse(const char *);

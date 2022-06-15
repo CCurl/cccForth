@@ -25,12 +25,12 @@ char theBlock[BLOCK_SZ];
 const char* msg = NULL;
 byte edLines[NUM_LINES][LLEN];
 
-void GotoXY(int x, int y) { printStringF("\x1B[%d;%dH", y, x); }
+void GotoXY(int x, int y) { psF("\x1B[%d;%dH", y, x); }
 void CLS() { printString("\x1B[2J"); GotoXY(1, 1); }
 void CursorOn() { printString("\x1B[?25h"); }
 void CursorOff() { printString("\x1B[?25l"); }
 void Color(int c, int bg) {
-    printStringF("%c[%d;%dm", 27, (30 + c), bg ? bg : 40);
+    psF("%c[%d;%dm", 27, (30 + c), bg ? bg : 40);
 }
 
 void NormLO() {
@@ -205,8 +205,8 @@ void edSvBlk() {
 void showFooter() {
     GotoXY(1, NUM_LINES);
     printString("- Block Editor v0.1 - ");
-    printStringF("Block# %03d %c", blkNum, isDirty ? '*' : ' ');
-    printStringF(" %s -\r\n", msg ? msg : "");
+    psF("Block# %03d %c", blkNum, isDirty ? '*' : ' ');
+    psF(" %s -\r\n", msg ? msg : "");
     printString("\r\n  (q)home (w)up (e)end (a)left (s)down (d)right (t)op (l)ast");
     printString("\r\n  (x)del char (r)eplace (i)nsert");
     printString("\r\n  (W)rite (L)reLoad (+)next (-)prev (Q)uit");
