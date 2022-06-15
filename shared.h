@@ -15,21 +15,19 @@
   #undef __BOARD__
   #define __BOARD__ PC
   #define __WINDOWS__
+  #define  _CRT_SECURE_NO_WARNINGS
+  #include <Windows.h>
   #include <conio.h>
-  #define NUM_FUNCS    (500)
-  #define CODE_SZ      (16*1024)
-  #define VARS_SZ      (48*1024)
+  #define CODE_SZ      ( 64*1024)
+  #define VARS_SZ      (256*1024)
   #define STK_SZ        16
   #define LSTK_SZ        8
-  #define LOCALS_SZ    100
-  #define VMSZ         (64*1024)
-  // #define __EDITOR__
+  #define LOCALS_SZ    160
+  #define __EDITOR__
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdarg.h>
-#include <time.h>
+#include <stdio.h>
 
 #if __BOARD__ == TEENSY4
   #define CODE_SZ      (48*1024)
@@ -50,50 +48,55 @@
 
 #define CELL_SZ      4
 
-#define TOS           stk[sp]
-#define NOS           stk[sp-1]
+#define TOS           stks[sp]
+#define NOS           stks[sp-1]
 #define AOS           (byte*)TOS
 #define LOS           lstk[lsp]
 #define DROP2         pop(); pop()
 #define CA(l)         (code+l)
 #define DP_AT(l)      ((DICT_T *)(&code[l]))
 #define betw(x, a, b) ((a<=x)&&(x<=b))
-#define BTW(x, a, b) ((a<=x)&&(x<=b))
 #define BA(a)         ((byte *)a)
 
 typedef unsigned char byte;
 typedef unsigned short WORD;
-typedef int CELL;
+typedef long CELL;
 typedef unsigned long UCELL;
 typedef unsigned short USHORT;
 
-typedef union {
-    float f[VMSZ / 4];
-    int i[VMSZ / 4];
-    char b[VMSZ];
-} FIB_T;
-
 typedef struct {
+    byte prev;
     byte flags;
-    USHORT xt;
-    char name[12];
+    char name[32];
 } DICT_T;
 
-extern byte sp, isError;
-extern CELL base, state, last, here, cb, xt;
+typedef struct {
+    byte *s, *e;
+    CELL f, t;
+} LOOP_T;
 
-extern void ps(const char*);
-extern void I(int, int, int, int);
+extern byte sp, isError;
+extern CELL BASE, STATE, LAST, HERE, tempWords[10];
+extern byte *VHERE, *VHERE2;
+extern byte code[];
+extern byte vars[];
+extern CELL stks[];
+
+extern void vmReset();
 extern void systemWords();
 extern void push(CELL);
 extern CELL pop();
-extern char *stringF(char *, const char*, ...);
-extern void pc(int);
-extern void pn(CELL, CELL);
+extern void SET_WORD(byte *l, WORD v);
+extern void SET_LONG(byte *l, long v);
+extern void printString(const char*);
+extern void printStringF(const char*, ...);
+extern void printChar(char);
+extern void printBase(CELL, CELL);
 extern int strLen(const char *);
 extern void run(WORD);
+extern void doDotS();
 extern void doOK();
-extern int doExt(CELL, int);
+extern byte *doExt(CELL, byte *);
 extern void doEditor();
 extern int doFind(const char *);
 extern void doParse(const char *);
