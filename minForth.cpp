@@ -14,7 +14,7 @@ PRIM_T prims[] = {
     , { "/", "/" }            // |/|/|(a b--c)|FORTH CORE|
     , { "*", "*" }            // |*|*|(a b--c)|FORTH CORE|
     , { "/MOD", "&" }         // |/MOD|&|(a b--q r)|FORTH CORE|
-    , { "MOD", "M" }          // |MOD|M|(a b--c)|FORTH CORE|
+    , { "MOD", "b%" }         // |MOD|M|(a b--c)|FORTH CORE|
     , { "SWAP", "$" }         // |SWAP|$|(a b--b a)|FORTH CORE|
     , { "DROP", "\\" }        // |DROP|\\|(a b--a)|FORTH CORE|
     , { "OVER", "%" }         // |OVER|%|(a b--a b a)|FORTH CORE|
@@ -32,35 +32,41 @@ PRIM_T prims[] = {
     , { "=", "=" }            // |=|=|(a b--f)|FORTH CORE|
     , { "<", "<" }            // |<|<|(a b--f)|FORTH CORE|
     , { ">", ">" }            // |>|>|(a b--f)|FORTH CORE|
-    , { "<=", ">N" }          // |<=|>N|(a b--f)|FORTH CORE|
-    , { ">=", "<N" }          // |>=|<N|(a b--f)|FORTH CORE|
-    , { "<>", "=N" }          // |<>|=N|(a b--f)|FORTH CORE|
-    , { "!=", "=N" }          // |!=|=N|(a b--f)|FORTH CORE|
-    , { "0=", "N" }           // |0=|N|(a b--f)|FORTH CORE|
+    , { "<=", ">~" }          // |<=|>N|(a b--f)|FORTH CORE|
+    , { ">=", "<~" }          // |>=|<N|(a b--f)|FORTH CORE|
+    , { "<>", "=~" }          // |<>|=N|(a b--f)|FORTH CORE|
+    , { "!=", "=~" }          // |!=|=N|(a b--f)|FORTH CORE|
+    , { "0=", "~" }           // |0=|N|(a b--f)|FORTH CORE|
     , { "ABS", "#0<(_)" }     // |ABS|#0<(_)|(a--b)|FORTH CORE|
     , { "NEGATE", "_" }       // |NEGATE|_|(a--b)|FORTH CORE|
-    , { "<<", "L" }           // |<<|L|(a b--c)|FORTH CORE|
-    , { ">>", "R" }           // |>>|R|(a b--c)|FORTH CORE|
+    , { "<<", "SL" }          // |<<|L|(a b--c)|FORTH CORE|
+    , { ">>", "SR" }          // |>>|R|(a b--c)|FORTH CORE|
     , { "ZLEN", "T" }         // |ZLEN|T|(a--n)|FORTH CORE|
     , { ".", ".32," }         // |.|.32,|(n--)|FORTH CORE|
     , { "@", "@" }            // |@|@|(a--n)|FORTH CORE|
-    , { "C@", "c" }           // |C@|c|(a--c)|FORTH CORE|
-    , { "W@", "w" }           // |W@|w|(a--w)|FORTH CORE|
+    , { "C@", "c@" }          // |C@|c@|(a--c)|FORTH CORE|
+    , { "W@", "w@" }          // |W@|w@|(a--w)|FORTH CORE|
     , { "!", "!" }            // |!|!|(n a--)|FORTH CORE|
-    , { "C!", "C" }           // |C!|C|(n a--)|FORTH CORE|
-    , { "W!", "W" }           // |W!|W|(n a--)|FORTH CORE|
-    , { "AND", "a" }          // |AND|a|(a b--c)|FORTH CORE|
-    , { "OR", "o" }           // |OR|o|(a b--c)|FORTH CORE|
-    , { "XOR", "x" }          // |XOR|x|(a b--c)|FORTH CORE|
-    , { "COM", "~" }          // |COM|~|(a--b)|FORTH CORE|
-    , { "NOT", "N" }          // |NOT|N|(a--b)|FORTH CORE|
+    , { "C!", "c!" }          // |C!|c!|(n a--)|FORTH CORE|
+    , { "W!", "w!" }          // |W!|w!|(n a--)|FORTH CORE|
+    , { "AND", "b&" }         // |AND|a|(a b--c)|FORTH CORE|
+    , { "FOR", "[" }          // |FOR|[|(a--b)|FORTH CORE|
+    , { "I", "I" }            // |I|I|(a--b)|FORTH CORE|
+    , { "NEXT", "]" }         // |NEXT|[|(a--b)|FORTH CORE|
+    , { "BEGIN", "{" }        // |FOR|[|(a--b)|FORTH CORE|
+    , { "WHILE", "}" }        // |I|I|(a--b)|FORTH CORE|
+    , { "UNTIL", "~}" }       // |I|I|(a--b)|FORTH CORE|
+    , { "OR", "b|" }          // |OR|o|(a b--c)|FORTH CORE|
+    , { "XOR", "b^" }         // |XOR|x|(a b--c)|FORTH CORE|
+    , { "COM", "b~" }         // |COM|~|(a--b)|FORTH CORE|
+    , { "NOT", "~" }          // |NOT|N|(a--b)|FORTH CORE|
     , { "1+", "P" }           // |1+|P|(a--b)|FORTH CORE|
     , { "2+", "PP" }          // |2+|PP|(a--b)|FORTH CORE|
     , { "4+", "PPPP" }        // |4+|PPPP|(a--b)|FORTH CORE|
     , { "+!", "$%@+$!" }      // |+!|$%@+$!|(n a--)|FORTH CORE|
     , { "1-", "D" }           // |1-|D|(a--b)|FORTH CORE|
     , { "I", "I" }            // |I|I|(--c)|FORTH CORE|
-    , { "+I", "m" }           // |+I|m|(n--)|FORTH CORE|
+    , { "+I", "M" }           // |+I|m|(n--)|FORTH CORE|
     , { "EXECUTE", "G" }      // |EXECUTE|G|(a--)|FORTH CORE|
     , { "MIN", "%%>($)\\" }   // |MIN|%%>($)\\|(a b--c)|FORTH CORE|
     , { "MAX", "%%<($)\\" }   // |MAX|%%<($)\\|(a b--c)|FORTH CORE|
@@ -69,12 +75,12 @@ PRIM_T prims[] = {
     , { "TIMER", "zT" }       // |TIMER|zT|(--n)|FORTH CORE|
     , { "WAIT", "zW" }        // |WAIT|zW|(n--)|FORTH CORE|
     , { "RESET", "Y" }        // |RESET|Y|(--)|FORTH CORE|
-    , { "UNLOOP", "k" }       // |UNLOOP|k|(--)|FORTH CORE|
-    , { "LEAVE", "l" }        // |LEAVE|l|(--)|FORTH CORE|
-    , { "KEY", "K" }          // |KEY|K|(--c)|FORTH CORE|
-    , { "KEY?", "?" }         // |KEY?|?|(--f)|FORTH CORE|
-    , { "+TMPS", "p" }        // |+TMPS|p|(--)|FORTH CORE|
-    , { "-TMPS", "q" }        // |-TMPS|q|(--)|FORTH CORE|
+    , { "UNLOOP", "^" }       // |UNLOOP|^|(--)|FORTH CORE|
+    , { "LEAVE", "^" }        // |LEAVE|l|(--)|FORTH CORE|
+    , { "KEY", "k@" }         // |KEY|K|(--c)|FORTH CORE|
+    , { "KEY?", "k?" }        // |KEY?|?|(--f)|FORTH CORE|
+    , { "+TMPS", "l+" }       // |+TMPS|l+|(--)|FORTH CORE|
+    , { "-TMPS", "l-" }       // |-TMPS|l-|(--)|FORTH CORE|
     , { "ZTYPE", "Z" }        // |ZTYPE|Z|(a--)|FORTH CORE|
     , { "QTYPE", "t" }        // |QTYPE|t|(a--)|FORTH CORE|
     , { ">R", "Q<" }          // |>R|Q<|(n--)|FORTH CORE|
@@ -232,7 +238,7 @@ int doNumber(int compile) {
     if (compile) {
         CELL num = pop();
         if ((num & 0xFF) == num) {
-            CComma(1);
+            CComma('\'');
             CComma(num & 0xff);
         }
         else if ((num & 0xFFFF) == num) {
@@ -282,10 +288,10 @@ int isNum(const char *wd) {
 }
 
 char *isRegOp(const char *wd, char *out) {
-    if (betw(wd[0], 'r', 's') && betw(wd[1], '0', '9') && (!wd[2])) { return (char *)wd; }
-    if ((wd[0] == 'i')        && betw(wd[1], '0', '9') && (!wd[2])) { return (char *)wd; }
-    if ((wd[0] == 'd')        && betw(wd[1], '0', '9') && (!wd[2])) { return (char *)wd; }
-
+    if ((wd[0] == 'r') && betw(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
+    if ((wd[0] == 's') && betw(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
+    if ((wd[0] == 'i') && betw(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
+    if ((wd[0] == 'd') && betw(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
     return 0;
 }
 
@@ -362,10 +368,8 @@ int doParseWord(char *wd) {
     }
 
     if (strEq(wd, ";")) {
+        CComma(';');
         STATE = 0;
-        // Simple tail-call optimization
-        if (lwc && (code[HERE - 3] == ':')) { code[HERE - 3] = 'J'; }
-        else { CComma(';'); }
         return 1;
     }
 
@@ -374,7 +378,7 @@ int doParseWord(char *wd) {
     if (strEqI(wd, "WORDS")) { return doWords(); }
 
     if (strEqI(wd, "IF")) {
-        CComma('j');
+        CComma('?');
         push(HERE);
         WComma(0);
         return 1;
@@ -390,48 +394,6 @@ int doParseWord(char *wd) {
     }
 
     if (strEqI(wd, "THEN")) {
-        CELL tgt = pop();
-        SET_WORD(CA(tgt), (WORD)HERE);
-        return 1;
-    }
-
-    if (strEqI(wd, "FOR")) {
-        CComma('[');
-        push(HERE);
-        WComma(0);
-        return 1;
-    }
-
-    if (strEqI(wd, "NEXT")) {
-        CComma(']');
-        CELL tgt = pop();
-        SET_WORD(CA(tgt), (WORD)HERE);
-        return 1;
-    }
-
-    if (strEqI(wd, "BEGIN")) {
-        CComma('{');
-        push(HERE);
-        WComma(0);
-        return 1;
-    }
-
-    if (strEqI(wd, "AGAIN")) {
-        CComma('}');
-        CELL tgt = pop();
-        SET_WORD(CA(tgt), (WORD)HERE);
-        return 1;
-    }
-
-    if (strEqI(wd, "WHILE")) {
-        CComma('v');
-        CELL tgt = pop();
-        SET_WORD(CA(tgt), (WORD)HERE);
-        return 1;
-    }
-
-    if (strEqI(wd, "UNTIL")) {
-        CComma('u');
         CELL tgt = pop();
         SET_WORD(CA(tgt), (WORD)HERE);
         return 1;
@@ -467,8 +429,17 @@ int doParseWord(char *wd) {
     return 0;
 }
 
+bool isASM(const char* ln) {
+    if ((ln[0]=='s') && (ln[1]==':') && (ln[2]==' ')) {
+        run((byte*)ln-code+3);
+        return 1;
+    }
+    return 0;
+}
+
 void doParse(const char *line) {
     in = (char*)line;
+    if (isASM(line)) { return; }
     int len = getWord(word);
     while (0 < len) {
         if (VHERE2 < VHERE) { VHERE2 = VHERE; }

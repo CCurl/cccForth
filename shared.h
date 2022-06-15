@@ -20,9 +20,9 @@
   #include <conio.h>
   #define CODE_SZ      ( 64*1024)
   #define VARS_SZ      (256*1024)
-  #define STK_SZ        16
+  #define STK_SZ        64
   #define LSTK_SZ        8
-  #define LOCALS_SZ    160
+  #define LOCALS_SZ    100
   #define __EDITOR__
 #endif
 
@@ -32,7 +32,7 @@
 #if __BOARD__ == TEENSY4
   #define CODE_SZ      (48*1024)
   #define VARS_SZ      (96*1024)
-  #define STK_SZ        16
+  #define STK_SZ        64
   #define LSTK_SZ        8
   #define LOCALS_SZ    160
   #define __FILES__
@@ -52,7 +52,8 @@
 #define NOS           stks[sp-1]
 #define AOS           (byte*)TOS
 #define LOS           lstk[lsp]
-#define DROP2         pop(); pop()
+#define DROP1         sp--
+#define DROP2         sp-=2
 #define CA(l)         (code+l)
 #define DP_AT(l)      ((DICT_T *)(&code[l]))
 #define betw(x, a, b) ((a<=x)&&(x<=b))
