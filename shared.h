@@ -76,7 +76,7 @@ typedef struct {
     CELL f, t;
 } LOOP_T;
 
-extern byte sp, isError;
+extern byte sp, isError, isBye;
 extern CELL BASE, STATE, LAST, HERE, tempWords[10];
 extern byte *VHERE, *VHERE2;
 extern byte code[];
@@ -96,6 +96,7 @@ extern void printBase(CELL, CELL);
 extern int strLen(const char *);
 extern void run(WORD);
 extern void doDotS();
+extern void doWords();
 extern void doOK();
 extern byte *doExt(CELL, byte *);
 extern void doEditor();

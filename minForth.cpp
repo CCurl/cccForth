@@ -91,12 +91,13 @@ PRIM_T prims[] = {
     , { "-ROT", "$Q<$Q>" }    // |-ROT|$Q<$Q>|(a b c--c a b)|FORTH CORE|
     , { ".IF", "(" }          // |.IF|(|(f--)|FORTH CORE|
     , { ".THEN", ")" }        // |.THEN|)|(--)|FORTH CORE|
-    , { ".S", "zS" }          // |.S|zS|(--)|FORTH CORE|
-    , { "WORDS", "zD" }       // |WORDS|zD|(--)|FORTH CORE|
+    , { ".S", "xS" }          // |.S|zS|(--)|FORTH CORE|
+    , { "WORDS", "xD" }       // |WORDS|xD|(--)|FORTH CORE|
+    , { "SYSTEM", "xY" }      // |SYSTEM|xY|(--)||
+    , { "BYE", "xQ" }         // |BYE|xQ|(--)|FORTH CORE|
     , { "NOP", "" }           // |NOP||(--)|FORTH CORE|
     // Extensions
 #if __BOARD__ == PC
-    , {"BYE","zZ"}            // |BYE|zZ|(--)|FORTH CORE|
     , {"LOAD","zL"}           // |LOAD|zL|(n--)|FORTH CORE|
 #else
         // Pin operations for dev boards
@@ -212,7 +213,7 @@ int doFind(const char *name) {
     return 0;
 }
 
-int doWords() {
+void doWords() {
     CELL l = (WORD)LAST;
     while (l) {
         DICT_T *dp = DP_AT(l);
@@ -221,7 +222,6 @@ int doWords() {
         if (l == dp->prev) break;
         l -= dp->prev;
     }
-    return 1;
 }
 
 int getWord(char *wd) {
@@ -506,14 +506,11 @@ long doRand() {
 
 byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
-    case 'D': doWords();                        break;
     case 'E': doEditor();                       break;
     case 'L': doLoad(pop());                    break;
     case 'R': push(doRand());                   break;
-    case 'S': doDotS();                         break;
     case 'T': push(clock());                    break;
     case 'W': if (TOS) { Sleep(TOS); } pop();   break;
-    case 'Z': isBye = 1;                        break;
     default: printString("-unk ext-");
     }
     return pc;

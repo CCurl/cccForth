@@ -168,6 +168,10 @@ void run(WORD start) {
         case 'v': if (pop()) { pc = LOS.s; } else { lpop(); }                break; // WHILE
         case 'w': ir = *(pc++); if (ir == '@') { TOS = GET_WORD(AOS); }
                 else if (ir == '!') { SET_WORD(AOS, (WORD)NOS); DROP2; }     break; // w@, w!
+        case 'x': ir=*(pc++); if (ir=='S') { doDotS(); }
+                else if (ir=='D') { doWords(); }
+                else if (ir=='Y') { char *y=(char*)pop(); system(y); }
+                else if (ir=='Q') { isBye=1; return; }                       break;
         case 'z': pc = doExt(*pc, pc+1);                                     break; // EXT
         case '{': lpush()->e=0; LOS.s = pc;                                  break; // BEGIN
         case '}': if (TOS) { pc = LOS.s; } else { DROP1; }                   break; // WHILE
