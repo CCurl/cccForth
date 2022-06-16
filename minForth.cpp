@@ -344,8 +344,10 @@ int doDotQuote() {
     }
     CComma('"');
     if (STATE == 0) {
+        CComma(0);
         run((WORD)xh);
         HERE = xh;
+
     }
     return 1;
 }
