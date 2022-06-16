@@ -336,12 +336,16 @@ int doQuote(int isDotQ) {
 }
 
 int doDotQuote() {
-    doQuote(1);
+    CELL xh = HERE;
+    CComma('"');
+    ++in;
+    while (*in && (*in != '"')) { 
+        CComma(*(in++));
+    }
+    CComma('"');
     if (STATE == 0) {
-        byte* cp = CA(HERE+10);
-        *(cp++) = 'Z';
-        *(cp++) = ';';
-        run((WORD)(HERE+10));
+        run((WORD)xh);
+        HERE = xh;
     }
     return 1;
 }
