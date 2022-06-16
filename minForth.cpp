@@ -550,16 +550,19 @@ void loop() {
     }
 }
 
-int main()
-{
-    printf("MinForth v0.0.1 - Chris Curl\n");
+int main(int argc, char *argv[]) {
+    // printf("MinForth v0.0.1 - Chris Curl\n");
     if (sizeof(&HERE) > CELL_SZ) {
         printf("ERROR: CELL cannot support a pointer!");
         exit(1);
     }
     vmReset();
-    doLoad(0);
+    if (argc > 1) {
+        FILE* fp = fopen(argv[1], "rt");
+        if (fp) { input_fp = fp; }
+    }
     while (!isBye) { loop(); }
+    return 0;
 }
 
 #endif
