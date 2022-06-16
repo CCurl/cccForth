@@ -119,9 +119,9 @@ PRIM_T prims[] = {
 };
 
 char word[32], *in;
-byte lastWasCall = 0, isBye = 0;
+byte *exBuf, isBye = 0;
 byte *VHERE, *VHERE2;
-CELL HERE, LAST, STATE, tempWords[10];
+CELL HERE, HERE2, LAST, STATE, tempWords[10];
 
 void CComma(CELL v) { code[HERE++] = (byte)v; }
 void Comma(CELL v) { SET_LONG(&code[HERE], v); HERE += CELL_SZ; }
@@ -161,6 +161,15 @@ void printStringF(const char *fmt, ...) {
     vsnprintf(buf, 100, fmt, args);
     va_end(args);
     printString(buf);
+}
+
+void doExec() {
+    if (STATE) { HERE2 = HERE; }
+    else {
+        CComma(0);
+        run((WORD)HERE2);
+        HERE = HERE2;
+    }
 }
 
 int isTempWord(const char *nm) {
@@ -226,42 +235,28 @@ int getWord(char *wd) {
     return l;
 }
 
-int execWord() {
-    CELL f = pop(), xt = pop();
-    if ((STATE) && (f == 0)) {
-        CComma(':');
-        WComma((WORD)xt);
-        lastWasCall = 1;
-    } else { run((WORD)xt); }
-    return 1;
-}
-
-int doNumber(int compile) {
-    if (compile) {
-        CELL num = pop();
-        if ((num & 0xFF) == num) {
-            CComma('\'');
-            CComma(num & 0xff);
-        }
-        else if ((num & 0xFFFF) == num) {
-            CComma(2);
-            WComma((WORD)num);
-        }
-        else {
-            CComma(4);
-            Comma(num);
-        }
+int doNumber() {
+    CELL num = pop();
+    if ((num & 0xFF) == num) {
+        CComma('\'');
+        CComma(num & 0xff);
+    }
+    else if ((num & 0xFFFF) == num) {
+        CComma(2);
+        WComma((WORD)num);
+    }
+    else {
+        CComma(4);
+        Comma(num);
     }
     return 1;
 }
 
-int doNumber2(int compile) {
-    if (compile) {
-        if (BTW(code[HERE-1],'0','9')) { CComma(' '); }
-        char buf[16];
-        sprintf(buf, "%d", pop());
-        for (int i=0; buf[i]; i++) { CComma(buf[i]); }
-    }
+int doNumber2() {
+    char buf[16];
+    sprintf(buf, "%d", pop());
+    if (HERE && BTW(code[HERE - 1], '0', '9')) { CComma(' '); }
+    for (int i=0; buf[i]; i++) { CComma(buf[i]); }
     return 1;
 }
 
@@ -308,61 +303,52 @@ int doPrim(const char *wd) {
 
     if (!vml) { return 0; } // Not found
 
-    if (STATE) {
-        if (BTW(vml[0],'0','9') && BTW(code[HERE-1],'0','9')) { CComma(' '); }
-        for (int j = 0; vml[j]; j++) { CComma(vml[j]); }
-    } else {
-        byte* x = CA(HERE + 10);
-        for (int j = 0; vml[j]; j++) { *(x++) = vml[j]; }
-        *x = ';';
-        run((WORD)HERE + 10);
-    }
+    if (BTW(vml[0],'0','9') && BTW(code[HERE-1],'0','9')) { CComma(' '); }
+    for (int j = 0; vml[j]; j++) { CComma(vml[j]); }
     return 1;
 }
 
-int doQuote(int isDotQ) {
+int doQuote() {
     in++;
-    if (STATE) { VHERE2 = VHERE; }
     push((CELL)VHERE2);
     while (*in && (*in != '"')) { *(VHERE2++) = *(in++); }
     *(VHERE2++) = 0;
     if (*in) { ++in; }
-    if (STATE) {
-        doNumber(STATE);
-        VHERE = VHERE2;
-        if (isDotQ) { CComma('Z'); }
-    }
+    doNumber();
     return 1;
 }
 
 int doDotQuote() {
-    CELL xh = HERE;
     CComma('"');
     ++in;
-    while (*in && (*in != '"')) { 
-        CComma(*(in++));
-    }
+    while (*in && (*in != '"')) { CComma(*(in++)); }
     CComma('"');
-    if (STATE == 0) {
-        CComma(0);
-        run((WORD)xh);
-        HERE = xh;
+    if (*in) { ++in; }
+    return 1;
+}
 
+int doWord() {
+    CELL flg = pop();
+    CELL xt = pop();
+    if (flg) {
+        doExec();
+        run((WORD)xt);
+    } else {
+        CComma(':');
+        WComma((WORD)xt);
     }
     return 1;
 }
 
 int doParseWord(char *wd) {
-    byte lwc = lastWasCall;
-    lastWasCall = 0;
-
     if (doPrim(wd))       {  return 1; }
-    if (doFind(wd))       {  return execWord(); }
-    if (isNum(wd))        {  return doNumber(STATE); }
+    if (doFind(wd))       {  return doWord(); }
+    if (isNum(wd))        {  return doNumber2(); }
     if (strEq(wd, ".\"")) {  return doDotQuote(); }
-    if (strEq(wd, "\""))  {  return doQuote(0); }
+    if (strEq(wd, "\""))  {  return doQuote(); }
 
     if (strEq(wd, ":")) {
+        doExec();
         if (getWord(wd) == 0) { return 0; }
         doCreate(wd, 0);
         STATE = 1;
@@ -377,6 +363,7 @@ int doParseWord(char *wd) {
 
     if (strEq(wd, ";")) {
         CComma(';');
+        doExec();
         STATE = 0;
         return 1;
     }
@@ -416,8 +403,9 @@ int doParseWord(char *wd) {
     if (strEqI(wd, "CONSTANT")) {
         if (getWord(wd)) {
             doCreate(wd, 0);
-            doNumber(1);
+            doNumber();
             CComma(';');
+            doExec();
             return 1;
         }
         else { return 0; }
@@ -431,7 +419,6 @@ int doParseWord(char *wd) {
     }
 
     STATE = 0;
-    VHERE2 = VHERE;
     printStringF("[%s]??", wd);
     return 0;
 }
@@ -444,17 +431,24 @@ bool isASM(const char* ln) {
     return 0;
 }
 
+const char* xln;
 void doParse(const char *line) {
+    xln = line;
+    HERE2 = HERE;
+    VHERE2 = VHERE;
+    exBuf = CA(HERE2);
     in = (char*)line;
     if (isASM(line)) { return; }
     int len = getWord(word);
     while (0 < len) {
+        // if (HERE2 < HERE) { HERE2 = HERE; }
         if (VHERE2 < VHERE) { VHERE2 = VHERE; }
         if (strEq(word, "//")) { return; }
         if (strEq(word, "\\")) { return; }
         if (doParseWord(word) == 0) { return; }
         len = getWord(word);
     }
+    doExec();
 }
 
 void doOK() {
@@ -553,7 +547,6 @@ void loop() {
         fgets(tib, 128, stdin);
         doHistory(tib);
         doParse(rtrim(tib));
-        return;
     }
 }
 
