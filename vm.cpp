@@ -11,7 +11,7 @@ void vmReset() {
     sp = sb - 1, rsp = rb + 1;
     BASE = 10;
     HERE = LAST = 0;
-    VHERE = VHERE2 = &vars[0];
+    VHERE = &vars[0];
     HERE = 2;
     for (int i = 0; i < CODE_SZ; i++) { code[i] = 0; }
     for (int i = 0; i < VARS_SZ; i++) { vars[i] = 0; }

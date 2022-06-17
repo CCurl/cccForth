@@ -78,7 +78,7 @@ typedef struct {
 
 extern byte sp, isError, isBye;
 extern CELL BASE, STATE, LAST, HERE, tempWords[10];
-extern byte *VHERE, *VHERE2;
+extern byte *VHERE;
 extern byte code[];
 extern byte vars[];
 extern CELL stks[];

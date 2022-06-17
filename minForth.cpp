@@ -120,9 +120,9 @@ PRIM_T prims[] = {
 };
 
 char word[32], *in;
-byte *exBuf, isBye = 0;
-byte *VHERE, *VHERE2;
-CELL HERE, HERE2, LAST, STATE, tempWords[10];
+byte isBye = 0;
+byte *VHERE, *oVHERE;
+CELL HERE, oHERE, LAST, STATE, tempWords[10];
 
 void CComma(CELL v) { code[HERE++] = (byte)v; }
 void Comma(CELL v) { SET_LONG(&code[HERE], v); HERE += CELL_SZ; }
@@ -165,11 +165,14 @@ void printStringF(const char *fmt, ...) {
 }
 
 void doExec() {
-    if (STATE) { HERE2 = HERE; }
+    if (STATE) {
+        oHERE = HERE;
+        oVHERE = VHERE;
+    }
     else {
         CComma(0);
-        run((WORD)HERE2);
-        HERE = HERE2;
+        run((WORD)oHERE);
+        HERE = oHERE;
     }
 }
 
@@ -214,11 +217,12 @@ int doFind(const char *name) {
 }
 
 void doWords() {
-    CELL l = (WORD)LAST;
+    CELL l = (WORD)LAST, n = 0;
     while (l) {
         DICT_T *dp = DP_AT(l);
         printString(dp->name);
-        printChar(' ');
+        if ((++n)%10==0) { printChar('\n'); }
+        else { printChar(9); }
         if (l == dp->prev) break;
         l -= dp->prev;
     }
@@ -237,9 +241,12 @@ int getWord(char *wd) {
 
 int doNumber() {
     CELL num = pop();
-    if ((num & 0xFF) == num) {
+    if ((BTW(num,32,126))) {
         CComma('\'');
-        CComma(num & 0xff);
+        CComma(num);
+    } else if ((num & 0xFF) == num) {
+        CComma(1);
+        CComma(num);
     }
     else if ((num & 0xFFFF) == num) {
         CComma(2);
@@ -310,11 +317,11 @@ int doPrim(const char *wd) {
 
 int doQuote() {
     in++;
-    push((CELL)VHERE2);
-    while (*in && (*in != '"')) { *(VHERE2++) = *(in++); }
-    *(VHERE2++) = 0;
-    if (*in) { ++in; }
+    push((CELL)VHERE);
     doNumber();
+    while (*in && (*in != '"')) { *(VHERE++) = *(in++); }
+    *(VHERE++) = 0;
+    if (*in) { ++in; }
     return 1;
 }
 
@@ -369,7 +376,7 @@ int doParseWord(char *wd) {
     }
 
     if (strEqI(wd, "IMMEDIATE")) { DP_AT(LAST)->flags |= 1; return 1; }
-    if (strEqI(wd, "ALLOT")) { VHERE += pop();              return 1; }
+    if (strEqI(wd, "ALLOT")) { oVHERE += pop();             return 1; }
 
     if (strEqI(wd, "IF")) {
         CComma('?');
@@ -394,9 +401,10 @@ int doParseWord(char *wd) {
     }
 
     if (strEqI(wd, "VARIABLE")) {
-        // NOTE: variable is just a CONSTANT to VHERE
-        push((CELL)VHERE);
-        VHERE += CELL_SZ;
+        // NOTE: variable is just a CONSTANT to oVHERE
+        push((CELL)oVHERE);
+        oVHERE += CELL_SZ;
+        VHERE = oVHERE;
         strCpy(wd, "CONSTANT");
     }
 
@@ -434,15 +442,12 @@ bool isASM(const char* ln) {
 const char* xln;
 void doParse(const char *line) {
     xln = line;
-    HERE2 = HERE;
-    VHERE2 = VHERE;
-    exBuf = CA(HERE2);
     in = (char*)line;
     if (isASM(line)) { return; }
     int len = getWord(word);
     while (0 < len) {
-        // if (HERE2 < HERE) { HERE2 = HERE; }
-        if (VHERE2 < VHERE) { VHERE2 = VHERE; }
+        if (HERE < oHERE) { HERE = oHERE; }
+        if (VHERE < oVHERE) { VHERE = oVHERE; }
         if (strEq(word, "//")) { return; }
         if (strEq(word, "\\")) { return; }
         if (doParseWord(word) == 0) { return; }
@@ -467,6 +472,8 @@ char *rtrim(char *str) {
 }
 
 void systemWords() {
+    oHERE = HERE;
+    oVHERE = VHERE;
     char *cp = (char*)(VHERE + 6);
     sprintf(cp, ": cb %lu ;", (UCELL)code);     doParse(cp);
     sprintf(cp, ": vb %lu ;", (UCELL)vars);     doParse(cp);
@@ -555,8 +562,7 @@ int main(int argc, char *argv[]) {
     }
     vmReset();
     if (argc > 1) {
-        FILE* fp = fopen(argv[1], "rt");
-        if (fp) { input_fp = fp; }
+        input_fp = fopen(argv[1], "rt");
     }
     while (!isBye) { loop(); }
     return 0;
