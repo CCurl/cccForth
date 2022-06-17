@@ -1,2 +1,3 @@
+." minForth v0.0.1 - Chris Curl" cr
 1 load
-here cb - cb vmsz ." MEM: %d, CB: %d, %d bytes used"
+here vsz csz ." CODE SZ: %d, VARS SZ: %d, %d bytes used"

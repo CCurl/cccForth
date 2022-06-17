@@ -10,7 +10,7 @@ here s7
 
 : T1 if 'Y' else 'N' then emit ;
 : T2 cr 1 2 3 + + . 19 42 for i . next ;
-: T3 cr 20 s1 begin r1 . r1 1- s1 r1 while ;
+: T3 cr 20 s1 begin r1 . d1 r1 while ;
 : T4 cr +tmps 123 445 s2 s1 r1 . r2 . -tmps ;
 : T5 cr +tmps 666 777 s2 s1 r1 . r2 . T4 r1 . r2 . -tmps ;
 : T6 cr 211 245 for i dup . 223 = if leave then next ." -out0" ;

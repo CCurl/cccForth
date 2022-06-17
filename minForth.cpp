@@ -3,8 +3,6 @@
 #include "Shared.h"
 #include <time.h>
 
-extern int isBye;
-
 typedef struct {
     const char *name;
     const char *op;
@@ -17,7 +15,7 @@ PRIM_T prims[] = {
     , { "/", "/" }            // |/|/|(a b--c)|FORTH CORE|
     , { "*", "*" }            // |*|*|(a b--c)|FORTH CORE|
     , { "/MOD", "&" }         // |/MOD|&|(a b--q r)|FORTH CORE|
-    , { "MOD", "&$\\" }       // |MOD|&$\\|(a b--c)|FORTH CORE|
+    , { "MOD", "b%" }         // |MOD|M|(a b--c)|FORTH CORE|
     , { "SWAP", "$" }         // |SWAP|$|(a b--b a)|FORTH CORE|
     , { "DROP", "\\" }        // |DROP|\\|(a b--a)|FORTH CORE|
     , { "OVER", "%" }         // |OVER|%|(a b--a b a)|FORTH CORE|
@@ -28,82 +26,79 @@ PRIM_T prims[] = {
     , { "2DROP", "\\\\" }     // |2DROP|\\\\|(a b--)|FORTH CORE|
     , { "EMIT", "," }         // |EMIT|,|(c--)|FORTH CORE|
     , { "(.)", "." }          // |(.)|.|(n--)|FORTH CORE|
-    , { "SPACE", "b" }        // |SPACE|32,|(--)|FORTH CORE|
+    , { "SPACE", "32," }      // |SPACE|32,|(--)|FORTH CORE|
     , { "CR", "13,10," }      // |CR|13,10,|(--)|FORTH CORE|
     , { "BL", "32" }          // |BL|32|(--c)|FORTH CORE|
     , { "CELL", "4" }         // |CELL|4|(--n)|FORTH CORE|
     , { "=", "=" }            // |=|=|(a b--f)|FORTH CORE|
     , { "<", "<" }            // |<|<|(a b--f)|FORTH CORE|
     , { ">", ">" }            // |>|>|(a b--f)|FORTH CORE|
-    , { "<=", "<=" }          // |<=|>N|(a b--f)|FORTH CORE|
-    , { ">=", ">=" }          // |>=|<N|(a b--f)|FORTH CORE|
+    , { "<=", ">~" }          // |<=|>N|(a b--f)|FORTH CORE|
+    , { ">=", "<~" }          // |>=|<N|(a b--f)|FORTH CORE|
     , { "<>", "=~" }          // |<>|=N|(a b--f)|FORTH CORE|
+    , { "!=", "=~" }          // |!=|=N|(a b--f)|FORTH CORE|
     , { "0=", "~" }           // |0=|N|(a b--f)|FORTH CORE|
     , { "ABS", "#0<(_)" }     // |ABS|#0<(_)|(a--b)|FORTH CORE|
     , { "NEGATE", "_" }       // |NEGATE|_|(a--b)|FORTH CORE|
-    , { "<<", "L" }           // |<<|L|(a b--c)|FORTH CORE|
-    , { ">>", "R" }           // |>>|R|(a b--c)|FORTH CORE|
+    , { "<<", "SL" }          // |<<|L|(a b--c)|FORTH CORE|
+    , { ">>", "SR" }          // |>>|R|(a b--c)|FORTH CORE|
     , { "ZLEN", "T" }         // |ZLEN|T|(a--n)|FORTH CORE|
-    , { ".", ".b"   }         // |.|.b|(n--)|FORTH CORE|
+    , { ".", ".32," }         // |.|.32,|(n--)|FORTH CORE|
     , { "@", "@" }            // |@|@|(a--n)|FORTH CORE|
-    , { "C@", "c@" }          // |C@|c|(a--c)|FORTH CORE|
-    , { "W@", "w@" }          // |W@|w|(a--w)|FORTH CORE|
+    , { "C@", "c@" }          // |C@|c@|(a--c)|FORTH CORE|
+    , { "W@", "w@" }          // |W@|w@|(a--w)|FORTH CORE|
     , { "!", "!" }            // |!|!|(n a--)|FORTH CORE|
-    , { "C!", "c!" }          // |C!|C|(n a--)|FORTH CORE|
-    , { "W!", "w!" }          // |W!|W|(n a--)|FORTH CORE|
+    , { "C!", "c!" }          // |C!|c!|(n a--)|FORTH CORE|
+    , { "W!", "w!" }          // |W!|w!|(n a--)|FORTH CORE|
     , { "AND", "b&" }         // |AND|a|(a b--c)|FORTH CORE|
+    , { "FOR", "[" }          // |FOR|[|(a--b)|FORTH CORE|
+    , { "I", "I" }            // |I|I|(a--b)|FORTH CORE|
+    , { "NEXT", "]" }         // |NEXT|[|(a--b)|FORTH CORE|
+    , { "BEGIN", "{" }        // |FOR|[|(a--b)|FORTH CORE|
+    , { "WHILE", "}" }        // |I|I|(a--b)|FORTH CORE|
+    , { "UNTIL", "~}" }       // |I|I|(a--b)|FORTH CORE|
     , { "OR", "b|" }          // |OR|o|(a b--c)|FORTH CORE|
     , { "XOR", "b^" }         // |XOR|x|(a b--c)|FORTH CORE|
     , { "COM", "b~" }         // |COM|~|(a--b)|FORTH CORE|
     , { "NOT", "~" }          // |NOT|N|(a--b)|FORTH CORE|
-    , { "1+", "1+" }          // |1+||(a--b)|FORTH CORE|
-    , { "1-", "1-" }          // |1-||(a--b)|FORTH CORE|
+    , { "1+", "P" }           // |1+|P|(a--b)|FORTH CORE|
+    , { "2+", "PP" }          // |2+|PP|(a--b)|FORTH CORE|
+    , { "4+", "PPPP" }        // |4+|PPPP|(a--b)|FORTH CORE|
     , { "+!", "$%@+$!" }      // |+!|$%@+$!|(n a--)|FORTH CORE|
-    , { "EXECUTE", "e" }      // |EXECUTE|e|(a--)|FORTH CORE|
+    , { "1-", "D" }           // |1-|D|(a--b)|FORTH CORE|
+    , { "I", "I" }            // |I|I|(--c)|FORTH CORE|
+    , { "+I", "M" }           // |+I|m|(n--)|FORTH CORE|
+    , { "EXECUTE", "G" }      // |EXECUTE|G|(a--)|FORTH CORE|
     , { "MIN", "%%>($)\\" }   // |MIN|%%>($)\\|(a b--c)|FORTH CORE|
     , { "MAX", "%%<($)\\" }   // |MAX|%%<($)\\|(a b--c)|FORTH CORE|
-    , { "RAND", "xR" }        // |RAND|xR|(--n)||
+    , { "RAND", "zR" }        // |RAND|zR|(--n)|FORTH CORE|
     , { "EXIT", ";" }         // |EXIT|;|(--)|FORTH CORE|
-    , { "TIMER", "xT" }       // |TIMER|xT|(--n)|FORTH CORE|
-    , { "WAIT", "xW" }        // |WAIT|zW|(n--)|FORTH CORE|
-    , { "RESET", "xX" }       // |RESET|xX|(--)||
-    , { "FOR", "[" }          // |FOR|[|(--)|FORTH CORE|
-    , { "I", "i" }            // |I|i|(--)|FORTH CORE|
-    , { "+I", "xI" }          // |+I|xI|(n--)|FORTH CORE|
-    , { "LEAVE", "xF" }       // |LEAVE|xF|(--)|FORTH CORE|
-    , { "NEXT", "]" }         // |NEXT|]|(--)|FORTH CORE|
-    , { "BEGIN", "{" }        // |BEGIN|{|(--)|FORTH CORE|
-    , { "UNLOOP", "xU" }      // |UNLOOP|uU|(--)|FORTH CORE|
-    , { "WHILE", "}" }        // |WHILE|}|(--)|FORTH CORE|
-    , { "UNTIL", "~}" }       // |UNTIL|~}|(--)|FORTH CORE|
+    , { "TIMER", "zT" }       // |TIMER|zT|(--n)|FORTH CORE|
+    , { "WAIT", "zW" }        // |WAIT|zW|(n--)|FORTH CORE|
+    , { "RESET", "Y" }        // |RESET|Y|(--)|FORTH CORE|
+    , { "UNLOOP", "^" }       // |UNLOOP|^|(--)|FORTH CORE|
+    , { "LEAVE", "^" }        // |LEAVE|l|(--)|FORTH CORE|
     , { "KEY", "k@" }         // |KEY|K|(--c)|FORTH CORE|
     , { "KEY?", "k?" }        // |KEY?|?|(--f)|FORTH CORE|
-    , { "ZTYPE", "z" }        // |ZTYPE|z|(a--)|FORTH CORE|
+    , { "+TMPS", "l+" }       // |+TMPS|l+|(--)|FORTH CORE|
+    , { "-TMPS", "l-" }       // |-TMPS|l-|(--)|FORTH CORE|
+    , { "ZTYPE", "Z" }        // |ZTYPE|Z|(a--)|FORTH CORE|
     , { "QTYPE", "t" }        // |QTYPE|t|(a--)|FORTH CORE|
-    , { ">R", "r<" }          // |>R|Q<|(n--)|FORTH CORE|
-    , { "R>", "r>" }          // |R>|Q>|(--n)|FORTH CORE|
-    , { "R@", "r@" }          // |R@|Q@|(--n)|FORTH CORE|
-    , { "ROT", "r<$r>$" }     // |ROT|Q<$Q>$|(a b c--b c a)|FORTH CORE|
-    , { "-ROT", "$r<$r>" }    // |-ROT|$Q<$Q>|(a b c--c a b)|FORTH CORE|
-    , { "IF", "(" }           // |IF|(|(f--)|FORTH CORE|
-    , { "THEN", ")" }         // |THEN|)|(--)|FORTH CORE|
-    , { ".S", "xS" }          // |.S|xS|(--)|FORTH CORE|
-    , { "HERE", "xH" }        // |HERE|xH|(--n)|FORTH CORE|
-    , { "BASE@", "xB" }       // |BASE@|xB|(n--)||
-    , { "BASE!", "xb" }       // |BASE!|xb|(--n)||
-    , { "SYSTEM", "xY" }      // |SYSTEM|xY|(n--)||
-    , { ">F", "ff" }          // |>F|ff|(n--f)|CELL TOS to FLOAT|
-    , { "F>", "fi" }          // |F>|fi|(F--n)|FLOAT TOS to CELL|
-    , { "F.", "f." }          // |F.|f.|(F--f)|Print FLOAT|
-    , { "F+", "f+" }          // |F+|f+|(a b--f)|Add FLOATs|
-    , { "F-", "f-" }          // |F-|f-|(a b--f)|Subtract FLOATs|
-    , { "F*", "f*" }          // |F*|f*|(a b--f)|Multiply FLOATs|
-    , { "F/", "f/" }          // |F/|f/|(a b--f)|Divide FLOATs|
-    , { "NOP", " " }          // |NOP| |(--)|FORTH CORE|
+    , { ">R", "Q<" }          // |>R|Q<|(n--)|FORTH CORE|
+    , { "R>", "Q>" }          // |R>|Q>|(--n)|FORTH CORE|
+    , { "R@", "Q@" }          // |R@|Q@|(--n)|FORTH CORE|
+    , { "ROT", "Q<$Q>$" }     // |ROT|Q<$Q>$|(a b c--b c a)|FORTH CORE|
+    , { "-ROT", "$Q<$Q>" }    // |-ROT|$Q<$Q>|(a b c--c a b)|FORTH CORE|
+    , { ".IF", "(" }          // |.IF|(|(f--)|FORTH CORE|
+    , { ".THEN", ")" }        // |.THEN|)|(--)|FORTH CORE|
+    , { ".S", "xS" }          // |.S|zS|(--)|FORTH CORE|
+    , { "WORDS", "xD" }       // |WORDS|xD|(--)|FORTH CORE|
+    , { "SYSTEM", "xY" }      // |SYSTEM|xY|(--)||
+    , { "BYE", "xQ" }         // |BYE|xQ|(--)|FORTH CORE|
+    , { "NOP", "" }           // |NOP||(--)|FORTH CORE|
     // Extensions
 #if __BOARD__ == PC
-    , {"BYE","xQ"}            // |BYE|zZ|(--)|FORTH CORE|
-    , {"LOAD","xL"}           // |LOAD|zL|(n--)|FORTH CORE|
+    , {"LOAD","zL"}           // |LOAD|zL|(n--)|FORTH CORE|
 #else
         // Pin operations for dev boards
     , { "pin-output","zPO" }      // open output
@@ -115,7 +110,7 @@ PRIM_T prims[] = {
     , { "digital-write","zDW" }   // digital write
 #endif
 #ifdef __EDITOR__
-    , { "EDIT","xE" }         // |EDIT|zE|(n--)|Edit block n|
+    , { "EDIT","zE" }         // |EDIT|zE|(n--)|Edit block n|
 #endif
 #ifdef __GAMEPAD__
     // Extensions
@@ -124,15 +119,16 @@ PRIM_T prims[] = {
     , {0,0}
 };
 
-char word[32], *in, exBuf[256];
-byte lastWasCall = 0;
-extern FIB_T st;
-extern void E(char*);
-CELL xt = 0, last = 0;
-DICT_T dict[100];
+char word[32], *in;
+byte isBye = 0;
+byte *VHERE, *oVHERE;
+CELL HERE, oHERE, LAST, STATE, tempWords[10];
 
+void CComma(CELL v) { code[HERE++] = (byte)v; }
+void Comma(CELL v) { SET_LONG(&code[HERE], v); HERE += CELL_SZ; }
+void WComma(WORD v) { SET_WORD(&code[HERE], v); HERE += 2; }
 
-char lower(char c) { return betw(c, 'A', 'Z') ? (c + 32) : c; }
+char lower(char c) { return BTW(c, 'A', 'Z') ? (c + 32) : c; }
 
 byte strEq(const char *x, const char *y) {
     while (*x && *y && (*x == *y)) { ++x; ++y; }
@@ -147,78 +143,89 @@ byte strEqI(const char *x, const char *y) {
     return (*x || *y) ? 0 : 1;
 }
 
-int strLen(const char* str) {
+char *strCpy(char *d, const char *s) {
+    while (*s) { *(d++) = *(s++); }
+    *d = 0;
+    return d;
+}
+
+int strLen(const char *str) {
     int l = 0;;
     while (*(str++)) { ++l; }
     return l;
 }
 
-char *strCpy(char * dst, const char * src) {
-    while (*src) { *(dst++) = *(src++); }
-    *dst = 0;
-    return dst;
-}
-
-char *strCat(char *dst, const char *src) {
-    dst += strLen(dst);
-    strCpy(dst, src);
-    return dst;
-}
-
-char *stringF(char *buf, const char *fmt, ...) {
+void printStringF(const char *fmt, ...) {
+    char *buf = (char*)&code[CODE_SZ-100];
     va_list args;
     va_start(args, fmt);
-    vsprintf(buf, fmt, args);
+    vsnprintf(buf, 100, fmt, args);
     va_end(args);
-    return buf;
+    printString(buf);
 }
 
-void psF(const char *fmt, ...) {
-    char buf[100];
-    va_list args;
-    va_start(args, fmt);
-    vsprintf(buf, fmt, args);
-    va_end(args);
+void doExec() {
+    if (STATE) {
+        oHERE = HERE;
+        oVHERE = VHERE;
+    }
+    else {
+        CComma(0);
+        run((WORD)oHERE);
+        HERE = oHERE;
+    }
 }
 
-void exec() {
-    if (exBuf[0]) { E(exBuf); }
-    exBuf[0] = 0;
+int isTempWord(const char *nm) {
+    return ((nm[0] == 'T') && BTW(nm[1], '0', '9') && (nm[2] == 0));
 }
 
 void doCreate(const char *name, byte f) {
-    exec();
-    DICT_T* dp = &dict[++last];
-    strCpy(dp->name, name);
+    if (isTempWord(name)) {
+        tempWords[name[1] - '0'] = HERE;
+        return;
+    }
+    DICT_T *dp = DP_AT(HERE);
+    dp->prev = (byte)(HERE - LAST);
     dp->flags = f;
-    dp->xt = xt++;
-    sprintf(exBuf, ":%c%c", dp->xt/26+'A', dp->xt%26+'A');
+    strCpy(dp->name, name);
+    LAST = HERE;
+    HERE += strLen(name) + 3;
 }
 
 int doFind(const char *name) {
-    int x = last;
-    while (x) {
-        DICT_T* dp = &dict[x--];
+    // Temporary word?
+    if (isTempWord(name) && (tempWords[name[1] - '0'])) {
+        push(tempWords[name[1] - '0']);
+        push(0);
+        return 1;
+    }
+
+    // Regular lookup
+    CELL def = (WORD)LAST;
+    while (def) {
+        DICT_T* dp = DP_AT(def);
         if (strEq(dp->name, name)) {
-            push(dp->xt);
+            push(def + strLen(dp->name) + 3);
             push(dp->flags);
             return 1;
         }
+        if (def == dp->prev) break;
+        def -= dp->prev;
     }
     return 0;
 }
 
-int doWords() {
-    int x = last;
-    char buf[8];
-    while (x) {
-        DICT_T* dp = &dict[x--];
-        CELL xt=dp->xt;
-        ps(dp->name);
-        sprintf(buf, "(%c%c) ", xt/26+'A', xt%26+'A');
-        ps(buf);
+void doWords() {
+    CELL l = (WORD)LAST, n = 0;
+    while (l) {
+        DICT_T *dp = DP_AT(l);
+        printString(dp->name);
+        if ((++n)%10==0) { printChar('\n'); }
+        else { printChar(9); }
+        if (l == dp->prev) break;
+        l -= dp->prev;
     }
-    return 1;
 }
 
 int getWord(char *wd) {
@@ -232,61 +239,70 @@ int getWord(char *wd) {
     return l;
 }
 
-int execWord() {
-    CELL f = pop(), xt = pop();
-    char buf[4];
-    sprintf(buf,"%c%c", xt/26+'A', xt%26+'A');
-    strCat(exBuf, buf);
+int doNumber() {
+    CELL num = pop();
+    if ((BTW(num,32,126))) {
+        CComma('\'');
+        CComma(num);
+    } else if ((num & 0xFF) == num) {
+        CComma(1);
+        CComma(num);
+    }
+    else if ((num & 0xFFFF) == num) {
+        CComma(2);
+        WComma((WORD)num);
+    }
+    else {
+        CComma(4);
+        Comma(num);
+    }
     return 1;
 }
 
-int doNumber() {
-    CELL l = strLen(exBuf), x = pop();
-    char c = (l) ? exBuf[l-1] : 0;
-    if (betw(c,'0','9')) { strCat(exBuf, " "); }
+int doNumber2() {
     char buf[16];
-    if (x<0) { sprintf(buf, "%d_", -x); }
-    else { sprintf(buf, "%d", x); }
-    strCat(exBuf, buf);
+    sprintf(buf, "%d", pop());
+    if (HERE && BTW(code[HERE - 1], '0', '9')) { CComma(' '); }
+    for (int i=0; buf[i]; i++) { CComma(buf[i]); }
     return 1;
 }
 
 int isNum(const char *wd) {
     CELL x = 0;
-    int b = base, isNeg = 0, lastCh = '9';
+    int base = BASE, isNeg = 0, lastCh = '9';
     if ((wd[0]=='\'') && (wd[2]==wd[0]) && (wd[3]==0)) { push(wd[1]); return 1; }
-    if (*wd == '#') { b = 10;  ++wd; }
-    if (*wd == '$') { b = 16;  ++wd; }
-    if (*wd == '%') { b = 2;  ++wd; lastCh = '1'; }
-    if (b < 10) { lastCh = '0' + b - 1; }
-    if ((*wd == '-') && (b == 10)) { isNeg = 1;  ++wd; }
+    if (*wd == '#') { base = 10;  ++wd; }
+    if (*wd == '$') { base = 16;  ++wd; }
+    if (*wd == '%') { base = 2;  ++wd; lastCh = '1'; }
+    if (base < 10) { lastCh = '0' + base - 1; }
+    if ((*wd == '-') && (base == 10)) { isNeg = 1;  ++wd; }
     if (*wd == 0) { return 0; }
     while (*wd) {
         char c = *(wd++);
         int t = -1;
-        if (betw(c, '0', lastCh)) { t = c - '0'; }
-        if ((b == 16) && (betw(c, 'A', 'F'))) { t = c - 'A' + 10; }
-        if ((b == 16) && (betw(c, 'a', 'f'))) { t = c - 'a' + 10; }
+        if (BTW(c, '0', lastCh)) { t = c - '0'; }
+        if ((base == 16) && (BTW(c, 'A', 'F'))) { t = c - 'A' + 10; }
+        if ((base == 16) && (BTW(c, 'a', 'f'))) { t = c - 'a' + 10; }
         if (t < 0) { return 0; }
-        x = (x * b) + t;
+        x = (x * base) + t;
     }
     if (isNeg) { x = -x; }
     push(x);
     return 1;
 }
 
-const char *isRegOp(const char *wd) {
-    // r+, r-, r0-r9, s0-s9
-    if (wd[2]) { return 0; }
-    if (strEqI(wd,"r+")) { return wd; }
-    if (strEqI(wd,"r-")) { return wd; }
-    if (BTW(wd[0],'r','s') && BTW(wd[1],'0','9')) { return wd; }
+char *isRegOp(const char *wd, char *out) {
+    if ((wd[0] == 'r') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
+    if ((wd[0] == 's') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
+    if ((wd[0] == 'i') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
+    if ((wd[0] == 'd') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
     return 0;
 }
 
 int doPrim(const char *wd) {
     // Words minForth can map directly into its VML (Virtual Machine Language)
-    const char *vml = isRegOp(wd);
+    char x[3];
+    const char *vml = vml = isRegOp(wd, x);
 
     for (int i = 0; prims[i].op && (!vml); i++) {
         if (strEqI(prims[i].name, wd)) { vml = prims[i].op; }
@@ -294,49 +310,55 @@ int doPrim(const char *wd) {
 
     if (!vml) { return 0; } // Not found
 
-    strCat(exBuf, vml);
+    if (BTW(vml[0],'0','9') && BTW(code[HERE-1],'0','9')) { CComma(' '); }
+    for (int j = 0; vml[j]; j++) { CComma(vml[j]); }
     return 1;
 }
 
 int doQuote() {
-    char buf[2] = { 0,0 };
-    strCat(exBuf, "|");
     in++;
-    while (*in && (*in != '"')) {
-        buf[0] = *(in++);
-        strCat(exBuf, buf);
-    }
-    ++in;
-    strCat(exBuf, "|");
+    push((CELL)VHERE);
+    doNumber();
+    while (*in && (*in != '"')) { *(VHERE++) = *(in++); }
+    *(VHERE++) = 0;
+    if (*in) { ++in; }
     return 1;
 }
 
 int doDotQuote() {
-    char buf[2] = {0,0};
-    strCat(exBuf, "\"");
-    in++;
-    while (*in && (*in != '"')) {
-        buf[0]=*(in++);
-        strCat(exBuf, buf);
-    }
+    CComma('"');
     ++in;
-    strCat(exBuf, "\"");
+    while (*in && (*in != '"')) { CComma(*(in++)); }
+    CComma('"');
+    if (*in) { ++in; }
+    return 1;
+}
+
+int doWord() {
+    CELL flg = pop();
+    CELL xt = pop();
+    if (flg) {
+        doExec();
+        run((WORD)xt);
+    } else {
+        CComma(':');
+        WComma((WORD)xt);
+    }
     return 1;
 }
 
 int doParseWord(char *wd) {
-    byte lwc = lastWasCall;
-    lastWasCall = 0;
-
     if (doPrim(wd))       {  return 1; }
-    if (doFind(wd))       {  return execWord(); }
-    if (isNum(wd))        {  return doNumber(); }
+    if (doFind(wd))       {  return doWord(); }
+    if (isNum(wd))        {  return doNumber2(); }
     if (strEq(wd, ".\"")) {  return doDotQuote(); }
     if (strEq(wd, "\""))  {  return doQuote(); }
 
     if (strEq(wd, ":")) {
+        doExec();
         if (getWord(wd) == 0) { return 0; }
         doCreate(wd, 0);
+        STATE = 1;
         return 1;
     }
 
@@ -347,17 +369,42 @@ int doParseWord(char *wd) {
     }
 
     if (strEq(wd, ";")) {
-        strCat(exBuf, ";");
-        exec();
-        state = 0;
+        CComma(';');
+        doExec();
+        STATE = 0;
         return 1;
     }
 
-    if (strEqI(wd, "IMMEDIATE")) { dict[last].flags |= 1; return 1; }
-    // if (strEqI(wd, "ALLOT")) { VHERE += pop();              return 1; }
-    if (strEqI(wd, "WORDS")) { return doWords(); }
+    if (strEqI(wd, "IMMEDIATE")) { DP_AT(LAST)->flags |= 1; return 1; }
+    if (strEqI(wd, "ALLOT")) { oVHERE += pop();             return 1; }
+
+    if (strEqI(wd, "IF")) {
+        CComma('?');
+        push(HERE);
+        WComma(0);
+        return 1;
+    }
+
+    if (strEqI(wd, "ELSE")) {
+        CELL tgt = pop();
+        CComma('J');
+        push(HERE);
+        WComma(0);
+        SET_WORD(CA(tgt), (WORD)HERE);
+        return 1;
+    }
+
+    if (strEqI(wd, "THEN")) {
+        CELL tgt = pop();
+        SET_WORD(CA(tgt), (WORD)HERE);
+        return 1;
+    }
 
     if (strEqI(wd, "VARIABLE")) {
+        // NOTE: variable is just a CONSTANT to oVHERE
+        push((CELL)oVHERE);
+        oVHERE += CELL_SZ;
+        VHERE = oVHERE;
         strCpy(wd, "CONSTANT");
     }
 
@@ -365,47 +412,55 @@ int doParseWord(char *wd) {
         if (getWord(wd)) {
             doCreate(wd, 0);
             doNumber();
-            strCat(exBuf, ";");
-            exec();
-            state = 0;
+            CComma(';');
+            doExec();
             return 1;
         }
         else { return 0; }
     }
 
-    state = 0;
-    pc('['); ps(wd); ps("]??");
+    if (strEqI(wd, "FORGET")) {
+        // Forget the last word
+        HERE = LAST;
+        LAST -= code[LAST];
+        return 1;
+    }
+
+    STATE = 0;
+    printStringF("[%s]??", wd);
     return 0;
 }
 
-extern FIB_T st;
-extern void R(int);
-int doS2(const char *l) {
-    if (l[0]!='s') return 0;
-    if (l[1]!=':') return 0;
-    l += 2;
-    int x = 1000, y=x;
-    while (*l) { st.b[y++]=*(l++); }
-    st.b[y]=0;
-    R(x);
-    return 1;
+bool isASM(const char* ln) {
+    if ((ln[0]=='s') && (ln[1]==':') && (ln[2]==' ')) {
+        run((byte*)ln-code+3);
+        return 1;
+    }
+    return 0;
 }
 
+const char* xln;
 void doParse(const char *line) {
-    if (doS2(line)) { return; }
+    xln = line;
     in = (char*)line;
+    if (isASM(line)) { return; }
     int len = getWord(word);
     while (0 < len) {
+        if (HERE < oHERE) { HERE = oHERE; }
+        if (VHERE < oVHERE) { VHERE = oVHERE; }
         if (strEq(word, "//")) { return; }
         if (strEq(word, "\\")) { return; }
         if (doParseWord(word) == 0) { return; }
         len = getWord(word);
     }
+    doExec();
 }
 
-extern void doDotS();
 void doOK() {
-    if (state) { ps(" ... "); } else { ps("\r\nOK "); doDotS(); pc('>'); }
+    if (STATE) { printString(" ... "); return; }
+    printString("\r\nOK ");
+    doDotS();
+    printString(">");
 }
 
 char *rtrim(char *str) {
@@ -417,12 +472,17 @@ char *rtrim(char *str) {
 }
 
 void systemWords() {
-    char cp[96];
-    exBuf[0] = 0;
-    doParse(stringF(cp, ": cb %lu ;", cb));
-    doParse(stringF(cp, ": vmsz %d ;", VMSZ));
-    doParse(stringF(cp, "cb %d + constant v", CODE_SZ));
-    doParse(stringF(cp, ": code cb here 1- for i c@ dup emit ';' = if i 1+ c@ ':' = if cr then next ;"));
+    oHERE = HERE;
+    oVHERE = VHERE;
+    char *cp = (char*)(VHERE + 6);
+    sprintf(cp, ": cb %lu ;", (UCELL)code);     doParse(cp);
+    sprintf(cp, ": vb %lu ;", (UCELL)vars);     doParse(cp);
+    sprintf(cp, ": csz %d ;", CODE_SZ);         doParse(cp);
+    sprintf(cp, ": vsz %d ;", VARS_SZ);         doParse(cp);
+    sprintf(cp, ": ha %lu ;", (UCELL)&HERE);    doParse(cp);
+    sprintf(cp, ": la %lu ;", (UCELL)&LAST);    doParse(cp);
+    sprintf(cp, ": va %lu ;", (UCELL)&VHERE);   doParse(cp);
+    sprintf(cp, ": base %lu ;", (UCELL)&BASE);  doParse(cp);
 }
 
 #if __BOARD__ == PC
@@ -434,7 +494,7 @@ void fpPush(FILE* v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }
 FILE* fpPop() { return (fpSP) ? fpStk[fpSP--] : 0 ; }
 
 void doLoad(int blk) {
-    char fn[16];
+    char *fn = (char*)(VHERE + 100);
     sprintf(fn, "./block-%03d.4th", blk);
     FILE* fp = fopen(fn, "rt");
     if (fp) {
@@ -444,26 +504,27 @@ void doLoad(int blk) {
 }
 
 long doRand() {
-    static long seed = 0;
-    if (seed==0) { seed = clock(); }
+    static long seed = clock();
     seed ^= (seed << 13);
     seed ^= (seed >> 17);
     seed ^= (seed <<  5);
     return seed;
 }
 
-int doExt(CELL ir, int pc) {
+byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
-    case 'E': doEditor();                break;
-    case 'L': doLoad(pop());             break;
-    case 'R': push(doRand());            break;
-    // case 'W': if (TOS) { Sleep(TOS); } pop();   break;
-    default: ps("-unk ext-");
+    case 'E': doEditor();                       break;
+    case 'L': doLoad(pop());                    break;
+    case 'R': push(doRand());                   break;
+    case 'T': push(clock());                    break;
+    case 'W': if (TOS) { Sleep(TOS); } pop();   break;
+    default: printString("-unk ext-");
     }
     return pc;
 }
 
-void pc(int c) { putc(c, stdout); }
+void printString(const char *cp) { fputs(cp, stdout); }
+void printChar(char c) { putc(c, stdout); }
 int charAvailable(void) { return _kbhit(); }
 int getChar(void) { return _getch(); }
 
@@ -476,7 +537,7 @@ void doHistory(const char *txt) {
 }
 
 void loop() {
-    char tib[128];;
+    char *tib = (char *)CA(HERE+32);
     FILE* fp = (input_fp) ? input_fp : stdin;
     if (input_fp) {
         if (fgets(tib, 128, fp) == tib) {
@@ -491,21 +552,20 @@ void loop() {
         doHistory(tib);
         doParse(rtrim(tib));
     }
-    exec();
 }
 
-int main()
-{
-    printf("MinForth v0.0.1 - Chris Curl\n");
-    if (sizeof(&here) > CELL_SZ) {
+int main(int argc, char *argv[]) {
+    // printf("MinForth v0.0.1 - Chris Curl\n");
+    if (sizeof(&HERE) > CELL_SZ) {
         printf("ERROR: CELL cannot support a pointer!");
         exit(1);
     }
-
-    I(NUM_FUNCS,STK_SZ*2,CODE_SZ,LOCALS_SZ);
-
-    doLoad(0);
+    vmReset();
+    if (argc > 1) {
+        input_fp = fopen(argv[1], "rt");
+    }
     while (!isBye) { loop(); }
+    return 0;
 }
 
 #endif
