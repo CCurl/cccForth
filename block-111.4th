@@ -44,10 +44,10 @@ variable ln cols allot
 
 : gen 1 1 ->b s4
     1 1 ->p cols 1- rows 1- ->p
-    for i c@ if b++ then i4 next
-    bak->pop .pop i7 r7 . ;
+    for i c@ .if b++ .then i4 next
+    bak->pop .pop r7 . i7 ;
 
 // 65 (r) ! 200 (c) !
 40 (r) ! 150 (c) !
 : T1 1 begin drop gen key? until key drop ;
-: go 0 s7 clr-bak rand-pop C-OFF CLS T1 C-ON ;
+: go 1 s7 clr-bak rand-pop C-OFF CLS T1 C-ON ;
