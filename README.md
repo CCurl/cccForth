@@ -2,7 +2,7 @@
 
 The main goals for this minimal Forth are as follows:
 
-- To be very frugal with its usage of memory.
+- To be frugal with its usage of memory.
 - To be easy to modify and add/extend the primitives.
 - To have an implementation that is minimal and "intuitively obvious upon casual inspection".
 - To be able to run on any system that has a C compiler.
@@ -12,7 +12,7 @@ The main goals for this minimal Forth are as follows:
 To these ends, I have wandered off the beaten path in the following ways:
 
 - This is NOT an ANSI-standard Forth.
-- This is a byte-coded implementation to save code space.
+- This is a byte-coded implementation.
 - Many primitives (core words) are built into the compiler, and are not included in the dictionary.
 - These primitves ARE NOT case sensitive (DUP = dup = Dup).
 - User-defined words ARE case sensitive.
@@ -63,100 +63,55 @@ To these ends, I have wandered off the beaten path in the following ways:
 
 ## VM primitives (these are NOT case-sensitive, and do NOT show up in WORDS)
 ```
+*** MATH ***
 +        (a b--c)          Addition
 -        (a b--c)          Subtraction
 /        (a b--c)          Division
 *        (a b--c)          Multiplication
+<<       (a b--c)          c: a left-shifted b bits
+>>       (a b--c)          c: a right-shifted b bits
+ABS      (a--b)            Absolute value
+MAX      (a b--c)          c: max(a,b)
+MIN      (a b--c)          c: min(a,b)
 /MOD     (a b--q r)        q: quotient(a,b), r: modulus(a,b)
 MOD      (a b--c)          modulus(a,b)
+NEGATE   (a--b)            b: -a
+
+*** STACK ***
+1+       (a--b)            Increment TOS
+1-       (a--b)            Decrement TOS
 SWAP     (a b--b a)        Swap top 2 stack entries (TOS and NOS)
 DROP     (a b--a)          Drop TOS
 OVER     (a b--a b a)      Copy NOS
 DUP      (a--a a)          Duplicate TOS
 NIP      (a b--b)          Drop NOS
 TUCK     (a b--b a b)      Push TOS under NOS
-2DUP     (a b--a b a b)    Duplicate NOS And TOS
-2DROP    (a b--)           Drop NOS and TOS
-EMIT     (c--)             Output c as a character
-(.)      (n--)             Output n in the current BASE (no SPACE)
-.        (n--)             Output n in the current BASE (trailing SPACE)
-SPACE    (--)              Output a single SPACE
-CR       (--)              Output a newline (#10,#13)
-BL       (--c)             c: 32
-CELL     (--n)             n: The size of a CELL
-=        (a b--f)          Equality
-<        (a b--f)          Less-than
->        (a b--f)          Greater-than
-<=       (a b--f)          Less-than or equal-to
->=       (a b--f)          Greater-than or equal-to
-<>       (a b--f)          Not equal-to
-0=       (a b--f)          Logical NOT
-NOT      (a--b)            Logical NOT
-ABS      (a--b)            Absolute value
-NEGATE   (a--b)            b: -a
-<<       (a b--c)          c: a left-shifted b bits
->>       (a b--c)          c: a right-shifted b bits
-ZLEN     (a--n)            n: length of string at a
-@        (a--n)            n: CELL at a
-C@       (a--b)            b: BYTE at a
-W@       (a--w)            w: WORD at a
-!        (n a--)           Store CELL n at a
-C!       (b a--)           Store BYTE b at a
-W!       (w a--)           Store WORD w at a
-FOR      (f t--)           Begin FOR/NEXT loop
-I        (--n)             n: Current index
-+I       (n--)             n: value to add to I
-NEXT     (--)              Increment I, jump to start of loop if I < T
-BEGIN    (f--f)            Start WHILE loop: if f=0, skip to WHILE
-WHILE    (f--f?)           If f==0, jump to BEGIN, else DROP f and continue
-UNTIL    (f--f?)           If f<>0, jump to BEGIN, else DROP f and continue
-UNLOOP   (--)              Drop top of loop stack (FOR or WHILE)
-AND      (a b--c)          Bitwise AND
-OR       (a b--c)          Bitwise OR
-XOR      (a b--c)          Bitwise XOR
-COM      (a--b)            Bitwise COMPLEMENT
-1+       (a--b)            Increment TOS
-1-       (a--b)            Decrement TOS
-+!       (n a--)           Add n to CELL at a
-EXECUTE  (a--)             Jump to CODE address a
-MIN      (a b--c)          c: min(a,b)
-MAX      (a b--c)          c: max(a,b)
-RAND     (--n)             n: a RANDOM 32-bit number
-EXIT     (--)              Leave the word immediately (make sure to UNLOOP first if in a LOOP)
-TIMER    (--n)             n: clock()
-WAIT     (n--)             n: MS to sleep
-RESET    (--)              Initialize minForth
-KEY      (--c)             c: Next keyboard char, wait if no press yet
-KEY?     (--f)             f: FALSE if no keyboard press, else TRUE
-+TMPS    (--)              Allocate 10 temp variables, r0 .. r9
-rX       (--n)             n: read value of temp var X
-sX       (n--)             Set value of temp var X to n
-iX       (--n)             Increment temp var X
-dX       (--n)             Decrement temp var X
--TMPS    (--)              Destroy current temp variables
-."       (?--?)            Output a (possibly formatted) string. See (1).
-"        (--a)             a: 32-bit address of a string. See (2).
-ZTYPE    (a--)             Output string at a. See (1).
-QTYPE    (a--)             Quick string output, no formatting.
 >R       (n--)             Move n to return stack
 R>       (--n)             Move n from return stack
 R@       (--n)             Copy n from return stack
 ROT      (a b c--b c a)    Rotate a to TOS
 -ROT     (a b c--c a b)    Rotate c before a
-IF       (f--)             Standard IF
-ELSE     (--)              Standard ELSE
-THEN     (--)              Standard THEN
-.IF      (f--)             Simple IF, no ELSE allowed (shorter)
-.THEN    (--)              Simple THEN
-.S       (--)              Output the stack
-VARIABLE (--)              Define a variable
-CONSTANT (--)              Define a constant
-WORDS    (--)              Output the dictionary
-SYSTEM   (a--)             a: string to send to system() ... eg: " dir" system
-LOAD     (n--)             Load block n from disk
-EDIT     (n--)             Edit block n
-BYE      (--)              Exit minForth
-NOP      (--)              Do nothing
+2DUP     (a b--a b a b)    Duplicate NOS And TOS
+2DROP    (a b--)           Drop NOS and TOS
+
+*** BITWISE ***
+AND      (a b--c)          Bitwise AND
+OR       (a b--c)          Bitwise OR
+XOR      (a b--c)          Bitwise XOR
+COM      (a--b)            Bitwise COMPLEMENT
+
+*** INPUT/OUTPUT ***
+(.)      (n--)             Output n in the current BASE (no SPACE)
+.        (n--)             Output n in the current BASE (trailing SPACE)
+."       (?--?)            Output a (possibly formatted) string. See (1).
+CR       (--)              Output a newline (#10,#13)
+EMIT     (c--)             Output c as a character
+KEY      (--c)             c: Next keyboard char, wait if no press yet
+KEY?     (--f)             f: FALSE if no keyboard press, else TRUE
+QTYPE    (a--)             Quick string output, no formatting.
+SPACE    (--)              Output a single SPACE
+ZLEN     (a--n)            n: length of string at a
+ZTYPE    (a--)             Output string at a. See (1).
 
 (1) Notes on .":
 - This is NOT ansi-standard
@@ -168,9 +123,71 @@ NOP      (--)              Do nothing
 
 example: : ascii $20 '~' for i i i i ." %n%d: (%c) %x %b" next ;
 
+*** LOGICAL ***
+=        (a b--f)          Equality
+<        (a b--f)          Less-than
+>        (a b--f)          Greater-than
+<=       (a b--f)          Less-than or equal-to
+>=       (a b--f)          Greater-than or equal-to
+<>       (a b--f)          Not equal-to
+0=       (a b--f)          Logical NOT
+NOT      (a--b)            Logical NOT
+
+*** MEMORY ***
+@        (a--n)            n: CELL at a
+C@       (a--b)            b: BYTE at a
+W@       (a--w)            w: WORD at a
+!        (n a--)           Store CELL n at a
+C!       (b a--)           Store BYTE b at a
+W!       (w a--)           Store WORD w at a
++!       (n a--)           Add n to CELL at a
+"        (--a)             a: 32-bit address of a string. See (2).
+
 (2) Notes on ":
 - This does not generate a standard FORTH counted string.
 - It is NULL-terminated, no count byte.
+
+*** FLOW CONTROL ***
+IF       (f--)             Standard IF
+ELSE     (--)              Standard ELSE
+THEN     (--)              Standard THEN
+.IF      (f--)             Simple IF, no ELSE allowed (shorter)
+.THEN    (--)              Simple THEN
+FOR      (f t--)           Begin FOR/NEXT loop
+I        (--n)             n: Current index
++I       (n--)             n: value to add to I
+NEXT     (--)              Increment I, jump to start of loop if I < T
+BEGIN    (f--f)            Start WHILE loop: if f=0, skip to WHILE
+WHILE    (f--f?)           If f==0, jump to BEGIN, else DROP f and continue
+UNTIL    (f--f?)           If f<>0, jump to BEGIN, else DROP f and continue
+UNLOOP   (--)              Drop top of loop stack (FOR or WHILE)
+EXIT     (--)              Leave the word immediately (make sure to UNLOOP first if in a LOOP)
+
+*** TEMPORARY VARIABLES ***
++TMPS    (--)              Allocate 10 temp variables, r0 .. r9
+rX       (--n)             n: read value of temp var X (X:[0..9])
+sX       (n--)             Set value of temp var X to n
+iX       (--n)             Increment temp var X
+dX       (--n)             Decrement temp var X
+-TMPS    (--)              Destroy current temp variables
+
+**** SYSTEM/OTHER ***
+.S       (--)              Output the stack
+BL       (--c)             c: 32
+BYE      (--)              Exit minForth
+CONSTANT (--)              Define a constant
+CELL     (--n)             n: The size of a CELL
+EDIT     (n--)             Edit block n
+EXECUTE  (a--)             Jump to CODE address a
+LOAD     (n--)             Load block n from disk
+NOP      (--)              Do nothing
+RAND     (--n)             n: a RANDOM 32-bit number
+RESET    (--)              Initialize minForth
+SYSTEM   (a--)             a: string to send to system() ... eg: " dir" system
+TIMER    (--n)             n: clock()
+WAIT     (n--)             n: MS to sleep
+VARIABLE (--)              Define a variable
+WORDS    (--)              Output the dictionary
 ```
 
 ## Built-in words
