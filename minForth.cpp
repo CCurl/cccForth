@@ -14,6 +14,7 @@ PRIM_T prims[] = {
     , { "-", "-" }
     , { "/", "/" }
     , { "*", "*" }
+    , { "ALLOT", "xA" }
     , { "/MOD", "&" }
     , { "MOD", "b%" }
     , { "SWAP", "$" }
@@ -77,9 +78,8 @@ PRIM_T prims[] = {
     , { "WAIT", "zW" }
     , { "RESET", "Y" }
     , { "UNLOOP", "^" }
-    , { "LEAVE", "^" }
-    , { "KEY", "k@" }
-    , { "KEY?", "k?" }
+    , { "KEY", "K@" }
+    , { "KEY?", "K?" }
     , { "+TMPS", "l+" }
     , { "-TMPS", "l-" }
     , { "ZTYPE", "Z" }
@@ -375,9 +375,6 @@ int doParseWord(char *wd) {
         return 1;
     }
 
-    if (strEqI(wd, "IMMEDIATE")) { DP_AT(LAST)->flags |= 1; return 1; }
-    if (strEqI(wd, "ALLOT")) { oVHERE += pop();             return 1; }
-
     if (strEqI(wd, "IF")) {
         CComma('?');
         push(HERE);
@@ -413,7 +410,9 @@ int doParseWord(char *wd) {
             doCreate(wd, 0);
             doNumber();
             CComma(';');
+            STATE = 1;
             doExec();
+            STATE = 0;
             return 1;
         }
         else { return 0; }

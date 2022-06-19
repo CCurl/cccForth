@@ -169,6 +169,7 @@ void run(WORD start) {
         case 'w': ir = *(pc++); if (ir == '@') { TOS = GET_WORD(AOS); }
                 else if (ir == '!') { SET_WORD(AOS, (WORD)NOS); DROP2; }     break; // w@, w!
         case 'x': ir=*(pc++); if (ir=='S') { doDotS(); }
+                else if (ir=='A') { oVHERE+=pop(); VHERE=oVHERE; }
                 else if (ir=='D') { doWords(); }
                 else if (ir=='Y') { char *y=(char*)pop(); system(y); }
                 else if (ir=='Q') { isBye=1; return; }                       break;
