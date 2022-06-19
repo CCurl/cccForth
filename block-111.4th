@@ -2,16 +2,14 @@
 
 1 load
 
-variable (r)
-variable (c)
-100 (r) ! 300 (c) !
+variable (r) 100 (r) !
+variable (c) 300 (c) !
 : rows (r) @ ; : cols (c) @ ;
 : pop-sz rows 2 + cols 2 + * ;
 
 variable pop pop-sz allot
 variable bak pop-sz allot
 variable ln cols allot
-." -here 2" .S
 
 : T5 ( a -- b ) dup c@ 1+ over c! 1+ ;
 : b++ ( -- )
@@ -51,5 +49,5 @@ variable ln cols allot
 
 // 65 (r) ! 200 (c) !
 40 (r) ! 150 (c) !
-: T1 1 begin drop gen key? .if key drop unloop exit .then 1 while ;
+: T1 1 begin drop gen key? until key drop ;
 : go 0 s7 clr-bak rand-pop C-OFF CLS T1 C-ON ;
