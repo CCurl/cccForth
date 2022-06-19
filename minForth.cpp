@@ -14,23 +14,76 @@ PRIM_T prims[] = {
     , { "-", "-" }
     , { "/", "/" }
     , { "*", "*" }
-    , { "ALLOT", "xA" }
-    , { "/MOD", "&" }
-    , { "MOD", "b%" }
-    , { "SWAP", "$" }
-    , { "DROP", "\\" }
-    , { "OVER", "%" }
-    , { "DUP", "#" }
-    , { "NIP", "$\\" }
-    , { "TUCK", "$%" }
+    , { "@", "@" }
+    , { "C@", "c@" }
+    , { "W@", "w@" }
+    , { "!", "!" }
+    , { "C!", "c!" }
+    , { "W!", "w!" }
+    , { "1-", "D" }
+    , { "1+", "P" }
+    , { "2+", "PP" }
+    , { "4+", "PPPP" }
     , { "2DUP", "%%" }
     , { "2DROP", "\\\\" }
-    , { "EMIT", "," }
-    , { "(.)", "." }
-    , { "SPACE", "32," }
-    , { "CR", "13,10," }
+    , { "ABS", "#0<(_)" }
+    , { "ALLOT", "xA" }
+    , { "AND", "b&" }
+    , { "OR", "b|" }
+    , { "XOR", "b^" }
+    , { "COM", "b~" }
     , { "BL", "32" }
+    , { "BYE", "xQ" }
     , { "CELL", "4" }
+    , { "CR", "13,10," }
+    , { "DROP", "\\" }
+    , { "DUP", "#" }
+    , { "EMIT", "," }
+    , { "EXECUTE", "G" }
+    , { "EXIT", ";" }
+    , { ".IF", "(" }
+    , { ".THEN", ")" }
+    , { "MAX", "%%<($)\\" }
+    , { "MIN", "%%>($)\\" }
+    , { "WAIT", "zW" }
+    , { "KEY", "K@" }
+    , { "KEY?", "K?" }
+    , { "LOAD", "zL"}
+    , { "/MOD", "&" }
+    , { "MOD", "b%" }
+    , { "NEGATE", "_" }
+    , { "NIP", "$\\" }
+    , { "NOP", " " }
+    , { "NOT", "~" }
+    , { "OVER", "%" }
+    , { "QTYPE", "t" }
+    , { "RAND", "zR" }
+    , { "RESET", "Y" }
+    , { ">R", "Q<" }
+    , { "R>", "Q>" }
+    , { "R@", "Q@" }
+    , { "ROT", "Q<$Q>$" }
+    , { "-ROT", "$Q<$Q>" }
+    , { ".S", "xS" }
+    , { "SPACE", "32," }
+    , { "SWAP", "$" }
+    , { "SYSTEM", "xY" }
+    , { "TIMER", "zT" }
+    , { "+TMPS", "l+" }
+    , { "-TMPS", "l-" }
+    , { "TUCK", "$%" }
+    , { "UNLOOP", "^" }
+    , { "WORDS", "xD" }
+    , { "ZLEN", "T" }
+    , { "ZTYPE", "Z" }
+    , { "FOR", "[" }
+    , { "I", "I" }
+    , { "+I", "M" }
+    , { "NEXT", "]" }
+    , { "BEGIN", "{" }
+    , { "WHILE", "}" }
+    , { "UNTIL", "~}" }
+    , { "(.)", "." }
     , { "=", "=" }
     , { "<", "<" }
     , { ">", ">" }
@@ -39,70 +92,14 @@ PRIM_T prims[] = {
     , { "<>", "=~" }
     , { "!=", "=~" }
     , { "0=", "~" }
-    , { "ABS", "#0<(_)" }
-    , { "NEGATE", "_" }
     , { "<<", "SL" }
     , { ">>", "SR" }
-    , { "ZLEN", "T" }
     , { ".", ".32," }
-    , { "@", "@" }
-    , { "C@", "c@" }
-    , { "W@", "w@" }
-    , { "!", "!" }
-    , { "C!", "c!" }
-    , { "W!", "w!" }
-    , { "AND", "b&" }
-    , { "FOR", "[" }
-    , { "I", "I" }
-    , { "NEXT", "]" }
-    , { "BEGIN", "{" }
-    , { "WHILE", "}" }
-    , { "UNTIL", "~}" }
-    , { "OR", "b|" }
-    , { "XOR", "b^" }
-    , { "COM", "b~" }
-    , { "NOT", "~" }
-    , { "1+", "P" }
-    , { "2+", "PP" }
-    , { "4+", "PPPP" }
     , { "+!", "$%@+$!" }
-    , { "1-", "D" }
-    , { "I", "I" }
-    , { "+I", "M" }
-    , { "EXECUTE", "G" }
-    , { "MIN", "%%>($)\\" }
-    , { "MAX", "%%<($)\\" }
-    , { "RAND", "zR" }
-    , { "EXIT", ";" }
-    , { "TIMER", "zT" }
-    , { "WAIT", "zW" }
-    , { "RESET", "Y" }
-    , { "UNLOOP", "^" }
-    , { "KEY", "K@" }
-    , { "KEY?", "K?" }
-    , { "+TMPS", "l+" }
-    , { "-TMPS", "l-" }
-    , { "ZTYPE", "Z" }
-    , { "QTYPE", "t" }
-    , { ">R", "Q<" }
-    , { "R>", "Q>" }
-    , { "R@", "Q@" }
-    , { "ROT", "Q<$Q>$" }
-    , { "-ROT", "$Q<$Q>" }
-    , { ".IF", "(" }
-    , { ".THEN", ")" }
-    , { ".S", "xS" }
-    , { "WORDS", "xD" }
-    , { "SYSTEM", "xY" }
-    , { "BYE", "xQ" }
-    , { "NOP", "" }
-    // Extensions
-#if __BOARD__ == PC
-    , {"LOAD","zL"}
-#else
+#if __BOARD__ != PC
         // Pin operations for dev boards
-    , { "pin-output","zPO" }      // open output
     , { "pin-input","zPI" }       // open input
+    , { "pin-output","zPO" }      // open output
     , { "pin-pullup","zPU" }      // open input-pullup
     , { "analog-read","zAR" }     // analog read
     , { "analog-write","zAW" }    // analog write
@@ -120,9 +117,8 @@ PRIM_T prims[] = {
 };
 
 char word[32], *in;
-byte isBye = 0;
-byte *VHERE, *oVHERE;
 CELL HERE, oHERE, LAST, STATE, tempWords[10];
+byte *VHERE, *oVHERE, isBye=0;
 
 void CComma(CELL v) { code[HERE++] = (byte)v; }
 void Comma(CELL v) { SET_LONG(&code[HERE], v); HERE += CELL_SZ; }
@@ -182,7 +178,7 @@ int isTempWord(const char *nm) {
 
 void doCreate(const char *name, byte f) {
     if (isTempWord(name)) {
-        tempWords[name[1] - '0'] = HERE;
+        tempWords[name[1]-'0'] = HERE;
         return;
     }
     DICT_T *dp = DP_AT(HERE);
@@ -195,8 +191,8 @@ void doCreate(const char *name, byte f) {
 
 int doFind(const char *name) {
     // Temporary word?
-    if (isTempWord(name) && (tempWords[name[1] - '0'])) {
-        push(tempWords[name[1] - '0']);
+    if (isTempWord(name) && (tempWords[name[1]-'0'])) {
+        push(tempWords[name[1]-'0']);
         push(0);
         return 1;
     }
@@ -291,7 +287,7 @@ int isNum(const char *wd) {
     return 1;
 }
 
-char *isRegOp(const char *wd, char *out) {
+char *isRegOp(const char *wd) {
     if ((wd[0] == 'r') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
     if ((wd[0] == 's') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
     if ((wd[0] == 'i') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
@@ -301,8 +297,7 @@ char *isRegOp(const char *wd, char *out) {
 
 int doPrim(const char *wd) {
     // Words minForth can map directly into its VML (Virtual Machine Language)
-    char x[3];
-    const char *vml = vml = isRegOp(wd, x);
+    const char *vml = isRegOp(wd);
 
     for (int i = 0; prims[i].op && (!vml); i++) {
         if (strEqI(prims[i].name, wd)) { vml = prims[i].op; }
@@ -326,8 +321,8 @@ int doQuote() {
 }
 
 int doDotQuote() {
-    CComma('"');
     ++in;
+    CComma('"');
     while (*in && (*in != '"')) { CComma(*(in++)); }
     CComma('"');
     if (*in) { ++in; }
@@ -348,11 +343,13 @@ int doWord() {
 }
 
 int doParseWord(char *wd) {
-    if (doPrim(wd))       {  return 1; }
-    if (doFind(wd))       {  return doWord(); }
-    if (isNum(wd))        {  return doNumber2(); }
-    if (strEq(wd, ".\"")) {  return doDotQuote(); }
-    if (strEq(wd, "\""))  {  return doQuote(); }
+    if (strEq(word, "//")) { return 0; }
+    if (strEq(word, "\\")) { return 0; }
+    if (doPrim(wd))        { return 1; }
+    if (doFind(wd))        { return doWord(); }
+    if (isNum(wd))         { return doNumber2(); }
+    if (strEq(wd, ".\""))  { return doDotQuote(); }
+    if (strEq(wd, "\""))   { return doQuote(); }
 
     if (strEq(wd, ":")) {
         doExec();
@@ -362,16 +359,16 @@ int doParseWord(char *wd) {
         return 1;
     }
 
-    if (strEq(wd, "(")) {
-        while (*in && (*in != ')')) { ++in; }
-        if (*in == ')') { ++in; }
-        return 1;
-    }
-
     if (strEq(wd, ";")) {
         CComma(';');
         doExec();
         STATE = 0;
+        return 1;
+    }
+
+    if (strEq(wd, "(")) {
+        while (*in && (*in != ')')) { ++in; }
+        if (*in == ')') { ++in; }
         return 1;
     }
 
@@ -420,7 +417,7 @@ int doParseWord(char *wd) {
 
     if (strEqI(wd, "FORGET")) {
         // Forget the last word
-        HERE = LAST;
+        oHERE = HERE = LAST;
         LAST -= code[LAST];
         return 1;
     }
@@ -447,8 +444,6 @@ void doParse(const char *line) {
     while (0 < len) {
         if (HERE < oHERE) { HERE = oHERE; }
         if (VHERE < oVHERE) { VHERE = oVHERE; }
-        if (strEq(word, "//")) { return; }
-        if (strEq(word, "\\")) { return; }
         if (doParseWord(word) == 0) { return; }
         len = getWord(word);
     }
@@ -485,17 +480,17 @@ void systemWords() {
 }
 
 #if __BOARD__ == PC
-FILE* input_fp = NULL;
-FILE* fpStk[10];
+FILE *input_fp = NULL;
+FILE *fpStk[10];
 byte fpSP = 0;
 
-void fpPush(FILE* v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }
-FILE* fpPop() { return (fpSP) ? fpStk[fpSP--] : 0 ; }
+void fpPush(FILE *v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }
+FILE *fpPop() { return (fpSP) ? fpStk[fpSP--] : 0 ; }
 
 void doLoad(int blk) {
     char *fn = (char*)(VHERE + 100);
     sprintf(fn, "./block-%03d.4th", blk);
-    FILE* fp = fopen(fn, "rt");
+    FILE *fp = fopen(fn, "rt");
     if (fp) {
         if (input_fp) { fpPush(input_fp); }
         input_fp = fp;
@@ -554,15 +549,13 @@ void loop() {
 }
 
 int main(int argc, char *argv[]) {
-    // printf("MinForth v0.0.1 - Chris Curl\n");
     if (sizeof(&HERE) > CELL_SZ) {
         printf("ERROR: CELL cannot support a pointer!");
         exit(1);
     }
     vmReset();
-    if (argc > 1) {
-        input_fp = fopen(argv[1], "rt");
-    }
+    if (argc > 1) { input_fp = fopen(argv[1], "rt"); }
+    else { doLoad(0); }
     while (!isBye) { loop(); }
     return 0;
 }

@@ -14,7 +14,7 @@ To these ends, I have wandered off the beaten path in the following ways:
 - This is NOT an ANSI-standard Forth.
 - This is a byte-coded implementation to save code space.
 - Many primitives (core words) are built into the compiler, and are not included in the dictionary.
-- The primitves ARE NOT case sensitive (DUP = dup = Dup).
+- These primitves ARE NOT case sensitive (DUP = dup = Dup).
 - User-defined words ARE case sensitive.
 - The dictionary is intersparsed with the CODE; it is not separated.
 - A dictionary entry looks like this: (offset,flags,name,null terminator,implementation).
@@ -26,7 +26,6 @@ To these ends, I have wandered off the beaten path in the following ways:
 - VHERE is a 32-bit absolute address to the first available byte in VARIABLE.
 - There are 10 temporary words (T0..T9) that can be re-defined without any dictionary overhead.
 - There are 10 temporary variables (r0..r9) that can be allocated/destroyed.
-- "WORDS" is built in, and cannot be called by another word at runtime (it's IMMEDIATE).
 
 ## Temporary words:
 - A temporary word is named T0 .. T9. (e.g. - ": T4 ... ;" will define word T4, but T4 is not added to the dictionary)
@@ -37,7 +36,7 @@ To these ends, I have wandered off the beaten path in the following ways:
 - All previous references to T4 still refer to the previous definition. New references to T4 refer to the new definition.
 - Here is a simple example:
 ```
-: T1 dup $20 < if drop '.' then ;
+: T1 dup $20 < .if drop '.' .then ;
 : dumpC for i c@ T1 emit next ;
 : .code cb dup here + 1- for i c@ T1 emit next ;
 ```
@@ -47,7 +46,7 @@ To these ends, I have wandered off the beaten path in the following ways:
 - They are completely under the control of the programmer.
 - They are not built into the call sequence, so they can be accessed across words.
 - They are not set or retrieved using @ and !.
-- There are 2 special operations for temp variables: read and set (eg - r3 1+ s3).
+- There are 4 special operations for temp variables: read, set, increment and decrement
 - The words to manage temps are: +tmps, r0..r9, s0..s9, i0..i9, d0..d9 and -tmps
   - +tmps: allocate 10 new temps
   - rX: push the value of temp #x onto the stack (read)
@@ -136,7 +135,7 @@ iX       (--n)             Increment temp var X
 dX       (--n)             Decrement temp var X
 -TMPS    (--)              Destroy current temp variables
 ."       (?--?)            Output a (possibly formatted) string. See (1).
-"        (--a)             a: address of a string. See (2).
+"        (--a)             a: 32-bit address of a string. See (2).
 ZTYPE    (a--)             Output string at a. See (1).
 QTYPE    (a--)             Quick string output, no formatting.
 >R       (n--)             Move n to return stack
