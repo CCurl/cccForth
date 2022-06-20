@@ -61,7 +61,7 @@ To these ends, I have wandered off the beaten path in the following ways:
 : dumpX (a n--) swap s8 1 for r8 c@ .c i8 next ;
 ```
 
-## VM primitives (
+## Primitives
 ```
 NOTE: (1) These are NOT case-sensitive.
       (2) They do NOT show up in WORDS.
