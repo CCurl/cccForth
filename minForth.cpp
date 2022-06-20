@@ -221,6 +221,33 @@ int doFind(const char *name) {
     return 0;
 }
 
+int doSee(const char* wd) {
+    if (!doFind(wd)) { return 1; }
+    CELL def = (WORD)LAST;
+    CELL prevDef = oHERE;
+    int found = 0;
+    DROP2;
+    while (def && (!found)) {
+        DICT_T* dp = DP_AT(def);
+        if (strEq(dp->name, wd)) {
+            found = 1;
+            break;
+        }
+        prevDef = def;
+        def -= dp->prev;
+    }
+
+    if (def < prevDef) {
+        printStringF("%s: ", wd);
+        for (int i = def; i < prevDef; i++) {
+            byte c = code[i];
+            if (BTW(c, 32, 126)) { printChar(c); }
+            else { printStringF("(%d)",c); }
+        }
+    }
+    return 1;
+}
+
 void doWords() {
     CELL l = (WORD)LAST, n = 0;
     while (l) {
@@ -430,6 +457,12 @@ int doParseWord(char *wd) {
         oHERE = HERE = LAST;
         LAST -= code[LAST];
         return 1;
+    }
+
+    if (strEqI(wd, "SEE")) {
+        doExec();
+        if (getWord(wd) == 0) { return 0; }
+        return doSee(wd);
     }
 
     STATE = 0;
