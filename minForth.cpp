@@ -39,8 +39,8 @@ PRIM_T prims[] = {
     , { "2DROP", "\\\\" }
     , { "NIP", "$\\" }
     , { "1-", "D" }
-    , { "2*", "1SL" }
-    , { "2/", "1SR" }
+    , { "2*", "#+" }
+    , { "2/", "2/" }
     , { "ROT", "Q<$Q>$" }
     , { "-ROT", "$Q<$Q>" }
     , { ".S", "xS" }
@@ -265,6 +265,7 @@ int doNumber() {
 }
 
 int doNumber2() {
+    if (TOS < 0) { return doNumber(); }
     char buf[16];
     sprintf(buf, "%d", pop());
     if (HERE && BTW(code[HERE - 1], '0', '9')) { CComma(' '); }
