@@ -2,7 +2,7 @@
 
 byte sp, rsp, lsp, locSP, lb, isError, sb, rb;
 CELL BASE, stks[STK_SZ], locals[LOCALS_SZ];
-byte code[CODE_SZ+1], vars[VARS_SZ+1];
+byte code[CODE_SZ+1], vars[VARS_SZ+1], *y;
 LOOP_T lstk[LSTK_SZ + 1];
 
 void vmReset() {
@@ -125,6 +125,7 @@ void run(WORD start) {
         case '<': NOS = (NOS < TOS) ? 1 : 0; DROP1;                          break; // <
         case '?': if (pop()==0) { pc=CA(GET_WORD(pc)); } else { pc+=2; }     break; // 0BRANCH
         case '@': TOS = GET_LONG((byte*)TOS);                                break; // FETCH
+        case 'C': y=(byte*)TOS; t1=0; while (*(y++)) { ++t1; } push(t1);     break; // COUNT (a--a c)
         case 'D': --TOS;                                                     break; // 1-
         case 'G': pc = CA((WORD)pop());                                      break; // EXECUTE (GOTO)
         case 'I': push(LOS.f);                                               break; // I
@@ -138,7 +139,7 @@ void run(WORD start) {
                 if (ir == '@') { push(stks[rsp]); }                          break;
         case 'S': ir = *(pc++); if (ir == 'L') { NOS = (NOS << TOS); }              // LSHIFT, RSHIFT
                 else if (ir == 'R') { NOS = (NOS >> TOS); } DROP1;           break;
-        case 'T': t1 = TOS; TOS = 0; while (BA(t1)[TOS]) { ++TOS; }          break; // ZLEN
+        case 'T': t1=pop(); y=(byte*)pop(); while (t1--) printChar(*(y++));  break; // TYPE (a c--)
         case 'Y': vmReset();                                                return; // RESET
         case 'Z': doType((byte *)pop(),-1, 0);                               break; // ZTYPE
         case '[': lpush()->e = 0; LOS.s = pc;                                       // FOR
@@ -164,14 +165,12 @@ void run(WORD start) {
         case 'r': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { push(locals[lb+t1]); }  break; // readLocal
         case 's': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]=pop(); }  break; // setLocal
         case 't': printString((char *)pop());                                break; // QTYPE
-        case 'u': if (pop() == 0) { pc = LOS.s; } else { lpop(); }           break; // UNTIL
-        case 'v': if (pop()) { pc = LOS.s; } else { lpop(); }                break; // WHILE
         case 'w': ir = *(pc++); if (ir == '@') { TOS = GET_WORD(AOS); }
                 else if (ir == '!') { SET_WORD(AOS, (WORD)NOS); DROP2; }     break; // w@, w!
         case 'x': ir=*(pc++); if (ir=='S') { doDotS(); }
                 else if (ir=='A') { oVHERE+=pop(); VHERE=oVHERE; }
                 else if (ir=='D') { doWords(); }
-                else if (ir=='Y') { char *y=(char*)pop(); system(y); }
+                else if (ir=='Y') { y=(byte*)pop(); system((char*)y); }
                 else if (ir=='Q') { isBye=1; return; }                       break;
         case 'z': pc = doExt(*pc, pc+1);                                     break; // EXT
         case '{': lpush()->e=0; LOS.s = pc;                                  break; // BEGIN

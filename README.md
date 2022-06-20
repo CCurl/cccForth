@@ -80,19 +80,21 @@ NEGATE   (a--b)            b: -a
 *** STACK ***
 1+       (a--b)            Increment TOS
 1-       (a--b)            Decrement TOS
-SWAP     (a b--b a)        Swap top 2 stack entries (TOS and NOS)
+2*       (a--b)            b: a*2
+2/       (a--b)            b: a/2
 DROP     (a b--a)          Drop TOS
-OVER     (a b--a b a)      Copy NOS
 DUP      (a--a a)          Duplicate TOS
+2DROP    (a b--)           Drop NOS and TOS
+2DUP     (a b--a b a b)    Duplicate NOS and TOS
 NIP      (a b--b)          Drop NOS
+OVER     (a b--a b a)      Copy NOS
+SWAP     (a b--b a)        Swap TOS and NOS
 TUCK     (a b--b a b)      Push TOS under NOS
 >R       (n--)             Move n to return stack
 R>       (--n)             Move n from return stack
 R@       (--n)             Copy n from return stack
 ROT      (a b c--b c a)    Rotate a to TOS
 -ROT     (a b c--c a b)    Rotate c before a
-2DUP     (a b--a b a b)    Duplicate NOS And TOS
-2DROP    (a b--)           Drop NOS and TOS
 
 *** BITWISE ***
 AND      (a b--c)          Bitwise AND
@@ -106,20 +108,22 @@ COM      (a--b)            Bitwise COMPLEMENT
 ."       (?--?)            Output a (possibly formatted) string. See (1).
 CR       (--)              Output a newline (#10,#13)
 EMIT     (c--)             Output c as a character
+COUNT    (a--a n)          n: length of string at a (a must be NULL-terminated)
+TYPE     (a n--)           Output string at (standard Forth TYPE)
 KEY      (--c)             c: Next keyboard char, wait if no press yet
 KEY?     (--f)             f: FALSE if no keyboard press, else TRUE
 QTYPE    (a--)             Quick string output, no formatting.
 SPACE    (--)              Output a single SPACE
-ZLEN     (a--n)            n: length of string at a
 ZTYPE    (a--)             Output string at a. See (1).
 
-(1) Notes on .":
-- This is NOT ansi-standard
-- %d: print TOS as integer
-- %x: print TOS as hex
-- %b: print TOS as binary
-- %n: print new-line
-- %q: print the quote (") character
+(1) Notes on ." and ZTYPE:
+- ." is NOT ansi-standard
+- %d: output TOS as integer
+- %x: output TOS as hex
+- %b: output TOS as binary
+- %c: output TOS as character
+- %n: output a new-line (13,10)
+- %q: output the quote (") character
 
 example: : ascii $20 '~' for i i i i ." %n%d: (%c) %x %b" next ;
 
