@@ -18,12 +18,12 @@ variable ln cols allot
     r4 1- cols + T5 T5 T5 drop ;
 
 : alive? ( a b -- c )
-    dup 2 = if drop exit then
-    3 = if drop 1 exit then
+    dup 2 = .if drop exit .then
+    3 = .if drop 1 exit .then
     drop 0 ;
 
 : rand-pop 0 pop-sz for rand $FF and #200 > i pop + c! next ;
-: clr-bak 0 pop-sz for 0 i bak + c! next ;
+: clr-bak bak s1 1 pop-sz for 0 r1 c! i1 next ;
 : bak->pop 0 pop-sz for 
         i pop + c@ 
         i bak + c@ alive? 
@@ -33,12 +33,11 @@ variable ln cols allot
 
 : ->p ( c r -- v ) cols * + pop + ;
 : ->b ( c r -- v ) cols * + bak + ;
-: p@ ( c r -- v ) ->p c@ ;
 
 : .pop 1 dup ->XY
     1 rows for i s1
         ln s6 
-        1 cols for i r1 p@ if '*' else bl then r6 c! i6 next 
+        1 cols for i r1 ->p c@ if '*' else bl then r6 c! i6 next 
         0 r6 c! ln qtype cr
     next ;
 
