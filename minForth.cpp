@@ -105,8 +105,15 @@ PRIM_T prims[] = {
     , { "+TMPS", "l+" }
     , { "-TMPS", "l-" }
     , { "WORDS", "xD" }
-#if __BOARD__ != PC
-        // Pin operations for dev boards
+#ifdef __FILES__
+    , { "FOPEN", "zFO" }
+    , { "FREAD", "zFR" }
+    , { "FWRITE", "zFW" }
+    , { "FCLOSE", "zFC" }
+#endif
+#if __BOARD__ == PC
+#else
+    // Pin operations for dev boards
     , { "pin-input","zPI" }       // open input
     , { "pin-output","zPO" }      // open output
     , { "pin-pullup","zPU" }      // open input-pullup
@@ -548,9 +555,20 @@ long doRand() {
     return seed;
 }
 
+byte *doFile(CELL ir, byte *pc) {
+    ir = *(pc++);
+    if (ir=='O') { ir=pop(); TOS=(CELL)fopen((char*)TOS,ir?"wb":"rb"); }
+    if (TOS==0) { printString("-nf-"); return pc; }
+    else if (ir=='R') { char b; ir=fread(&b,1,1,(FILE*)TOS); TOS=b; push(ir); }
+    else if (ir=='W') { CELL b=NOS; fwrite(&b,1,1,(FILE*)TOS); DROP2; }
+    else if (ir=='C') { fclose((FILE*)pop()); }
+    return pc;
+}
+
 byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
     case 'E': doEditor();                       break;
+    case 'F': return doFile(ir, pc);
     case 'L': doLoad(pop());                    break;
     case 'R': push(doRand());                   break;
     case 'T': push(clock());                    break;

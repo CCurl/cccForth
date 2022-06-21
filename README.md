@@ -130,6 +130,12 @@ ZTYPE    (a--)             Output string at a. See (1).
 
 example: : ascii $20 '~' for i i i i ." %n%d: (%c) %x %b" next ;
 
+*** FILE ***
+FOPEN    (a n--fh)         a: file name, fh: file handle, n: 0 => READ, else WRITE
+FREAD    (fh--c n)         c: next char from file fh, n: number chars read (0 => EOF)
+FWRITE   (c fh--)          c: char to write to file fh.
+FCLOSE   (fh--)            fh: file handle to close.
+
 *** LOGICAL ***
 =        (a b--f)          Equality
 <        (a b--f)          Less-than

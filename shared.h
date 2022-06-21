@@ -23,6 +23,7 @@
   #define STK_SZ        64
   #define LSTK_SZ        8
   #define LOCALS_SZ    100
+  #define __FILES__
   // #define __EDITOR__
 #endif
 
