@@ -87,6 +87,20 @@ PRIM_T prims[] = {
     , { "OR", "b|" }
     , { "XOR", "b^" }
     , { "COM", "b~" }
+    // Float
+    , { "Fi", "Fi" }  // In
+    , { "Fo", "Fo" }  // Out
+    , { "F+", "F+" }  // Add
+    , { "F-", "F-" }  // Sub
+    , { "F*", "F*" }  // Mult
+    , { "F/", "F/" }  // Div
+    , { "F<", "F<" }  // LT
+    , { "F>", "F>" }  // GT
+    , { "F.", "F." }  // PRINT
+    , { "FDUP", "F#" }
+    , { "FOVER", "F%" }
+    , { "FSWAP", "F$" }
+    , { "FDROP", "F\\" }
     // System
     , { "BL", "32" }
     , { "BYE", "xQ" }

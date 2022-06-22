@@ -1,12 +1,13 @@
 #include "shared.h"
 
-byte sp, rsp, lsp, locSP, lb, isError, sb, rb;
+byte sp, rsp, lsp, locSP, lb, isError, sb, rb, fsp;
 CELL BASE, stks[STK_SZ], locals[LOCALS_SZ];
 byte code[CODE_SZ+1], vars[VARS_SZ+1], *y;
 LOOP_T lstk[LSTK_SZ + 1];
+float fstk[10];
 
 void vmReset() {
-    lsp = locSP = lb = 0;
+    lsp = locSP = lb = 0, fsp = 0;
     sb = 2, rb = (STK_SZ-2);
     sp = sb - 1, rsp = rb + 1;
     BASE = 10;
@@ -21,6 +22,13 @@ void vmReset() {
 
 inline void push(CELL v) { stks[++sp] = v; }
 inline CELL pop() { return stks[sp--]; }
+
+#define FTOS fstk[fsp]
+#define FNOS fstk[fsp-1]
+#define FDROP fsp-=(0<fsp)?1:0
+
+inline void fpush(float v) { fstk[++fsp] = v; }
+inline float fpop() { return fstk[fsp--]; }
 
 inline void rpush(CELL v) { stks[--rsp] = v; }
 inline CELL rpop() { return stks[rsp++]; }
@@ -74,6 +82,7 @@ byte *doType(byte *a, int l, int delim) {
             if (c == 'b') { printBase(pop(), 2); }
             else if (c == 'c') { printChar((char)pop()); }
             else if (c == 'd') { printBase(pop(), 10); }
+            else if (c == 'f') { printStringF("%g",fpop()); }
             else if (c == 'n') { printString("\r\n"); }
             else if (c == 'q') { printChar('"'); }
             else if (c == 'x') { printBase(pop(), 16); }
@@ -91,6 +100,8 @@ void run(WORD start) {
     lsp = locSP = isError = 0;
     if (sp < sb) { sp = sb - 1; }
     if (rsp > rb) { rsp = rb + 1; }
+    if (fsp < 0) { fsp = 0; }
+    if (9 < fsp) { fsp = 9; }
     while ((pc) && (isError == 0)) {
         byte ir = *(pc++);
         switch (ir) {
@@ -127,6 +138,19 @@ void run(WORD start) {
         case '@': TOS = GET_LONG((byte*)TOS);                                break; // FETCH
         case 'C': y=(byte*)TOS; t1=0; while (*(y++)) { ++t1; } push(t1);     break; // COUNT (a--a c)
         case 'D': --TOS;                                                     break; // 1-
+        case 'F': ir = *(pc++); if (ir=='.') { printStringF("%g",fpop()); }         // FLOAT ops
+                else if (ir=='#') { fpush(FTOS); }
+                else if (ir=='$') { float x=FTOS; FTOS=FNOS; FNOS=x; }
+                else if (ir=='%') { fpush(FNOS); }
+                else if (ir=='\\') { FDROP; }
+                else if (ir=='i') { fpush((float)pop()); }
+                else if(ir=='o') { push((CELL)fpop()); }
+                else if(ir=='+') { FNOS+=FTOS; FDROP; }
+                else if(ir=='-') { FNOS-=FTOS; FDROP; }
+                else if(ir=='*') { FNOS*=FTOS; FDROP; }
+                else if(ir=='/') { FNOS/=FTOS; FDROP; }
+                else if(ir=='<') { push((FNOS<FTOS)?1:0); FDROP; FDROP; }
+                else if(ir=='>') { push((FNOS>FTOS)?1:0); FDROP; FDROP; }    break;
         case 'G': pc = CA((WORD)pop());                                      break; // EXECUTE (GOTO)
         case 'I': push(LOS.f);                                               break; // I
         case 'J': pc = CA(GET_WORD(pc));                                     break; // BRANCH
