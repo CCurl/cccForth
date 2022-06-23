@@ -9,6 +9,7 @@
 
 CELL timer() { return millis(); }
 CELL getSeed() { return millis(); }
+void system(const char *cmd) {}
 
 #ifdef __SERIAL__
     int charAvailable() { return mySerial.available(); }
@@ -38,7 +39,7 @@ void gamePadInit() {
 }
 #else
 void gamePadInit() {}
-WORD doGamePad(byte ir, WORD pc) { printString("-noGamepad-"); return pc; }
+byte *doGamePad(byte ir, byte *pc) { printString("-noGamepad-"); return pc; }
 #endif
 
 int isOTA = 0;
@@ -48,23 +49,24 @@ void printString(const char* str) {
     else { printSerial(str); }
 }
 
-void printChar(const char ch) { 
-    char b[2] = { ch, 0 };
-    printString(b);
+void printChar(char ch) { 
+    printSerial((const char)ch);
+    // char b[2] = { ch, 0 };
+    // printString(b);
 }
 
-WORD doPin(WORD pc) {
+byte *doPin(byte *pc) {
     CELL pin = pop();
-    byte ir = U(pc++);
+    byte ir = *(pc++);
     switch (ir) {
     case 'I': pinMode(pin, INPUT);          break;
     case 'O': pinMode(pin, OUTPUT);         break;
     case 'U': pinMode(pin, INPUT_PULLUP);   break;
-    case 'R': ir = U(pc++);
+    case 'R': ir = *(pc++);
         if (ir == 'A') { push(analogRead(pin));  }
         if (ir == 'D') { push(digitalRead(pin)); }
         break;
-    case 'W': ir = U(pc++);
+    case 'W': ir = *(pc++);
         if (ir == 'A') { analogWrite(pin,  (int)pop()); }
         if (ir == 'D') { digitalWrite(pin, (int)pop()); }
         break;
@@ -75,7 +77,7 @@ WORD doPin(WORD pc) {
     return pc;
 }
 
-WORD doExt(CELL ir, WORD pc) {
+byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
     case 'G': pc = doGamePad(ir, pc);       break;
     case 'N': push(micros());               break;
@@ -167,7 +169,7 @@ void handleInput(char c) {
         return;
     }
     if (c == 9) { c = 32; }
-    if (betw(c, 32, 126)) {
+    if (BTW(c, 32, 126)) {
         *(e++) = c;
         if (!isOTA) { printChar(c); }
     }
