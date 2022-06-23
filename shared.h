@@ -63,9 +63,9 @@
 #define TOS           stks[sp]
 #define NOS           stks[sp-1]
 #define AOS           (byte*)TOS
-#define LOS           lstk[lsp]
-#define LOS1          lstk[lsp-1]
-#define LOS2          lstk[lsp-2]
+#define L0            lstk[lsp]
+#define L1            lstk[lsp-1]
+#define L2            lstk[lsp-2]
 #define FTOS          fstk[fsp]
 #define FNOS          fstk[fsp-1]
 #define FDROP         fsp-=(0<fsp)?1:0

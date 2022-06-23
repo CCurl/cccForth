@@ -88,14 +88,14 @@ byte *doType(byte *a, int l, int delim) {
 }
 
 void run(WORD start) {
-    byte *pc = CA(start);
+    byte* pc = CA(start);
     CELL t1, t2;
     lsp = locSP = isError = 0;
     if (sp < sb) { sp = sb - 1; }
     if (rsp > rb) { rsp = rb + 1; }
     if (fsp < 0) { fsp = 0; }
     if (9 < fsp) { fsp = 9; }
-    while ((pc) && (isError == 0)) {
+    while (pc) {
         byte ir = *(pc++);
         switch (ir) {
         case 0: return;
@@ -145,11 +145,11 @@ void run(WORD start) {
                 else if(ir=='<') { push((FNOS<FTOS)?1:0); FDROP; FDROP; }
                 else if(ir=='>') { push((FNOS>FTOS)?1:0); FDROP; FDROP; }    break;
         case 'G': pc = CA((WORD)pop());                                      break; // EXECUTE (GOTO)
-        case 'I': push(LOS);                                                 break; // I
+        case 'I': push(L0);                                                  break; // I
         case 'J': pc = CA(GET_WORD(pc));                                     break; // BRANCH
         case 'K': ir = *(pc++); if (ir=='@') { push(getChar()); }                   // KEY?, KEY
                 else if(ir=='?') { push(charAvailable()); }                  break;
-        case 'M': LOS += pop();                                              break; // +I
+        case 'M': L0 += pop();                                               break; // +I
         case 'P': ++TOS;                                                     break; // 1+
         case 'Q': ir = *(pc++); if (ir == '<') { rpush(pop()); }                    // >R, R@, R>
                 if (ir == '>') { push(rpop()); }
@@ -159,11 +159,11 @@ void run(WORD start) {
         case 'T': t1=pop(); y=(byte*)pop(); while (t1--) printChar(*(y++));  break; // TYPE (a c--)
         case 'Y': vmReset();                                                return; // RESET
         case 'Z': doType((byte *)pop(),-1, 0);                               break; // ZTYPE
-        case '[': lsp += 3; LOS2 = (CELL)pc;                                        // FOR
-            LOS1 = (TOS > NOS) ? TOS : NOS;
-            LOS = (TOS < NOS) ? TOS : NOS; DROP2;                            break;
+        case '[': lsp += 3; L2 = (CELL)pc;                                          // FOR
+            L1 = (TOS > NOS) ? TOS : NOS;
+            L0 = (TOS < NOS) ? TOS : NOS; DROP2;                             break;
         case '\\': DROP1;                                                    break; // DROP
-        case ']': if (++LOS<=LOS1) { pc=(BYTE *)LOS2; } else { lsp-=3; }     break; // NEXT
+        case ']': ++L0; if (L0<=L1) { pc=(BYTE*)L2; } else { lsp-=3; }       break; // NEXT
         case '^': ir = *(pc++); if (ir == 'W') { lsp -= 1; }                        // UNLOOP
                 else if (ir == 'F') { lsp =- 3; }                            break;
         case '_': TOS = -TOS;                                                break; // NEGATE
@@ -191,8 +191,8 @@ void run(WORD start) {
                 else if (ir=='Y') { y=(byte*)pop(); system((char*)y); }
                 else if (ir=='Q') { isBye=1; return; }                       break;
         case 'z': pc = doExt(*pc, pc+1);                                     break; // EXT
-        case '{': ++lsp; LOS=(CELL)pc;                                       break; // BEGIN
-        case '}': if (TOS) { pc=(byte*)LOS; } else { DROP1; lsp--; }         break; // WHILE
+        case '{': ++lsp; L0=(CELL)pc; if (!TOS) { while (*pc!='}') ++pc; }   break; // BEGIN
+        case '}': if (TOS) { pc=(byte*)L0; } else { DROP1; lsp--; }          break; // WHILE
         case '~': TOS = (TOS) ? 0 : 1;                                       break; // NOT (0=)
         default: printStringF("-unk ir: %d (%c)-", ir, ir);                 return;
         }
