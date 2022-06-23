@@ -7,9 +7,10 @@
 #define ESP32_DEV    4
 #define ESP8266      5
 #define APPLE_MAC    6
-#define LINUX        7
+#define PICO         7
+#define LINUX        8
 
-#define __BOARD__    TEENSY4
+#define __BOARD__    PICO
 
 #ifdef _WIN32
   #undef __BOARD__
@@ -27,10 +28,20 @@
   #define __EDITOR__
 #endif
 
-#include <stdarg.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
+#include <time.h>
 
 #if __BOARD__ == TEENSY4
+  #define CODE_SZ      (48*1024)
+  #define VARS_SZ      (96*1024)
+  #define STK_SZ        64
+  #define LSTK_SZ        8
+  #define LOCALS_SZ    160
+  #define __FILES__
+  #define __EDITOR__
+#elif __BOARD__ == PICO
   #define CODE_SZ      (48*1024)
   #define VARS_SZ      (96*1024)
   #define STK_SZ        64
@@ -100,6 +111,7 @@ extern void doDotS();
 extern void doWords();
 extern void doOK();
 extern byte *doExt(CELL, byte *);
+extern char *rtrim(char *);
 extern void doEditor();
 extern int doFind(const char *);
 extern void doParse(const char *);

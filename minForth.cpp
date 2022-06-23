@@ -1,7 +1,6 @@
 // MinForth.cpp : An extremely memory conscious Forth interpreter
 
 #include "Shared.h"
-#include <time.h>
 
 typedef struct {
     const char *name;

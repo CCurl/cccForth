@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "shared.h"
-#include "file-board.h"
 
 #define AR(x) analogRead(x)
 #define DR(x) digitalRead(x)
@@ -9,7 +8,6 @@
 
 CELL timer() { return millis(); }
 CELL getSeed() { return millis(); }
-void system(const char *cmd) {}
 
 #ifdef __SERIAL__
     int charAvailable() { return mySerial.available(); }
@@ -50,9 +48,8 @@ void printString(const char* str) {
 }
 
 void printChar(char ch) { 
-    printSerial((const char)ch);
-    // char b[2] = { ch, 0 };
-    // printString(b);
+    char b[2] = { ch, 0 };
+    printString(b);
 }
 
 byte *doPin(byte *pc) {
@@ -77,8 +74,11 @@ byte *doPin(byte *pc) {
     return pc;
 }
 
+#include "file-board.h"
+
 byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
+    case 'F': pc = doFile(ir, pc);          break;
     case 'G': pc = doGamePad(ir, pc);       break;
     case 'N': push(micros());               break;
     case 'P': pc = doPin(pc);               break;
@@ -149,18 +149,19 @@ int isBackSpace(char c) {
 }
 
 void handleInput(char c) {
-    static char *s = NULL, *e = NULL;
-    if (s == NULL) { s = e = (char *)(VHERE + 6); }
+    static char *tib = NULL, *e = NULL;
+
+    if (tib == NULL) { tib = e = (char *)CA(HERE+32); }
     if (c == 13) {
         *e = 0;
         printString(" ");
-        doParse(s);
-        s = NULL;
+        doParse(rtrim(tib));
+        tib = NULL;
         doOK();
         return;
     }
 
-    if (isBackSpace(c) && (s < e)) {
+    if (isBackSpace(c) && (tib < e)) {
         e--;
         if (!isOTA) {
           char b[] = {8, 32, 8, 0};
@@ -181,9 +182,10 @@ void setup() {
     while (!mySerial) {}
     delay(500);
     // while (mySerial.available()) { char c = mySerial.read(); }
-    doOK();
 #endif
     vmReset(); 
+    printString("minForth v0.0.1 - Chris Curl\r\n");
+    doOK();
     gamePadInit();
 //    wifiStart();
 //    fileInit();
