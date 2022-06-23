@@ -12,7 +12,7 @@ here s7
 : T3 cr 20 s1 r1 begin . d1 r1 while ;
 : T4 cr +tmps 123 445 s2 s1 r1 . r2 . -tmps ;
 : T5 cr +tmps 666 777 s2 s1 r1 . r2 . T4 r1 . r2 . -tmps ;
-: T6 s6 for i . i r6 = .if unloop exit .then next ." out6" ;
+: T6 s6 for i . i r6 = .if exit-f exit .then next ." out6" ;
 
 cr 1 T1 0 T1 
 T2 T3 T4 T5

@@ -22,7 +22,7 @@
   #define CODE_SZ      ( 64*1024)
   #define VARS_SZ      (256*1024)
   #define STK_SZ        64
-  #define LSTK_SZ        8
+  #define LSTK_SZ       16
   #define LOCALS_SZ    100
   #define __FILES__
   #define __EDITOR__
@@ -37,7 +37,7 @@
   #define CODE_SZ      (48*1024)
   #define VARS_SZ      (96*1024)
   #define STK_SZ        64
-  #define LSTK_SZ        8
+  #define LSTK_SZ       16
   #define LOCALS_SZ    160
   #define __FILES__
   #define __EDITOR__
@@ -45,15 +45,15 @@
   #define CODE_SZ      (48*1024)
   #define VARS_SZ      (96*1024)
   #define STK_SZ        64
-  #define LSTK_SZ        8
+  #define LSTK_SZ       16
   #define LOCALS_SZ    160
   #define __FILES__
   #define __EDITOR__
 #elif __BOARD__ == XIAO
   #define CODE_SZ      (16*1024)
   #define VARS_SZ      ( 8*1024)
-  #define STK_SZ        16
-  #define LSTK_SZ        8
+  #define STK_SZ        32
+  #define LSTK_SZ       12
   #define LOCALS_SZ    160
   // #define __GAMEPAD__
 #endif
@@ -64,6 +64,11 @@
 #define NOS           stks[sp-1]
 #define AOS           (byte*)TOS
 #define LOS           lstk[lsp]
+#define LOS1          lstk[lsp-1]
+#define LOS2          lstk[lsp-2]
+#define FTOS          fstk[fsp]
+#define FNOS          fstk[fsp-1]
+#define FDROP         fsp-=(0<fsp)?1:0
 #define DROP1         sp--
 #define DROP2         sp-=2
 #define CA(l)         (code+l)

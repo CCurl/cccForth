@@ -171,7 +171,7 @@ W!       (w a--)           Store WORD w at a
 +!       (n a--)           Add n to CELL at a
 "        (--a)             a: 32-bit address of a string. See (2).
 
-(2) Notes on ":
+(2) Notes on " (--a):
 - This does not generate a standard FORTH counted string.
 - It is NULL-terminated, no count byte.
 
@@ -184,12 +184,13 @@ THEN     (--)              Standard THEN
 FOR      (f t--)           Begin FOR/NEXT loop
 I        (--n)             n: Current index
 +I       (n--)             n: value to add to I
+EXIT-F   (--)              Drop top 3 from loop stack (unwind FOR loop)
 NEXT     (--)              Increment I, jump to start of loop if I < T
 BEGIN    (f--f)            Start WHILE loop: if f=0, skip to WHILE
 WHILE    (f--f?)           If f==0, jump to BEGIN, else DROP f and continue
 UNTIL    (f--f?)           If f<>0, jump to BEGIN, else DROP f and continue
-UNLOOP   (--)              Drop top of loop stack (FOR or WHILE)
-EXIT     (--)              Leave the word immediately (make sure to UNLOOP first if in a LOOP)
+EXIT-W   (--)              Drop top 1 from loop stack (unwind WHILE loop)
+EXIT     (--)              Exit the word immediately (don't forget to EXIT-F/W first if in a LOOP)
 
 *** TEMPORARY VARIABLES ***
 +TMPS    (--)              Allocate 10 temp variables, r0 .. r9
