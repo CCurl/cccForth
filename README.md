@@ -1,5 +1,7 @@
 # minForth
 
+*** NOTE: this is NOT in any way related to the MinForth created by ANDREAS KOCHERBURGER ***
+
 The main goals for this minimal Forth are as follows:
 
 - To be frugal with its usage of memory.
