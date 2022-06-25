@@ -49,6 +49,7 @@
   #define LOCALS_SZ    160
   #define __FILES__
   #define __EDITOR__
+  #define NEEDS_ALIGN
 #elif __BOARD__ == XIAO
   #define CODE_SZ      (16*1024)
   #define VARS_SZ      ( 8*1024)

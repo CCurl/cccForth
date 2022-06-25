@@ -146,7 +146,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="file-board.h" />
-    <ClInclude Include="pc.h" />
+    <ClInclude Include="file-generic.h" />
+    <ClInclude Include="file-teensy.h" />
+    <ClInclude Include="pc.inc" />
     <ClInclude Include="shared.h" />
   </ItemGroup>
   <ItemGroup>

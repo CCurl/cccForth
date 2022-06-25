@@ -537,12 +537,12 @@ void systemWords() {
     sprintf(cp, ": vb %lu ;", (UCELL)vars);     doParse(cp);
     sprintf(cp, ": csz %d ;", CODE_SZ);         doParse(cp);
     sprintf(cp, ": vsz %d ;", VARS_SZ);         doParse(cp);
-    sprintf(cp, ": ha %lu ;", (UCELL)&HERE);    doParse(cp);
+    sprintf(cp, ": ha %lu ;", (UCELL)&oHERE);   doParse(cp);
     sprintf(cp, ": la %lu ;", (UCELL)&LAST);    doParse(cp);
-    sprintf(cp, ": va %lu ;", (UCELL)&VHERE);   doParse(cp);
+    sprintf(cp, ": va %lu ;", (UCELL)&oVHERE);  doParse(cp);
     sprintf(cp, ": base %lu ;", (UCELL)&BASE);  doParse(cp);
 }
 
 #if __BOARD__ == PC
-#include "pc.h"
+#include "pc.inc"
 #endif

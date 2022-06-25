@@ -1,4 +1,7 @@
-// include file for the PC
+// Support for the PC
+// NOTE: this is a .inc file because the Arduino IDE only knows about .CPP and .H files
+// If it were a .CPP file, it would need a #if around the entire thing.
+// Making it a .INC file avoids that need.
 
 FILE *input_fp = NULL;
 FILE *fpStk[10];
