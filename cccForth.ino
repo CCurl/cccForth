@@ -184,7 +184,7 @@ void setup() {
     // while (mySerial.available()) { char c = mySerial.read(); }
 #endif
     vmReset(); 
-    printString("minForth v0.0.1 - Chris Curl\r\n");
+    printString("cccForth v0.0.1 - Chris Curl\r\n");
     doOK();
     gamePadInit();
 //    wifiStart();

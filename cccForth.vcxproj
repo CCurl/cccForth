@@ -24,7 +24,7 @@
     <ProjectGuid>{7481fb3e-060e-4354-b1a0-f274e086d204}</ProjectGuid>
     <RootNamespace>MinForth</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>minForth</ProjectName>
+    <ProjectName>cccForth</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -141,7 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="editor.cpp" />
-    <ClCompile Include="minForth.cpp" />
+    <ClCompile Include="cccForth.cpp" />
     <ClCompile Include="vm.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -157,9 +157,8 @@
     <None Include="block-111.4th" />
     <None Include="block-222.4th" />
     <None Include="block-223.4th" />
-    <None Include="doc\reference.md" />
     <None Include="LICENSE" />
-    <None Include="minForth.ino" />
+    <None Include="cccForth.ino" />
     <None Include="README.md" />
     <None Include="block-667.4th" />
   </ItemGroup>

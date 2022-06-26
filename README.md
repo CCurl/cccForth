@@ -1,6 +1,6 @@
-# minForth
+# cccForth
 
-*** NOTE: this is NOT in any way related to the MinForth created by ANDREAS KOCHERBURGER ***
+*** NOTE: this is NOT in any way related to the cccForth created by ANDREAS KOCHERBURGER ***
 
 The main goals for this minimal Forth are as follows:
 
@@ -205,7 +205,7 @@ dX       (--n)             Decrement temp var X
 **** SYSTEM/OTHER ***
 .S       (--)              Output the stack
 BL       (--c)             c: 32
-BYE      (--)              Exit minForth
+BYE      (--)              Exit cccForth
 CONSTANT (--)              Define a constant
 CELL     (--n)             n: The size of a CELL
 EDIT     (n--)             Edit block n
@@ -213,7 +213,7 @@ EXECUTE  (a--)             Jump to CODE address a
 LOAD     (n--)             Load block n from disk
 NOP      (--)              Do nothing
 RAND     (--n)             n: a RANDOM 32-bit number
-RESET    (--)              Initialize minForth
+RESET    (--)              Initialize cccForth
 SYSTEM   (a--)             a: string to send to system() ... eg: " dir" system
 TIMER    (--n)             n: clock()
 WAIT     (n--)             n: MS to sleep

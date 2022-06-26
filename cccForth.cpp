@@ -1,4 +1,4 @@
-// MinForth.cpp : An extremely memory conscious Forth interpreter
+// cccForth.cpp : An extremely memory conscious Forth interpreter
 
 #include "Shared.h"
 
@@ -354,7 +354,7 @@ char *isRegOp(const char *wd) {
 }
 
 int doPrim(const char *wd) {
-    // Words minForth can map directly into its VML (Virtual Machine Language)
+    // Words cccForth can map directly into its VML (Virtual Machine Language)
     const char *vml = isRegOp(wd);
 
     for (int i = 0; prims[i].op && (!vml); i++) {
