@@ -87,6 +87,16 @@ byte *doType(byte *a, int l, int delim) {
     return e;
 }
 
+byte* doFile(CELL ir, byte* pc) {
+    ir = *(pc++);
+    if (ir == 'O') { fOpen(); }
+    else if (TOS == 0) { printString("-nofp-"); return pc; }
+    else if (ir == 'R') { fRead(); }
+    else if (ir == 'W') { fWrite(); }
+    else if (ir == 'C') { fClose(); }
+    return pc;
+}
+
 void run(WORD start) {
     byte* pc = CA(start);
     CELL t1, t2;
@@ -178,6 +188,7 @@ void run(WORD start) {
                 else if(ir=='!') { *AOS = (byte)NOS; DROP2; }                break; // c@, c!
         case 'd': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { --locals[lb+t1]; }      break; // decLocal
         case 'i': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { ++locals[lb+t1]; }      break; // incLocal
+        case 'f': pc = doFile(ir, pc);                                       break; // BINARY ops
         case 'l': ir=*(pc++); if (ir=='+') { lb+=((lb+10)<LOCALS_SZ)?10:0; }        // locals
                 else if (ir=='-') { lb-=(lb<10)?0:10; }                      break;
         case 'r': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { push(locals[lb+t1]); }  break; // readLocal

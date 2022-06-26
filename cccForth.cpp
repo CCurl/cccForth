@@ -120,10 +120,10 @@ PRIM_T prims[] = {
     , { "-TMPS", "l-" }
     , { "WORDS", "xD" }
 #ifdef __FILES__
-    , { "FOPEN", "zFO" }
-    , { "FREAD", "zFR" }
-    , { "FWRITE", "zFW" }
-    , { "FCLOSE", "zFC" }
+    , { "FOPEN", "fO" }
+    , { "FREAD", "fR" }
+    , { "FWRITE", "fW" }
+    , { "FCLOSE", "fC" }
 #endif
 #if __BOARD__ == PC
 #else

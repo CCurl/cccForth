@@ -129,10 +129,11 @@ extern void delay();
 
 // FILEs
 extern void fileInit();
-extern void fileOpen();
-extern void fileRead();
-extern void fileWrite();
-extern void fileClose();
+extern byte *doFile(CELL, byte *);
+extern void fOpen();
+extern void fRead();
+extern void fWrite();
+extern void fClose();
 extern void readBlock();
 extern void writeBlock();
 

@@ -10,6 +10,32 @@ byte fpSP = 0;
 void fpPush(FILE *v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }
 FILE *fpPop() { return (fpSP) ? fpStk[fpSP--] : 0 ; }
 
+void fOpen() {
+    CELL mode = pop();
+    char *fn = (char *)pop();
+    push((CELL)fopen(fn, mode?"wb":"rb"));
+}
+
+void fClose() {
+    CELL fp = pop();
+    if (fp) { fclose((FILE *)fp); }
+}
+
+void fRead() {
+    FILE *fp = (FILE *)pop();
+    push(0); push(0);
+    if (fp && (!feof(fp))) {
+        NOS = fgetc(fp);
+        TOS = 1;
+    }
+}
+
+void fWrite() {
+    FILE *fp = (FILE *)pop();
+    CELL val = pop();
+    if (fp) { fputc(val, fp); }
+}
+
 void doLoad(int blk) {
     char *fn = (char*)(VHERE + 100);
     sprintf(fn, "./block-%03d.4th", blk);
@@ -26,16 +52,6 @@ long doRand() {
     seed ^= (seed >> 17);
     seed ^= (seed <<  5);
     return seed;
-}
-
-byte *doFile(CELL ir, byte *pc) {
-    ir = *(pc++);
-    if (ir=='O') { ir=pop(); TOS=(CELL)fopen((char*)TOS,ir?"wb":"rb"); }
-    if (TOS==0) { printString("-nf-"); return pc; }
-    else if (ir=='R') { char b; ir=fread(&b,1,1,(FILE*)TOS); TOS=b; push(ir); }
-    else if (ir=='W') { CELL b=NOS; fwrite(&b,1,1,(FILE*)TOS); DROP2; }
-    else if (ir=='C') { fclose((FILE*)pop()); }
-    return pc;
 }
 
 byte *doExt(CELL ir, byte *pc) {
