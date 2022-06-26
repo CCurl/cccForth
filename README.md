@@ -1,10 +1,8 @@
 # cccForth
 
-*** NOTE: this is NOT in any way related to the cccForth created by ANDREAS KOCHERBURGER ***
-
 The main goals for this minimal Forth are as follows:
 
-- To be frugal with its usage of memory.
+- To be very frugal with its usage of memory.
 - To be easy to modify and add/extend the primitives.
 - To have an implementation that is minimal and "intuitively obvious upon casual inspection".
 - To be able to run on any system that has a C compiler.
