@@ -173,7 +173,7 @@ void run(WORD start) {
             L1 = (TOS > NOS) ? TOS : NOS;
             L0 = (TOS < NOS) ? TOS : NOS; DROP2;                             break;
         case '\\': DROP1;                                                    break; // DROP
-        case ']': ++L0; if (L0<=L1) { pc=(byte*)L2; } else { lsp-=3; }       break; // NEXT
+        case ']': ++L0; if (L0<L1) { pc=(byte*)L2; } else { lsp-=3; }        break; // NEXT
         case '^': ir = *(pc++); if (ir == 'W') { lsp -= 1; }                        // UNLOOP
                 else if (ir == 'F') { lsp =- 3; }                            break;
         case '_': TOS = -TOS;                                                break; // NEGATE
