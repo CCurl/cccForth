@@ -1,23 +1,23 @@
 // File support for generic boards
 
-void doFopen() {
+void fOpen() {
   // (fn md--fh)
-  char *md = (char *)pop();
+  CELL md = pop();
   char *fn = (char *)pop();
   push(0);
 }
-void doFread() {
+void fRead() {
   // (fh--c n)
   CELL fh = pop();
   push(0);
   push(0);
 }
-void doFwrite() {
+void fWrite() {
   // (c fh--)
   CELL fh = pop();
   CELL c = pop();
 }
-void doFclose() {
+void fClose() {
   // (fh--)
   CELL fh = pop();
 }

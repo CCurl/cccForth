@@ -78,7 +78,6 @@ byte *doPin(byte *pc) {
 
 byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
-    case 'F': pc = doFile(ir, pc);          break;
     case 'G': pc = doGamePad(ir, pc);       break;
     case 'N': push(micros());               break;
     case 'P': pc = doPin(pc);               break;
@@ -91,55 +90,13 @@ byte *doExt(CELL ir, byte *pc) {
     return pc;
 }
 
-// void loadCode(const char* src) {
-//     WORD here = HERE;
-//     WORD here1 = HERE;
-//     while (*src) {
-//         *(here1++) = *(src++);
-//     }
-//     *here1 = 0;
-//     run(here);
-// }
-
-// void input_push(FILE *fp) { }
-// FILE *input_pop() { return NULL; }
-
 // ********************************************
 // * HERE is where you load your default code *
 // ********************************************
-
-// #define SOURCE_STARTUP \
-//     X(1000, ":CODE CR xIAU xIH 1-[rI c@ #,';=(rI 1+ c@':=(CR))];") \
-//     X(1001, ":CR 13,10,;:U xIHxIAU-;") \
-//     X(1002, ":REGS 0 xIR 1-[rI xIC* xIAR+@ #s1(CR\"r\" rI 26&$ 26&$ 'A+,'A+,'A+,\": \"r1.)];") \
-//     X(1003, ":SI xIUxIFxIR\"%nThis system has %d registers, %d functions, and %d bytes user memory.\";") \
-//     X(1004, ":XDOT s2 0s1{r2&$i1} 1 r1[#9>(7+)'0+,]32,;") \
-//     X(1005, ":BDOT 2 XDOT;:HDOT 16 XDOT;:DOT 10 XDOT;") \
-//     X(1006, ":NN 10&$..32,;:NNN 100&$.NN;") \
-//     X(9999, "SI")
-// 
-//#if __BOARD__ == ESP8266
-// #define X(num, val) const char str ## num[] = val;
-//#else
-//#define X(num, val) const PROGMEM char str ## num[] = val;
-//#endif
-// SOURCE_STARTUP
-
-// #undef X
-// #define X(num, val) str ## num,
-// const char *bootStrap[] = {
-//     SOURCE_STARTUP
-//     NULL
-// };
-
-// void loadBaseSystem() {
-//     for (int i = 0; bootStrap[i] != NULL; i++) {
-//         loadCode(bootStrap[i]);
-//     }
-// #ifdef __FILES__
-//     loadCode("xFL");
-// #endif
-// }
+void loadCode() {
+    doParse(": T0 dup 32 >= .if dup '~' <= .if emit exit .then .\" (%d)\" ;");
+    doParse(": .code cb here over + 1- for i c@ T0 next ;");
+}
 
 // NB: tweak this depending on what your terminal window sends for [Backspace]
 // E.G. - PuTTY sends a 127 for Backspace
@@ -183,7 +140,8 @@ void setup() {
     delay(500);
     // while (mySerial.available()) { char c = mySerial.read(); }
 #endif
-    vmReset(); 
+    vmReset();
+    loadCode();
     printString("cccForth v0.0.1 - Chris Curl\r\n");
     doOK();
     gamePadInit();
