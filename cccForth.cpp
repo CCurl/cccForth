@@ -487,6 +487,7 @@ int doParseWord(char *wd) {
     }
 
     STATE = 0;
+    HERE = oHERE;
     printStringF("[%s]??", wd);
     return 0;
 }
