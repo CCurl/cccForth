@@ -1,32 +1,58 @@
 // File support for generic boards
 
+// file-teensy.h
+// File ops on the Teensy are different
+
+LittleFS myFS;
+
 void fileInit() {
     myFS.begin();
-    printString("\r\nLittleFS: initialized");
     FSInfo fs_info;
     myFS.info(fs_info);
-    printStringF("\r\nLittleFS: Total: %ld", fs_info.totalBytes);
-    printStringF("\r\nLittleFS: Used: %ld", fs_info.usedBytes);
+    printString("\r\nLittleFS: initialized");
+    printStringF("\r\nTotal Size: %ld bytes, Used: %ld", fs_info.totalBytes, fs_info.usedBytes);
+    for (int i = 0; i <= NF; i++) { files[i] = 0; }
+    isInit = 1;
 }
 
-void fOpen() {
-  // (fn md--fh)
-  CELL md = pop();
-  char *fn = (char *)pop();
-  push(0);
+int openSlot() {
+    if (!isInit) { fileInit(); }
+    for (int i = 1; i <= NF; i++)
+        if (files[i] == 0) { return i; }
+    return 0;
 }
-void fRead() {
-  // (fh--c n)
-  CELL fh = pop();
-  push(0);
-  push(0);
+
+void fOpen() {               // (name mode--fh)
+    CELL mode = pop();
+    char* fn = (char*)TOS;
+    TOS = 0;
+    int i = openSlot();
+    if (i) {
+        files[i] = myFS.open(fn, (mode) ? "w" : "r");
+        if (files[i]) { TOS = i; }
+    }
 }
-void fWrite() {
-  // (c fh--)
-  CELL fh = pop();
-  CELL c = pop();
+
+void fRead() {               // (fh--c n)
+    byte c;
+    CELL fh = TOS;
+    push(0);
+    if (VALIDF(fh)) {
+        TOS = files[fh].read(&c, 1);
+        NOS = (CELL)c;
+    }
 }
-void fClose() {
-  // (fh--)
-  CELL fh = pop();
+
+void fWrite() {              // (c fh--)
+    CELL fh = pop();
+    byte c = (byte)pop();
+    if (VALIDF(fh)) { files[fh].write(&c, 1); }
+}
+
+void fClose() {              // (fh--)
+    CELL fh = pop();
+    if (VALIDF(fh)) {
+        files[fh].close();
+        files[fh] = 0;
+    }
 }

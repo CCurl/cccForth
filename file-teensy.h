@@ -3,58 +3,52 @@
 
 LittleFS_Program myFS;
 
-static File files[10];
-static int fileSp=0, isInit=0;
-
 void fileInit() {
     myFS.begin(1 * 1024 * 1024);
     printString("\r\nLittleFS: initialized");
-    printStringF("\r\nBytes Used: %llu, Bytes Total:%llu", myFS.usedSize(), myFS.totalSize());
-    for (int i = 0; i < 10; i++) { files[i] = 0; }
-    fileSp = 0;
+    printStringF("\r\nTotal Size: %llu bytes, Used: %llu", myFS.totalSize(), myFS.usedSize());
+    for (int i = 0; i <= NF; i++) { files[i] = 0; }
     isInit = 1;
 }
 
-void fOpen() {
-    if (!isInit) { fileInit();  }
-    CELL md = pop();
-    char* fn = (char*)pop();
-    int i = (fileSp<9) ? fileSp+1 : 0;
-    if (i) {
-        files[i] = myFS.open(fn, (md) ? FILE_WRITE : FILE_READ);
-        if (files[i]) {
-            fileSp = i;
-        } else {
-            i = 0;
-            isError = 1;
-            printString("-openFail-");
-        }
-    }
-    push(i);
+int openSlot() {
+    if (!isInit) { fileInit(); }
+    for (int i = 1; i <= NF; i++)
+    if (files[i] == 0) { return i; }
+    return 0;
 }
 
-void fRead() {
-    // (fh--c n)
+void fOpen() {               // (name mode--fh)
+    CELL mode = pop();
+    char *fn = (char*)TOS;
+    TOS = 0;
+    int i = openSlot();
+    if (i) {
+        files[i] = myFS.open(fn, (mode) ? FILE_WRITE : FILE_READ);
+        if (files[i]) { TOS = i; }
+    }
+}
+
+void fRead() {               // (fh--c n)
     byte c;
     CELL fh = TOS; 
     push(0);
-    if (BTW(fh, 1, 9)) {
+    if (VALIDF(fh)) {
         TOS = files[fh].read(&c, 1);
         NOS = (CELL)c;
     }
 }
-void fWrite() {
-    // (c fh--)
+
+void fWrite() {              // (c fh--)
     CELL fh = pop();
-    CELL c = pop();
+    byte c = (byte)pop();
+    if (VALIDF(fh)) { files[fh].write(&c, 1); }
 }
 
-void fClose() {
-    // (fh--)
+void fClose() {              // (fh--)
     CELL fh = pop();
-    if (BTW(fh,1,9)) {
+    if (VALIDF(fh)) { 
         files[fh].close();
         files[fh] = 0;
     }
-    while ((0<fileSp) && (files[fileSp]==0)) { --fileSp; }
 }

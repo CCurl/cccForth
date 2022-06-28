@@ -24,10 +24,10 @@
   #define VARS_SZ      (256*1024)
   #define STK_SZ        64
   #define LSTK_SZ       16
-  #define LOCALS_SZ    100
+  #define LOCALS_SZ    160
   #define FLT_SZ        10
   #define __FILES__
-  #define __EDITOR__
+  //#define __EDITOR__
 #endif
 
 #include <stdlib.h>
