@@ -315,7 +315,7 @@ int doNumber() {
 int doNumber2() {
     if (TOS < 0) { return doNumber(); }
     char buf[16];
-    sprintf(buf, "%d", pop());
+    sprintf(buf, "%ld", pop());
     if (HERE && BTW(code[HERE - 1], '0', '9')) { CComma(' '); }
     for (int i=0; buf[i]; i++) { CComma(buf[i]); }
     return 1;

@@ -4,7 +4,7 @@ byte sp, rsp, lsp, locSP, lb, isError, sb, rb, fsp;
 CELL BASE, stks[STK_SZ], locals[LOCALS_SZ];
 byte code[CODE_SZ+1], vars[VARS_SZ+1], *y;
 CELL lstk[LSTK_SZ+1];
-float fstk[10];
+float fstk[FLT_SZ];
 
 void vmReset() {
     lsp = locSP = lb = 0, fsp = 0;
@@ -20,8 +20,8 @@ void vmReset() {
     systemWords();
 }
 
-inline void push(CELL v) { stks[++sp] = v; }
-inline CELL pop() { return stks[sp--]; }
+void push(CELL v) { stks[++sp] = v; }
+CELL pop() { return stks[sp--]; }
 
 inline void fpush(float v) { fstk[++fsp] = v; }
 inline float fpop() { return fstk[fsp--]; }

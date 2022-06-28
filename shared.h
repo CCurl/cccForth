@@ -9,8 +9,9 @@
 #define APPLE_MAC    6
 #define PICO         7
 #define LINUX        8
+#define LEO          9
 
-#define __BOARD__    PICO
+#define __BOARD__    TEENSY4
 
 #ifdef _WIN32
   #undef __BOARD__
@@ -24,6 +25,7 @@
   #define STK_SZ        64
   #define LSTK_SZ       16
   #define LOCALS_SZ    100
+  #define FLT_SZ        10
   #define __FILES__
   #define __EDITOR__
 #endif
@@ -39,24 +41,47 @@
   #define STK_SZ        64
   #define LSTK_SZ       16
   #define LOCALS_SZ    160
+  #define FLT_SZ        10
   #define __FILES__
   #define __EDITOR__
+  #define NEEDS_ALIGN
 #elif __BOARD__ == PICO
   #define CODE_SZ      (48*1024)
   #define VARS_SZ      (96*1024)
   #define STK_SZ        64
   #define LSTK_SZ       16
   #define LOCALS_SZ    160
+  #define FLT_SZ        10
   #define __FILES__
   #define __EDITOR__
   #define NEEDS_ALIGN
 #elif __BOARD__ == XIAO
-  #define CODE_SZ      (16*1024)
-  #define VARS_SZ      ( 8*1024)
+  #define CODE_SZ      (14*1024)
+  #define VARS_SZ      (12*1024)
   #define STK_SZ        32
   #define LSTK_SZ       12
-  #define LOCALS_SZ    160
-  // #define __GAMEPAD__
+  #define LOCALS_SZ     80
+  #define FLT_SZ         8
+  #define NEEDS_ALIGN
+// #define __GAMEPAD__
+#elif __BOARD__ == ESP8266
+  #define CODE_SZ      (14*1024)
+  #define VARS_SZ      (12*1024)
+  #define STK_SZ        32
+  #define LSTK_SZ       12
+  #define LOCALS_SZ     80
+  #define FLT_SZ         8
+  #define NEEDS_ALIGN
+// #define __GAMEPAD__
+#elif __BOARD__ == LEO
+  #define CODE_SZ      (1*256)
+  #define VARS_SZ      (1*256)
+  #define STK_SZ        12
+  #define LSTK_SZ        4
+  #define LOCALS_SZ     10
+  #define FLT_SZ         4
+  #define NEEDS_ALIGN
+// #define __GAMEPAD__
 #endif
 
 #define CELL_SZ      4
@@ -72,6 +97,8 @@
 #define FDROP         fsp-=(0<fsp)?1:0
 #define DROP1         sp--
 #define DROP2         sp-=2
+// #define push(x)       stks[++sp]=(CELL)x
+// #define pop()         (CELL)stks[sp--]
 #define CA(l)         (code+l)
 #define DP_AT(l)      ((DICT_T *)(&code[l]))
 #define BTW(x, a, b)  ((a<=x)&&(x<=b))

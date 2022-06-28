@@ -1,5 +1,14 @@
 // File support for generic boards
 
+void fileInit() {
+    myFS.begin();
+    printString("\r\nLittleFS: initialized");
+    FSInfo fs_info;
+    myFS.info(fs_info);
+    printStringF("\r\nLittleFS: Total: %ld", fs_info.totalBytes);
+    printStringF("\r\nLittleFS: Used: %ld", fs_info.usedBytes);
+}
+
 void fOpen() {
   // (fn md--fh)
   CELL md = pop();

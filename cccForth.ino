@@ -94,8 +94,9 @@ byte *doExt(CELL ir, byte *pc) {
 // * HERE is where you load your default code *
 // ********************************************
 void loadCode() {
-    doParse(": T0 dup 32 >= .if dup '~' <= .if emit exit .then .\" (%d)\" ;");
-    doParse(": .code cb here over + 1- for i c@ T0 next ;");
+    // doParse(": T0 dup 32 >= .if dup '~' <= .if emit exit .then .\" (%d)\" ;");
+    // doParse(": .code cb here over + 1- for i c@ T0 next ;");
+    // doParse("cr words");
 }
 
 // NB: tweak this depending on what your terminal window sends for [Backspace]
@@ -105,15 +106,17 @@ int isBackSpace(char c) {
   return (c == 127) ? 1 : 0; 
 }
 
-void handleInput(char c) {
-    static char *tib = NULL, *e = NULL;
+char tib[128];
 
-    if (tib == NULL) { tib = e = (char *)CA(HERE+32); }
+void handleInput(char c) {
+    static char *e = NULL;
+
+    if (e == NULL) { e = tib; }
     if (c == 13) {
         *e = 0;
         printString(" ");
         doParse(rtrim(tib));
-        tib = NULL;
+        e = NULL;
         doOK();
         return;
     }
@@ -146,7 +149,7 @@ void setup() {
     doOK();
     gamePadInit();
 //    wifiStart();
-//    fileInit();
+    fileInit();
 }
 
 void doAutoRun() {
