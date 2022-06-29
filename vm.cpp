@@ -198,13 +198,14 @@ void run(WORD start) {
         case 't': printString((char *)pop());                                break; // QTYPE
         case 'w': ir = *(pc++); if (ir == '@') { TOS = GET_WORD(AOS); }
                 else if (ir == '!') { SET_WORD(AOS, (WORD)NOS); DROP2; }     break; // w@, w!
-        case 'x': ir=*(pc++); if (ir=='S') { doDotS(); }
-                else if (ir=='A') { oVHERE+=pop(); VHERE=oVHERE; }
-                else if (ir=='D') { doWords(); }
-                else if (ir=='Y') { y=(byte*)pop(); system((char*)y); }
-                else if (ir=='Q') { isBye=1; return; }                       break;
+        case 'x': ir=*(pc++); if (ir=='S') { doDotS(); }                            // .S
+                else if (ir=='}') { pc=(byte*)L0; }                                 // AGAIN
+                else if (ir=='A') { oVHERE+=pop(); VHERE=oVHERE; }                  // ALLOT
+                else if (ir=='D') { doWords(); }                                    // WORDS
+                else if (ir=='Y') { y=(byte*)pop(); system((char*)y); }             // SYSTEM
+                else if (ir=='Q') { isBye=1; return; }                       break; // BYE
         case 'z': pc = doExt(*pc, pc+1);                                     break; // EXT
-        case '{': ++lsp; L0=(CELL)pc; if (!TOS) { while (*pc!='}') ++pc; }   break; // BEGIN
+        case '{': ++lsp; L0=(CELL)pc;                                        break; // BEGIN
         case '}': if (TOS) { pc=(byte*)L0; } else { DROP1; lsp--; }          break; // WHILE
         case '~': TOS = (TOS) ? 0 : 1;                                       break; // NOT (0=)
         default: printStringF("-unk ir: %d (%c)-", ir, ir);                 return;

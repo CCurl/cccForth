@@ -189,9 +189,10 @@ I        (--n)             n: Current index
 +I       (n--)             n: value to add to I
 EXIT-F   (--)              Drop top 3 entries from loop stack (unwind FOR loop)
 NEXT     (--)              Increment I, jump to start of loop if I < T
-BEGIN    (f--f)            Start WHILE loop: if f=0, skip to WHILE
-WHILE    (f--f?)           If f==0, jump to BEGIN, else DROP f and continue
-UNTIL    (f--f?)           If f<>0, jump to BEGIN, else DROP f and continue
+BEGIN    (f--f)            Start WHILE/UNTIL/AGAIN loop.
+WHILE    (f--f?)           If f==0, jump to BEGIN, else DROP f and continue.
+UNTIL    (f--f?)           If f<>0, jump to BEGIN, else DROP f and continue.
+AGAIN    (--)              Jump to BEGIN. Use IF EXIT-W EXIT THEN to break out.
 EXIT-W   (--)              Drop top 1 entry from loop stack (unwind WHILE loop)
 EXIT     (--)              Exit the word immediately (don't forget to EXIT-F/W first if in a LOOP)
 
