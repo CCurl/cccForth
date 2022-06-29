@@ -90,6 +90,8 @@ byte *doType(byte *a, int l, int delim) {
 byte* doFile(CELL ir, byte* pc) {
     ir = *(pc++);
     if (ir == 'O') { fOpen(); }
+    else if (ir == 'D') { fDelete(); }
+    else if (ir == 'L') { fList(); }
     else if (TOS == 0) { printString("-nofp-"); return pc; }
     else if (ir == 'R') { fRead(); }
     else if (ir == 'W') { fWrite(); }

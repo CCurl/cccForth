@@ -161,6 +161,8 @@ extern void fOpen();
 extern void fRead();
 extern void fWrite();
 extern void fClose();
+extern void fDelete();
+extern void fList();
 extern void readBlock();
 extern void writeBlock();
 

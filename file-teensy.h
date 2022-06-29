@@ -52,3 +52,23 @@ void fClose() {              // (fh--)
         files[fh] = 0;
     }
 }
+
+void fDelete() {
+    char* fn = (char*)pop();
+    if (myFS.remove(fn)) { printString("-deleted-"); }
+    else { printString("-noFile-"); }
+}
+
+void fList() {
+    File dir = myFS.open("/");
+    while(true) {
+         File entry = dir.openNextFile();
+         if (!entry) { break; }
+         printString(entry.name());
+         // files have sizes, directories do not
+         if (entry.isDirectory()) { printStringF(" (dir)\r\n"); }
+         else { printStringF(" (%ld)\r\n", entry.size()); }
+      entry.close();
+    }
+    dir.close();
+}

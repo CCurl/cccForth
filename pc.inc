@@ -36,6 +36,12 @@ void fWrite() {
     if (fp) { fputc(val, fp); }
 }
 
+void fDelete() {
+}
+
+void fList() {
+}
+
 void doLoad(int blk) {
     char *fn = (char*)(VHERE + 100);
     sprintf(fn, "./block-%03d.4th", blk);

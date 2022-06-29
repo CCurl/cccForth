@@ -124,6 +124,8 @@ PRIM_T prims[] = {
     , { "FREAD", "fR" }
     , { "FWRITE", "fW" }
     , { "FCLOSE", "fC" }
+    , { "FDELETE", "fD" }
+    , { "FLIST", "fL" }
 #endif
 #if __BOARD__ == PC
 #else
