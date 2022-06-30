@@ -135,7 +135,7 @@ void run(WORD start) {
         case '0': case '1': case '2': case '3': case '4': case '5':                 // NUMBER
         case '6': case '7': case '8': case '9': push(ir-'0');
             while (BTW(*pc,'0','9')) { TOS = (TOS*10) + *(pc++) - '0'; }     break;
-        case ':': if (*(pc+2) != ';') { rpush(pc - st.code + 2); }                     // CALL (w/tail-call optimization)
+        case ':': if (*(pc+2) != ';') { rpush(pc-st.code+2); }                      // CALL (w/tail-call optimization)
             pc = CA(GET_WORD(pc));                                           break;
         case ';': if (rsp>rb) { pc=0; rsp=rb+1; } else { pc=CA(rpop()); }    break; // RETURN
         case '>': NOS = (NOS > TOS) ? 1 : 0; DROP1;                          break; // >
