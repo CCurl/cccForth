@@ -2,12 +2,13 @@
 
 The main goals for this minimal Forth are as follows:
 
-- To be very frugal with its usage of memory.
+- To be be very frugal with its usage of memory.
+- To be able to fit on systems with small amounts of memory.
 - To be easy to modify and add/extend the primitives.
 - To have an implementation that is minimal and "intuitively obvious upon casual inspection".
 - To be able to run on any system that has a C compiler.
 - To be deployable to as many different kinds of development boards as possible via the Arduino IDE.
-- To have a VML (virtual machine language) that is as human-reabable as possible, but not at the expense of performance.
+- To have a VML (virtual machine language) that is as human-reabable as possible.
 
 To these ends, I have wandered off the beaten path in the following ways:
 
@@ -150,6 +151,8 @@ FOPEN    (a n--fh)         a: file name, fh: file handle, n: 0 => READ, else WRI
 FREAD    (fh--c n)         c: next char from file fh, n: number chars read (0 => EOF)
 FWRITE   (c fh--)          c: char to write to file fh.
 FCLOSE   (fh--)            fh: file handle to close.
+FDELETE  (fn--)            fn: The name of the file to be deleted.
+FLIST    (--)              Print the list of files created on the dev board.
 
 *** LOGICAL ***
 =        (a b--f)          Equality
@@ -184,12 +187,13 @@ THEN     (--)              Standard THEN
 FOR      (f t--)           Begin FOR/NEXT loop
 I        (--n)             n: Current index
 +I       (n--)             n: value to add to I
-EXIT-F   (--)              Drop top 3 from loop stack (unwind FOR loop)
+EXIT-F   (--)              Drop top 3 entries from loop stack (unwind FOR loop)
 NEXT     (--)              Increment I, jump to start of loop if I < T
-BEGIN    (f--f)            Start WHILE loop: if f=0, skip to WHILE
-WHILE    (f--f?)           If f==0, jump to BEGIN, else DROP f and continue
-UNTIL    (f--f?)           If f<>0, jump to BEGIN, else DROP f and continue
-EXIT-W   (--)              Drop top 1 from loop stack (unwind WHILE loop)
+BEGIN    (f--f)            Start WHILE/UNTIL/AGAIN loop.
+WHILE    (f--f?)           If f==0, jump to BEGIN, else DROP f and continue.
+UNTIL    (f--f?)           If f<>0, jump to BEGIN, else DROP f and continue.
+AGAIN    (--)              Jump to BEGIN. Use IF EXIT-W EXIT THEN to break out.
+EXIT-W   (--)              Drop top 1 entry from loop stack (unwind WHILE loop)
 EXIT     (--)              Exit the word immediately (don't forget to EXIT-F/W first if in a LOOP)
 
 *** TEMPORARY VARIABLES ***
@@ -203,7 +207,7 @@ dX       (--n)             Decrement temp var X
 **** SYSTEM/OTHER ***
 .S       (--)              Output the stack
 BL       (--c)             c: 32
-BYE      (--)              Exit cccForth
+BYE      (--)              Exit cccForth (PC)
 CONSTANT (--)              Define a constant
 CELL     (--n)             n: The size of a CELL
 EDIT     (n--)             Edit block n
@@ -211,8 +215,8 @@ EXECUTE  (a--)             Jump to CODE address a
 LOAD     (n--)             Load block n from disk
 NOP      (--)              Do nothing
 RAND     (--n)             n: a RANDOM 32-bit number
-RESET    (--)              Initialize cccForth
-SYSTEM   (a--)             a: string to send to system() ... eg: " dir" system
+RESET    (--)              Re-initialize cccForth
+SYSTEM   (a--)             a: string to send to system() ... eg: " dir" system (PC)
 TIMER    (--n)             n: clock()
 WAIT     (n--)             n: MS to sleep
 VARIABLE (--)              Define a variable

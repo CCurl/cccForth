@@ -20,6 +20,7 @@ T2 T3 T4 T5
 
 : T1 ." %nx1-"  9 1 begin drop dup . 1+ dup 34 < while ." -out1" drop ;
 : T2 ." %nx2-"  8 1 begin drop dup . 1+ dup 27 = until ." -out2" drop ;
-T1 T2
+: T3 ." %nx3-"  8 s1 begin r1 . i1 r1 30 > .if exit-w exit .then again ." -out2" drop ;
+T1 T2 T3
 
 cr words
