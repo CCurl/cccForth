@@ -208,7 +208,7 @@ void run(WORD start) {
                 else if (ir=='Q') { isBye=1; return; }                       break; // BYE
         case 'z': pc = doExt(*pc, pc+1);                                     break; // EXT
         case '{': ++lsp; L0=(CELL)pc;                                        break; // BEGIN
-        case '}': if (TOS) { pc=(byte*)L0; } else { DROP1; lsp--; }          break; // WHILE
+        case '}': if (pop()) { pc=(byte*)L0; } else { lsp--; }               break; // WHILE
         case '~': TOS = (TOS) ? 0 : 1;                                       break; // NOT (0=)
         default: printStringF("-unk ir: %d (%c)-", ir, ir);                 return;
         }

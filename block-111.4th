@@ -47,5 +47,5 @@ variable ln cols allot
 
 // 65 (r) ! 200 (c) !
 40 (r) ! 150 (c) !
-: T1 1 begin drop gen key? until key drop ;
+: T1 begin gen key? until key drop ;
 : go 1 s7 clr-bak rand-pop C-OFF CLS T1 C-ON ;
