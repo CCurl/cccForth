@@ -159,46 +159,51 @@ void toLines() {
             x = 0;
         }
     }
-
 }
 
 void edRdBlk() {
     clearBlock();
     char buf[24];
     sprintf(buf, "./block-%03d.4th", blkNum);
+    push((CELL)buf);
+    push(0);
+    fOpen();
     msg = "-noFile-";
-    FILE* fp = fopen(buf, "rb");
-    if (fp) {
-        fread(theBlock, 1, BLOCK_SZ, fp);
+    CELL fh = pop();
+    if (fh) {
+        for (int i = 0; i < BLOCK_SZ; i++) {
+            push(fh);
+            fRead();
+            if (pop()) { theBlock[i] = (byte)pop(); }
+            else { pop(); break; }
+        }
         msg = "-loaded-";
-        fclose(fp);
+        push(fh);
+        fClose();
     }
     toLines();
-    //push(blkNum);
-    //push((CELL)theBlock);
-    //push(BLOCK_SZ);
-    // blockRead();
-    //msg = (pop()) ? "-loaded-" : "-noFile-";
     cur = isDirty = 0;
 }
 
 void edSvBlk() {
-    //push(blkNum);
-    //push((CELL)theBlock);
-    //push(BLOCK_SZ);
-    //push(0);
-    // blockWrite();
     int sz = toBlock();
     char buf[24];
     sprintf(buf, "./block-%03d.4th", blkNum);
+    push((CELL)buf);
+    push(1);
+    fOpen();
     msg = "-err-";
-    FILE* fp = fopen(buf, "wb");
-    if (fp) {
-        fwrite(theBlock, 1, sz, fp);
+    CELL fh = pop();
+    if (fh) {
+        for (int i = 0; i < BLOCK_SZ; i++) {
+            push(theBlock[i]);
+            push(fh);
+            fWrite();
+        }
+        push(fh);
+        fClose();
         msg = "-saved-";
-        fclose(fp);
     }
-    // msg = (pop()) ? "-saved-" : "-errWrite-";
     cur = isDirty = 0;
 }
 
