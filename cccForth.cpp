@@ -127,6 +127,8 @@ PRIM_T prims[] = {
     , { "FCLOSE", "fC" }
     , { "FDELETE", "fD" }
     , { "FLIST", "fL" }
+    , { "FSAVE", "fs" }
+    , { "FLOAD", "fl" }
 #endif
 #if __BOARD__ == PC
 #else
@@ -150,12 +152,12 @@ PRIM_T prims[] = {
 };
 
 char word[32], *in;
-CELL HERE, oHERE, LAST, STATE, tempWords[10];
+CELL STATE, tempWords[10];
 byte *VHERE, *oVHERE, isBye=0;
 
-void CComma(CELL v) { code[HERE++] = (byte)v; }
-void Comma(CELL v) { SET_LONG(&code[HERE], v); HERE += CELL_SZ; }
-void WComma(WORD v) { SET_WORD(&code[HERE], v); HERE += 2; }
+void CComma(CELL v) { st.code[st.HERE++] = (byte)v; }
+void Comma(CELL v) { SET_LONG(&st.code[st.HERE], v); st.HERE += CELL_SZ; }
+void WComma(WORD v) { SET_WORD(&st.code[st.HERE], v); st.HERE += 2; }
 
 char lower(char c) { return BTW(c, 'A', 'Z') ? (c + 32) : c; }
 
@@ -185,7 +187,7 @@ int strLen(const char *str) {
 }
 
 void printStringF(const char *fmt, ...) {
-    char *buf = (char*)&code[CODE_SZ-100];
+    char *buf = (char*)&st.vars[VARS_SZ-100];
     va_list args;
     va_start(args, fmt);
     vsnprintf(buf, 100, fmt, args);
@@ -195,13 +197,13 @@ void printStringF(const char *fmt, ...) {
 
 void doExec() {
     if (STATE) {
-        oHERE = HERE;
+        st.oHERE = st.HERE;
         oVHERE = VHERE;
     }
     else {
         CComma(0);
-        run((WORD)oHERE);
-        HERE = oHERE;
+        run((WORD)st.oHERE);
+        st.HERE = st.oHERE;
     }
 }
 
@@ -211,15 +213,15 @@ int isTempWord(const char *nm) {
 
 void doCreate(const char *name, byte f) {
     if (isTempWord(name)) {
-        tempWords[name[1]-'0'] = HERE;
+        tempWords[name[1]-'0'] = st.HERE;
         return;
     }
-    DICT_T *dp = DP_AT(HERE);
-    dp->prev = (byte)(HERE - LAST);
+    DICT_T *dp = DP_AT(st.HERE);
+    dp->prev = (byte)(st.HERE - st.LAST);
     dp->flags = f;
     strCpy(dp->name, name);
-    LAST = HERE;
-    HERE += strLen(name) + 3;
+    st.LAST = st.HERE;
+    st.HERE += strLen(name) + 3;
 }
 
 int doFind(const char *name) {
@@ -231,7 +233,7 @@ int doFind(const char *name) {
     }
 
     // Regular lookup
-    CELL def = (WORD)LAST;
+    CELL def = (WORD)st.LAST;
     while (def) {
         DICT_T* dp = DP_AT(def);
         if (strEq(dp->name, name)) {
@@ -247,8 +249,8 @@ int doFind(const char *name) {
 
 int doSee(const char* wd) {
     if (!doFind(wd)) { return 1; }
-    CELL def = (WORD)LAST;
-    CELL prevDef = oHERE;
+    CELL def = (WORD)st.LAST;
+    CELL prevDef = st.oHERE;
     int found = 0;
     DROP2;
     while (def && (!found)) {
@@ -264,7 +266,7 @@ int doSee(const char* wd) {
     if (def < prevDef) {
         printStringF("%s: ", wd);
         for (int i = def; i < prevDef; i++) {
-            byte c = code[i];
+            byte c = st.code[i];
             if (BTW(c, 32, 126)) { printChar(c); }
             else { printStringF("(%d)",c); }
         }
@@ -273,7 +275,7 @@ int doSee(const char* wd) {
 }
 
 void doWords() {
-    CELL l = (WORD)LAST, n = 0;
+    CELL l = (WORD)st.LAST, n = 0;
     while (l) {
         DICT_T *dp = DP_AT(l);
         printString(dp->name);
@@ -319,7 +321,7 @@ int doNumber2() {
     if (TOS < 0) { return doNumber(); }
     char buf[16];
     sprintf(buf, "%ld", pop());
-    if (HERE && BTW(code[HERE - 1], '0', '9')) { CComma(' '); }
+    if (st.HERE && BTW(st.code[st.HERE-1],'0','9')) { CComma(' '); }
     for (int i=0; buf[i]; i++) { CComma(buf[i]); }
     return 1;
 }
@@ -366,7 +368,7 @@ int doPrim(const char *wd) {
 
     if (!vml) { return 0; } // Not found
 
-    if (BTW(vml[0],'0','9') && BTW(code[HERE-1],'0','9')) { CComma(' '); }
+    if (BTW(vml[0],'0','9') && BTW(st.code[st.HERE-1],'0','9')) { CComma(' '); }
     for (int j = 0; vml[j]; j++) { CComma(vml[j]); }
     return 1;
 }
@@ -435,7 +437,7 @@ int doParseWord(char *wd) {
 
     if (strEqI(wd, "IF")) {
         CComma('?');
-        push(HERE);
+        push(st.HERE);
         WComma(0);
         return 1;
     }
@@ -443,15 +445,15 @@ int doParseWord(char *wd) {
     if (strEqI(wd, "ELSE")) {
         CELL tgt = pop();
         CComma('J');
-        push(HERE);
+        push(st.HERE);
         WComma(0);
-        SET_WORD(CA(tgt), (WORD)HERE);
+        SET_WORD(CA(tgt), (WORD)st.HERE);
         return 1;
     }
 
     if (strEqI(wd, "THEN")) {
         CELL tgt = pop();
-        SET_WORD(CA(tgt), (WORD)HERE);
+        SET_WORD(CA(tgt), (WORD)st.HERE);
         return 1;
     }
 
@@ -478,8 +480,8 @@ int doParseWord(char *wd) {
 
     if (strEqI(wd, "FORGET")) {
         // Forget the last word
-        oHERE = HERE = LAST;
-        LAST -= code[LAST];
+        st.oHERE = st.HERE = st.LAST;
+        st.LAST -= st.code[st.LAST];
         return 1;
     }
 
@@ -490,14 +492,14 @@ int doParseWord(char *wd) {
     }
 
     STATE = 0;
-    HERE = oHERE;
+    st.HERE = st.oHERE;
     printStringF("[%s]??", wd);
     return 0;
 }
 
 bool isASM(const char* ln) {
     if ((ln[0]=='s') && (ln[1]==':') && (ln[2]==' ')) {
-        run((byte*)ln-code+3);
+        run((byte*)ln-st.code+3);
         return 1;
     }
     return 0;
@@ -510,7 +512,7 @@ void doParse(const char *line) {
     if (isASM(line)) { return; }
     int len = getWord(word);
     while (0 < len) {
-        if (HERE < oHERE) { HERE = oHERE; }
+        if (st.HERE < st.oHERE) { st.HERE = st.oHERE; }
         if (VHERE < oVHERE) { VHERE = oVHERE; }
         if (doParseWord(word) == 0) { return; }
         len = getWord(word);
@@ -534,17 +536,17 @@ char *rtrim(char *str) {
 }
 
 void systemWords() {
-    oHERE = HERE;
-    oVHERE = VHERE;
+    BASE = 10;
+    oVHERE = VHERE = &st.vars[0];
     char *cp = (char*)(VHERE + 6);
-    sprintf(cp, ": cb %lu ;", (UCELL)code);     doParse(cp);
-    sprintf(cp, ": vb %lu ;", (UCELL)vars);     doParse(cp);
-    sprintf(cp, ": csz %d ;", CODE_SZ);         doParse(cp);
-    sprintf(cp, ": vsz %d ;", VARS_SZ);         doParse(cp);
-    sprintf(cp, ": ha %lu ;", (UCELL)&oHERE);   doParse(cp);
-    sprintf(cp, ": la %lu ;", (UCELL)&LAST);    doParse(cp);
-    sprintf(cp, ": va %lu ;", (UCELL)&oVHERE);  doParse(cp);
-    sprintf(cp, ": base %lu ;", (UCELL)&BASE);  doParse(cp);
+    sprintf(cp, ": cb %lu ;", (UCELL)st.code);     doParse(cp);
+    sprintf(cp, ": vb %lu ;", (UCELL)st.vars);     doParse(cp);
+    sprintf(cp, ": csz %d ;", CODE_SZ);            doParse(cp);
+    sprintf(cp, ": vsz %d ;", VARS_SZ);            doParse(cp);
+    sprintf(cp, ": ha %lu ;", (UCELL)&st.oHERE);   doParse(cp);
+    sprintf(cp, ": la %lu ;", (UCELL)&st.LAST);    doParse(cp);
+    sprintf(cp, ": va %lu ;", (UCELL)&oVHERE);     doParse(cp);
+    sprintf(cp, ": base %lu ;", (UCELL)&BASE);     doParse(cp);
 }
 
 #if __BOARD__ == PC

@@ -1,21 +1,21 @@
 #include "shared.h"
 
-byte sp, rsp, lsp, locSP, lb, isError, sb, rb, fsp;
+byte sp, rsp, lsp, locSP, lb, isError, sb, rb, fsp, *y;
 CELL BASE, stks[STK_SZ], locals[LOCALS_SZ];
-byte code[CODE_SZ+1], vars[VARS_SZ+1], *y;
 CELL lstk[LSTK_SZ+1];
 float fstk[FLT_SZ];
+
+ST_T st;
 
 void vmReset() {
     lsp = locSP = lb = 0, fsp = 0;
     sb = 2, rb = (STK_SZ-2);
     sp = sb - 1, rsp = rb + 1;
-    BASE = 10;
-    HERE = LAST = 0;
-    VHERE = &vars[0];
-    HERE = 2;
-    for (int i = 0; i < CODE_SZ; i++) { code[i] = 0; }
-    for (int i = 0; i < VARS_SZ; i++) { vars[i] = 0; }
+    st.LAST = 0;
+    st.oHERE = st.HERE = 2;
+    st.oVHERE = st.VHERE = 0;
+    for (int i = 0; i < CODE_SZ; i++) { st.code[i] = 0; }
+    for (int i = 0; i < VARS_SZ; i++) { st.vars[i] = 0; }
     for (int i = 0; i < 10; i++) { tempWords[i] = 0; }
     systemWords();
 }
@@ -44,7 +44,7 @@ void SET_LONG(byte* l, long v) { *(long *)l = v; }
 void printBase(CELL num, CELL base) {
     UCELL n = (UCELL) num, isNeg = 0;
     if ((base == 10) && (num < 0)) { isNeg = 1; n = -num; }
-    char* cp = (char *)&code[CODE_SZ];
+    char* cp = (char *)&st.vars[VARS_SZ];
     *(cp--) = 0;
     do {
         int x = (n % base) + '0';
@@ -92,6 +92,8 @@ byte* doFile(CELL ir, byte* pc) {
     if (ir == 'O') { fOpen(); }
     else if (ir == 'D') { fDelete(); }
     else if (ir == 'L') { fList(); }
+    else if (ir == 's') { fSave(); }
+    else if (ir == 'l') { fLoad(); pc = 0; }
     else if (TOS == 0) { printString("-nofp-"); return pc; }
     else if (ir == 'R') { fRead(); }
     else if (ir == 'W') { fWrite(); }
@@ -133,7 +135,7 @@ void run(WORD start) {
         case '0': case '1': case '2': case '3': case '4': case '5':                 // NUMBER
         case '6': case '7': case '8': case '9': push(ir-'0');
             while (BTW(*pc,'0','9')) { TOS = (TOS*10) + *(pc++) - '0'; }     break;
-        case ':': if (*(pc+2) != ';') { rpush(pc - code + 2); }                     // CALL (w/tail-call optimization)
+        case ':': if (*(pc+2) != ';') { rpush(pc - st.code + 2); }                     // CALL (w/tail-call optimization)
             pc = CA(GET_WORD(pc));                                           break;
         case ';': if (rsp>rb) { pc=0; rsp=rb+1; } else { pc=CA(rpop()); }    break; // RETURN
         case '>': NOS = (NOS > TOS) ? 1 : 0; DROP1;                          break; // >
@@ -186,7 +188,7 @@ void run(WORD start) {
                 else if (ir == '^') { NOS ^= TOS; DROP1; }
                 else if (ir == '|') { NOS |= TOS; DROP1; }
                 else { --pc; printChar(32); } break;
-        case 'c': ir = *(pc++); if (ir=='@') { TOS = *AOS; }
+        case 'c': ir = *(pc++); if (ir=='@') { TOS = *(byte*)(TOS); }
                 else if(ir=='!') { *AOS = (byte)NOS; DROP2; }                break; // c@, c!
         case 'd': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { --locals[lb+t1]; }      break; // decLocal
         case 'i': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { ++locals[lb+t1]; }      break; // incLocal

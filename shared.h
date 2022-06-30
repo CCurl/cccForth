@@ -97,10 +97,8 @@
 #define FDROP         fsp-=(0<fsp)?1:0
 #define DROP1         sp--
 #define DROP2         sp-=2
-// #define push(x)       stks[++sp]=(CELL)x
-// #define pop()         (CELL)stks[sp--]
-#define CA(l)         (code+l)
-#define DP_AT(l)      ((DICT_T *)(&code[l]))
+#define CA(l)         (st.code+l)
+#define DP_AT(l)      ((DICT_T *)(&st.code[l]))
 #define BTW(x, a, b)  ((a<=x)&&(x<=b))
 #define BA(a)         ((byte *)a)
 
@@ -111,21 +109,22 @@ typedef unsigned long UCELL;
 typedef unsigned short USHORT;
 
 typedef struct {
+    int oHERE, HERE, LAST;
+    int oVHERE, VHERE;
+    byte code[CODE_SZ + 4];
+    byte vars[VARS_SZ + 4];
+} ST_T;
+
+typedef struct {
     byte prev;
     byte flags;
     char name[32];
 } DICT_T;
 
-typedef struct {
-    byte *s, *e;
-    CELL f, t;
-} LOOP_T;
-
+extern ST_T st;
 extern byte sp, isError, isBye;
-extern CELL BASE, STATE, LAST, HERE, tempWords[10];
+extern CELL BASE, STATE, tempWords[10];
 extern byte *VHERE, *oVHERE;
-extern byte code[];
-extern byte vars[];
 extern CELL stks[];
 
 extern void vmReset();
@@ -163,6 +162,8 @@ extern void fWrite();
 extern void fClose();
 extern void fDelete();
 extern void fList();
+extern void fSave();
+extern void fLoad();
 extern void readBlock();
 extern void writeBlock();
 

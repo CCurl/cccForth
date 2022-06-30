@@ -42,6 +42,27 @@ void fDelete() {
 void fList() {
 }
 
+void fSave() {
+    FILE *fp = fopen("system.ccc", "wb");
+    if (fp) {
+        st.VHERE = VHERE-st.vars;
+        st.oVHERE = oVHERE-st.vars;
+        fwrite(&st, sizeof(st), 1, fp);
+        fclose(fp);
+    }
+}
+
+void fLoad() {
+    FILE *fp = fopen("system.ccc", "rb");
+    if (fp) {
+        vmReset();
+        fread(&st, sizeof(st), 1, fp);
+        VHERE = &st.vars[st.VHERE];
+        oVHERE = &st.vars[st.oVHERE];
+        fclose(fp);
+    }
+}
+
 void doLoad(int blk) {
     char *fn = (char*)(VHERE + 100);
     sprintf(fn, "./block-%03d.4th", blk);
@@ -87,7 +108,7 @@ void doHistory(const char *txt) {
 }
 
 void loop() {
-    char *tib = (char *)CA(HERE+32);
+    char *tib = (char *)CA(st.HERE+32);
     FILE* fp = (input_fp) ? input_fp : stdin;
     if (input_fp) {
         if (fgets(tib, 128, fp) == tib) {
@@ -105,7 +126,7 @@ void loop() {
 }
 
 int main(int argc, char *argv[]) {
-    if (sizeof(&HERE) > CELL_SZ) {
+    if (sizeof(&st.HERE) > CELL_SZ) {
         printf("ERROR: CELL cannot support a pointer!");
         exit(1);
     }
