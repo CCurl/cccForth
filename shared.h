@@ -124,7 +124,6 @@ typedef struct {
 extern ST_T st;
 extern byte sp, isError, isBye;
 extern CELL BASE, STATE, tempWords[10];
-extern byte *VHERE, *oVHERE;
 extern CELL stks[];
 
 extern void vmReset();

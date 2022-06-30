@@ -198,11 +198,12 @@ void run(WORD start) {
         case 'r': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { push(locals[lb+t1]); }  break; // readLocal
         case 's': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]=pop(); }  break; // setLocal
         case 't': printString((char *)pop());                                break; // QTYPE
+        case 'v': t1=GET_LONG(pc); pc+=4; push((CELL)&st.vars[t1]);          break; // VAR-ADDR
         case 'w': ir = *(pc++); if (ir == '@') { TOS = GET_WORD(AOS); }
                 else if (ir == '!') { SET_WORD(AOS, (WORD)NOS); DROP2; }     break; // w@, w!
         case 'x': ir=*(pc++); if (ir=='S') { doDotS(); }                            // .S
                 else if (ir=='}') { pc=(byte*)L0; }                                 // AGAIN
-                else if (ir=='A') { oVHERE+=pop(); VHERE=oVHERE; }                  // ALLOT
+                else if (ir=='A') { st.oVHERE+=pop(); st.VHERE=st.oVHERE; }         // ALLOT
                 else if (ir=='D') { doWords(); }                                    // WORDS
                 else if (ir=='Y') { y=(byte*)pop(); system((char*)y); }             // SYSTEM
                 else if (ir=='Q') { isBye=1; return; }                       break; // BYE

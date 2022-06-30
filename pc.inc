@@ -45,8 +45,6 @@ void fList() {
 void fSave() {
     FILE *fp = fopen("system.ccc", "wb");
     if (fp) {
-        st.VHERE = VHERE-st.vars;
-        st.oVHERE = oVHERE-st.vars;
         fwrite(&st, sizeof(st), 1, fp);
         fclose(fp);
     }
@@ -57,14 +55,12 @@ void fLoad() {
     if (fp) {
         vmReset();
         fread(&st, sizeof(st), 1, fp);
-        VHERE = &st.vars[st.VHERE];
-        oVHERE = &st.vars[st.oVHERE];
         fclose(fp);
     }
 }
 
 void doLoad(int blk) {
-    char *fn = (char*)(VHERE + 100);
+    char *fn = (char*)(&st.vars[VARS_SZ-32]);
     sprintf(fn, "./block-%03d.4th", blk);
     FILE *fp = fopen(fn, "rt");
     if (fp) {

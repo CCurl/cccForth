@@ -153,7 +153,7 @@ PRIM_T prims[] = {
 
 char word[32], *in;
 CELL STATE, tempWords[10];
-byte *VHERE, *oVHERE, isBye=0;
+byte isBye=0;
 
 void CComma(CELL v) { st.code[st.HERE++] = (byte)v; }
 void Comma(CELL v) { SET_LONG(&st.code[st.HERE], v); st.HERE += CELL_SZ; }
@@ -198,7 +198,7 @@ void printStringF(const char *fmt, ...) {
 void doExec() {
     if (STATE) {
         st.oHERE = st.HERE;
-        oVHERE = VHERE;
+        st.oVHERE = st.VHERE;
     }
     else {
         CComma(0);
@@ -297,9 +297,12 @@ int getWord(char *wd) {
     return l;
 }
 
-int doNumber() {
+int doNumber(int t) {
     CELL num = pop();
-    if ((BTW(num,32,126))) {
+    if (t=='v') {
+        CComma('v');
+        Comma(num);
+    } else if ((BTW(num,32,126))) {
         CComma('\'');
         CComma(num);
     } else if ((num & 0xFF) == num) {
@@ -318,7 +321,7 @@ int doNumber() {
 }
 
 int doNumber2() {
-    if (TOS < 0) { return doNumber(); }
+    if (TOS < 0) { return doNumber(0); }
     char buf[16];
     sprintf(buf, "%ld", pop());
     if (st.HERE && BTW(st.code[st.HERE-1],'0','9')) { CComma(' '); }
@@ -375,10 +378,10 @@ int doPrim(const char *wd) {
 
 int doQuote() {
     in++;
-    push((CELL)VHERE);
-    doNumber();
-    while (*in && (*in != '"')) { *(VHERE++) = *(in++); }
-    *(VHERE++) = 0;
+    push((CELL)st.VHERE);
+    doNumber('v');
+    while (*in && (*in != '"')) { st.vars[st.VHERE++] = *(in++); }
+    st.vars[st.VHERE++] = 0;
     if (*in) { ++in; }
     return 1;
 }
@@ -458,17 +461,25 @@ int doParseWord(char *wd) {
     }
 
     if (strEqI(wd, "VARIABLE")) {
-        // NOTE: variable is just a CONSTANT to oVHERE
-        push((CELL)oVHERE);
-        oVHERE += CELL_SZ;
-        VHERE = oVHERE;
-        strCpy(wd, "CONSTANT");
+        if (getWord(wd)) {
+            push((CELL)st.oVHERE);
+            st.oVHERE += CELL_SZ;
+            st.VHERE = st.oVHERE;
+            doCreate(wd, 0);
+            doNumber('v');
+            CComma(';');
+            STATE = 1;
+            doExec();
+            STATE = 0;
+            return 1;
+        }
+        else { return 0; }
     }
 
     if (strEqI(wd, "CONSTANT")) {
         if (getWord(wd)) {
             doCreate(wd, 0);
-            doNumber();
+            doNumber(0);
             CComma(';');
             STATE = 1;
             doExec();
@@ -513,7 +524,7 @@ void doParse(const char *line) {
     int len = getWord(word);
     while (0 < len) {
         if (st.HERE < st.oHERE) { st.HERE = st.oHERE; }
-        if (VHERE < oVHERE) { VHERE = oVHERE; }
+        if (st.VHERE < st.oVHERE) { st.VHERE = st.oVHERE; }
         if (doParseWord(word) == 0) { return; }
         len = getWord(word);
     }
@@ -537,15 +548,14 @@ char *rtrim(char *str) {
 
 void systemWords() {
     BASE = 10;
-    oVHERE = VHERE = &st.vars[0];
-    char *cp = (char*)(VHERE + 6);
+    char *cp = (char*)(&st.vars[VARS_SZ-32]);
     sprintf(cp, ": cb %lu ;", (UCELL)st.code);     doParse(cp);
     sprintf(cp, ": vb %lu ;", (UCELL)st.vars);     doParse(cp);
     sprintf(cp, ": csz %d ;", CODE_SZ);            doParse(cp);
     sprintf(cp, ": vsz %d ;", VARS_SZ);            doParse(cp);
     sprintf(cp, ": ha %lu ;", (UCELL)&st.oHERE);   doParse(cp);
     sprintf(cp, ": la %lu ;", (UCELL)&st.LAST);    doParse(cp);
-    sprintf(cp, ": va %lu ;", (UCELL)&oVHERE);     doParse(cp);
+    sprintf(cp, ": va %lu ;", (UCELL)&st.oVHERE);  doParse(cp);
     sprintf(cp, ": base %lu ;", (UCELL)&BASE);     doParse(cp);
 }
 
