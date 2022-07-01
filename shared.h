@@ -17,7 +17,6 @@
   #undef __BOARD__
   #define __BOARD__ PC
   #define __WINDOWS__
-  #define  _CRT_SECURE_NO_WARNINGS
   #include <Windows.h>
   #include <conio.h>
   #define CODE_SZ      ( 64*1024)
@@ -27,7 +26,16 @@
   #define LOCALS_SZ    160
   #define FLT_SZ        10
   #define __FILES__
-  //#define __EDITOR__
+#elif __BOARD__ == LINUX
+  #undef __BOARD__
+  #define __BOARD__ PC
+  #define CODE_SZ      ( 64*1024)
+  #define VARS_SZ      (256*1024)
+  #define STK_SZ        64
+  #define LSTK_SZ       16
+  #define LOCALS_SZ    160
+  #define FLT_SZ        10
+  #define __FILES__
 #endif
 
 #include <stdlib.h>
@@ -149,8 +157,6 @@ extern void doParse(const char *);
 extern int charAvailable();
 extern int getChar();
 extern WORD getXT(WORD, DICT_T *);
-extern CELL timer();
-extern void delay();
 
 // FILEs
 extern void fileInit();
@@ -163,7 +169,5 @@ extern void fDelete();
 extern void fList();
 extern void fSave();
 extern void fLoad();
-extern void readBlock();
-extern void writeBlock();
 
 #endif

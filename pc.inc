@@ -10,10 +10,21 @@ byte fpSP = 0;
 void fpPush(FILE *v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }
 FILE *fpPop() { return (fpSP) ? fpStk[fpSP--] : 0 ; }
 
+FILE *myFopen(const char *fn, const char *md) {
+    FILE *fp;
+#ifdef _WIN32
+    fopen_s(&fp, fn, md);
+#else
+    FILE *fp = fopen(fn, md);
+#endif
+    return fp;
+}
+
 void fOpen() {
     CELL mode = pop();
     char *fn = (char *)pop();
-    push((CELL)fopen(fn, mode?"wb":"rb"));
+    FILE *fp = myFopen(fn, mode ? "wb" : "rb");
+    push((CELL)fp);
 }
 
 void fClose() {
@@ -43,7 +54,7 @@ void fList() {
 }
 
 void fSave() {
-    FILE *fp = fopen("system.ccc", "wb");
+    FILE *fp = myFopen("system.ccc", "wb");
     if (fp) {
         fwrite(&st, sizeof(st), 1, fp);
         fclose(fp);
@@ -51,7 +62,7 @@ void fSave() {
 }
 
 void fLoad() {
-    FILE *fp = fopen("system.ccc", "rb");
+    FILE *fp = myFopen("system.ccc", "rb");
     if (fp) {
         vmReset();
         fread(&st, sizeof(st), 1, fp);
@@ -61,8 +72,8 @@ void fLoad() {
 
 void doLoad(int blk) {
     char *fn = (char*)(&st.vars[VARS_SZ-32]);
-    sprintf(fn, "./block-%03d.4th", blk);
-    FILE *fp = fopen(fn, "rt");
+    sprintF(fn, "./block-%03d.4th", blk);
+    FILE *fp = myFopen(fn, "rt");
     if (fp) {
         if (input_fp) { fpPush(input_fp); }
         input_fp = fp;
@@ -96,7 +107,7 @@ int charAvailable(void) { return _kbhit(); }
 int getChar(void) { return _getch(); }
 
 void doHistory(const char *txt) {
-    FILE* fp = fopen("history.txt", "at");
+    FILE* fp = myFopen("history.txt", "at");
     if (fp) {
         fputs(txt, fp);
         fclose(fp);
@@ -127,7 +138,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     vmReset();
-    if (argc > 1) { input_fp = fopen(argv[1], "rt"); }
+    if (argc > 1) { input_fp = myFopen(argv[1], "rt"); }
     else { doLoad(0); }
     while (!isBye) { loop(); }
     return 0;

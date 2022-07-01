@@ -320,10 +320,18 @@ int doNumber(int t) {
     return 1;
 }
 
+char *sprintF(char *dst, const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(dst, 256, fmt, args);
+    va_end(args);
+    return dst;
+}
+
 int doNumber2() {
     if (TOS < 0) { return doNumber(0); }
     char buf[16];
-    sprintf(buf, "%ld", pop());
+    sprintF(buf, "%ld", pop());
     if (st.HERE && BTW(st.code[st.HERE-1],'0','9')) { CComma(' '); }
     for (int i=0; buf[i]; i++) { CComma(buf[i]); }
     return 1;
@@ -549,14 +557,14 @@ char *rtrim(char *str) {
 void systemWords() {
     BASE = 10;
     char *cp = (char*)(&st.vars[VARS_SZ-32]);
-    sprintf(cp, ": cb %lu ;", (UCELL)st.code);     doParse(cp);
-    sprintf(cp, ": vb %lu ;", (UCELL)st.vars);     doParse(cp);
-    sprintf(cp, ": csz %d ;", CODE_SZ);            doParse(cp);
-    sprintf(cp, ": vsz %d ;", VARS_SZ);            doParse(cp);
-    sprintf(cp, ": ha %lu ;", (UCELL)&st.oHERE);   doParse(cp);
-    sprintf(cp, ": la %lu ;", (UCELL)&st.LAST);    doParse(cp);
-    sprintf(cp, ": va %lu ;", (UCELL)&st.oVHERE);  doParse(cp);
-    sprintf(cp, ": base %lu ;", (UCELL)&BASE);     doParse(cp);
+    sprintF(cp, ": cb %lu ;", (UCELL)st.code);     doParse(cp);
+    sprintF(cp, ": vb %lu ;", (UCELL)st.vars);     doParse(cp);
+    sprintF(cp, ": csz %d ;", CODE_SZ);            doParse(cp);
+    sprintF(cp, ": vsz %d ;", VARS_SZ);            doParse(cp);
+    sprintF(cp, ": ha %lu ;", (UCELL)&st.oHERE);   doParse(cp);
+    sprintF(cp, ": la %lu ;", (UCELL)&st.LAST);    doParse(cp);
+    sprintF(cp, ": va %lu ;", (UCELL)&st.oVHERE);  doParse(cp);
+    sprintF(cp, ": base %lu ;", (UCELL)&BASE);     doParse(cp);
 }
 
 #if __BOARD__ == PC

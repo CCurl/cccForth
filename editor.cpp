@@ -164,7 +164,7 @@ void toLines() {
 void edRdBlk() {
     clearBlock();
     char buf[24];
-    sprintf(buf, "./block-%03d.4th", blkNum);
+    sprintF(buf, "./block-%03d.4th", blkNum);
     push((CELL)buf);
     push(0);
     fOpen();
@@ -188,7 +188,7 @@ void edRdBlk() {
 void edSvBlk() {
     int sz = toBlock();
     char buf[24];
-    sprintf(buf, "./block-%03d.4th", blkNum);
+    sprintF(buf, "./block-%03d.4th", blkNum);
     push((CELL)buf);
     push(1);
     fOpen();
