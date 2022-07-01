@@ -153,6 +153,8 @@ FWRITE   (c fh--)          c: char to write to file fh.
 FCLOSE   (fh--)            fh: file handle to close.
 FDELETE  (fn--)            fn: The name of the file to be deleted.
 FLIST    (--)              Print the list of files created on the dev board.
+FSAVE    (--)              Saves the system to file "/system.ccc"
+FLOAD    (--)              Loads the last saved system file, if any.
 
 *** LOGICAL ***
 =        (a b--f)          Equality

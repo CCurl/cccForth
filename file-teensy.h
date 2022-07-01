@@ -53,6 +53,27 @@ void fClose() {              // (fh--)
     }
 }
 
+void fSave() {
+    myFS.remove("/system.ccc");
+    File fp = myFS.open("/system.ccc", FILE_WRITE);
+    if (fp) {
+        fp.write(&st, sizeof(st));
+        fp.close();
+        printString("-saved-");
+    } else { printString("-error-"); }
+}
+
+void fLoad() {
+    File fp = myFS.open("/system.ccc", FILE_READ);
+    if (fp) {
+        vmReset();
+        fp.read(&st, sizeof(st));
+        fp.close();
+        printString("-loaded-");
+    } else { printString("-error-"); }
+}
+
+
 void fDelete() {
     char* fn = (char*)pop();
     if (myFS.remove(fn)) { printString("-deleted-"); }
@@ -67,7 +88,9 @@ void fList() {
          printString(entry.name());
          // files have sizes, directories do not
          if (entry.isDirectory()) { printStringF(" (dir)\r\n"); }
-         else { printStringF(" (%ld)\r\n", entry.size()); }
+         else { printStringF(" (%llu)\r\n", entry.size()); }
+         //char *x = entry.size();
+         // fprintStringF("%d", (int)x);
       entry.close();
     }
     dir.close();

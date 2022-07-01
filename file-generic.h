@@ -56,3 +56,29 @@ void fClose() {              // (fh--)
         files[fh] = 0;
     }
 }
+
+void fSave() {
+    File fp = myFS.open("system.ccc", "w");
+    if (fp) {
+        fp.write(&st, sizeof(st));
+        fp.close();
+        printString("-saved-");
+    } else { printString("-error-"); }
+}
+
+void fLoad() {
+    File fp = myFS.open("system.ccc", "r");
+    if (fp) {
+        vmReset();
+        fp.read(&st, sizeof(st));
+        fp.close();
+        printString("-loaded-");
+    } else { printString("-error-"); }
+}
+
+
+void fDelete() {
+    char* fn = (char*)pop();
+    if (myFS.remove(fn)) { printString("-deleted-"); }
+    else { printString("-noFile-"); }
+}
