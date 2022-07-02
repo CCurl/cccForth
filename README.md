@@ -1,12 +1,12 @@
-# cccForth
+# cccForth a minimal and extensible Forth system
 
 The main goals for this minimal Forth are as follows:
 
-- To be be very frugal with its usage of memory.
-- To be able to fit on systems with small amounts of memory.
-- To be easy to modify and add/extend the primitives.
-- To have an implementation that is minimal and "intuitively obvious upon casual inspection".
 - To be able to run on any system that has a C compiler.
+- To be easy to modify and add/extend the primitives.
+- To be able to fit on systems with small amounts of memory.
+- To have an implementation that is minimal and "intuitively obvious upon casual inspection".
+- To be be frugal with its usage of memory.
 - To be deployable to as many different kinds of development boards as possible via the Arduino IDE.
 - To have a VML (virtual machine language) that is as human-reabable as possible.
 
@@ -236,3 +236,6 @@ la     (--a)   a: Address of LAST
 va     (--a)   a: Address of VHERE
 base   (--a)   a: Address of BASE
 ```
+## Extending cccForth
+
+There is a section in the cccForth.cpp file
