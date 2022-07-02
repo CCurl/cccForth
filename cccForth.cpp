@@ -116,7 +116,7 @@ PRIM_T prims[] = {
     , { "RESET", "Y" }
     , { "SPACE", "32," }
     , { "SYSTEM", "xY" }
-    , { "TIMER", "zT" }
+    , { "TIMER", "xT" }
     , { "+TMPS", "l+" }
     , { "-TMPS", "l-" }
     , { "WORDS", "xD" }
@@ -132,15 +132,14 @@ PRIM_T prims[] = {
     , { "FLOAD", "fl" }
 #endif
 #ifdef __PIN__
-    // Extension: PIN operations
-    // Pin operations for dev boards
+    // Extension: PIN operations ... for dev boards
     , { "pin-input","zPI" }       // open input
     , { "pin-output","zPO" }      // open output
     , { "pin-pullup","zPU" }      // open input-pullup
-    , { "analog-read","zAR" }     // analog read
-    , { "analog-write","zAW" }    // analog write
-    , { "digital-read","zDR" }    // digital read
-    , { "digital-write","zDW" }   // digital write
+    , { "analog-read","zPRA" }    // Pin read: analog
+    , { "digital-read","zPRD" }   // Pin read: digital
+    , { "analog-write","zPWA" }   // Pin write: analog
+    , { "digital-write","zPWD" }  // Pin write: digital
 #endif
 #ifdef __EDITOR__
     // Extension: A simple block editor

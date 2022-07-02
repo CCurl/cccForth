@@ -52,37 +52,29 @@ void printChar(char ch) {
     printString(b);
 }
 
-byte *doPin(byte *pc) {
-    CELL pin = pop();
-    byte ir = *(pc++);
-    switch (ir) {
-    case 'I': pinMode(pin, INPUT);          break;
-    case 'O': pinMode(pin, OUTPUT);         break;
-    case 'U': pinMode(pin, INPUT_PULLUP);   break;
-    case 'R': ir = *(pc++);
-        if (ir == 'A') { push(analogRead(pin));  }
-        if (ir == 'D') { push(digitalRead(pin)); }
-        break;
-    case 'W': ir = *(pc++);
-        if (ir == 'A') { analogWrite(pin,  (int)pop()); }
-        if (ir == 'D') { digitalWrite(pin, (int)pop()); }
-        break;
-    default:
-        isError = 1;
-        printString("-notPin-");
-    }
-    return pc;
-}
-
 #include "file-board.h"
 
 byte *doExt(CELL ir, byte *pc) {
+    CELL pin;
     switch (ir) {
-    case 'G': pc = doGamePad(ir, pc);       break;
-    case 'N': push(micros());               break;
-    case 'P': pc = doPin(pc);               break;
-    case 'T': push(millis());               break;
-    case 'W': delay(pop());                 break;
+    case 'G': pc = doGamePad(ir, pc);           break;  // zG<x>
+    case 'N': push(micros());                   break;  // zN (--n)
+    case 'P': pin = pop(); ir = *(pc++);                // Pin operations
+        switch (ir) {
+        case 'I': pinMode(pin, INPUT);                           break;  // zPI (p--)
+        case 'O': pinMode(pin, OUTPUT);                          break;  // zPO (p--)
+        case 'U': pinMode(pin, INPUT_PULLUP);                    break;  // zPU (p--)
+        case 'R': ir = *(pc++);
+            if (ir == 'A') { push(analogRead(pin));  }                   // zPRA (p--n)
+            if (ir == 'D') { push(digitalRead(pin)); }           break;  // zPRD (p--n)
+        case 'W': ir = *(pc++);
+            if (ir == 'A') { analogWrite(pin,  (int)pop()); }            // zPWA (n p--)
+            if (ir == 'D') { digitalWrite(pin, (int)pop()); }    break;  // zPWD (n p--)
+        default:
+            isError = 1;
+            printString("-notPin-");
+        }                                       break;
+    case 'W': delay(pop());                     break;  // zW (n--)
     default:
         isError = 1;
         printString("-notExt-");

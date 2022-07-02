@@ -1,13 +1,15 @@
 # cccForth a minimal and extensible Forth system
 
+cccForth is intended to be a starting point for a programming environment that can grow to fit the user's needs.
+
 The main goals for this minimal Forth are as follows:
 
-- To be able to run on any system that has a C compiler.
 - To be easy to modify and add/extend the primitives.
-- To be able to fit on systems with small amounts of memory.
+- To be able to run on any system that has a C compiler.
 - To have an implementation that is minimal and "intuitively obvious upon casual inspection".
 - To be be frugal with its usage of memory.
-- To be deployable to as many different kinds of development boards as possible via the Arduino IDE.
+- To be able to fit on systems with small amounts of memory.
+- To be deployable to as many different kinds of development boards as possible, via the Arduino IDE.
 - To have a VML (virtual machine language) that is as human-reabable as possible.
 
 To these ends, I have wandered off the beaten path in the following ways:
@@ -24,7 +26,7 @@ To these ends, I have wandered off the beaten path in the following ways:
 - All CODE addresses are offsets into the CODE space, not absolute addresses.
 - HERE and LAST are also offsets into the CODE space, not absolute addresses.
 - The VARIABLE space is separated from the CODE space, and can be larger than 64kb.
-- VHERE is a 32-bit absolute address to the first available byte in VARIABLE.
+- VHERE is a 32-bit offset to the first available byte in he VARIABLE space.
 - There are 10 temporary words (T0..T9) that can be re-defined without any dictionary overhead.
 - There are 10 temporary variables (r0..r9) that can be allocated/destroyed.
 
@@ -62,7 +64,7 @@ To these ends, I have wandered off the beaten path in the following ways:
 : dumpX (a n--) swap s8 1 for r8 c@ .c i8 next ;
 ```
 
-## Primitives
+## cccForth Primitives
 ```
 NOTE: (1) These are NOT case-sensitive.
       (2) They do NOT show up in WORDS.
@@ -244,26 +246,39 @@ In the cccForth.cpp file, in the beginning, there is a section where prims[] is 
 You will see there are sections that add additional primitives if a symbol is #defined, for example:
 ```
 #ifdef __PIN__
-    // Extension: PIN operations
-    // Pin operations for dev boards
+    // Extension: PIN operations ... for dev boards
     , { "pin-input","zPI" }       // open input
     , { "pin-output","zPO" }      // open output
     , { "pin-pullup","zPU" }      // open input-pullup
-    , { "analog-read","zAR" }     // analog read
-    , { "analog-write","zAW" }    // analog write
-    , { "digital-read","zDR" }    // digital read
-    , { "digital-write","zDW" }   // digital write
+    , { "analog-read","zPRA" }    // Pin read: analog
+    , { "digital-read","zPRD" }   // Pin read: digital
+    , { "analog-write","zPWA" }   // Pin write: analog
+    , { "digital-write","zPWD" }  // Pin write: digital
 #endif
 ```
 You will notice that the VML code for these operations all begin with 'z'. The byte 'z' is the trigger to the VM that the command is implemented in doExt(ir, pc). Here is the definition of that function for development boards (cccForth.ino):
 ```
 byte *doExt(CELL ir, byte *pc) {
+    CELL pin;
     switch (ir) {
-    case 'G': pc = doGamePad(ir, pc);       break;
-    case 'N': push(micros());               break;
-    case 'P': pc = doPin(pc);               break;
-    case 'T': push(millis());               break;
-    case 'W': delay(pop());                 break;
+    case 'G': pc = doGamePad(ir, pc);           break;  // zG<x>
+    case 'N': push(micros());                   break;  // zN (--n)
+    case 'P': pin = pop(); ir = *(pc++);                // Pin operations
+        switch (ir) {
+        case 'I': pinMode(pin, INPUT);                           break;  // zPI (p--)
+        case 'O': pinMode(pin, OUTPUT);                          break;  // zPO (p--)
+        case 'U': pinMode(pin, INPUT_PULLUP);                    break;  // zPU (p--)
+        case 'R': ir = *(pc++);
+            if (ir == 'A') { push(analogRead(pin));  }                     // zPRA (p--n)
+            if (ir == 'D') { push(digitalRead(pin)); }             break;  // zPRD (p--n)
+        case 'W': ir = *(pc++);
+            if (ir == 'A') { analogWrite(pin,  (int)pop()); }              // zPWA (n p--)
+            if (ir == 'D') { digitalWrite(pin, (int)pop()); }      break;  // zPWD (n p--)
+        default:
+            isError = 1;
+            printString("-notPin-");
+        }                                       break;
+    case 'W': delay(pop());                     break;  // zW (n--)
     default:
         isError = 1;
         printString("-notExt-");
@@ -271,5 +286,6 @@ byte *doExt(CELL ir, byte *pc) {
     return pc;
 }
 ```
-In this context, 'pc' points to the next byte in the command stream, so "byte x = *(pc++);" sets x to the next byte and points pc to the next byte after that. A VML command "zN" will execute the 'N' case in doExt(), which in this case, calls "push(micros())", which pushes the return value from the Arduino lilbrary function "micros()" onto the stack. 
-So, to add one or more primitive, add the Forth you want somewhere in the prims[] section, make sure it starts with 'z', then add a handler for that new case in doExt() that does whatever you want.
+In this context, 'pc' points to the next byte in the command stream, so "byte x = *(pc++);" sets x to the next byte and points pc to the next byte after that. A VML command "zN" will execute the 'N' case in doExt(), which in this case, executes "push(micros())", which pushes the return value from the Arduino lilbrary function "micros()" onto the stack. 
+
+So, to add a primitive, add the Forth word to the prims[] array (either behind a #define or not), make sure it starts with 'z', then add a handler for that new case in doExt() that does whatever you want.
