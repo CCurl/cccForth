@@ -237,5 +237,39 @@ va     (--a)   a: Address of VHERE
 base   (--a)   a: Address of BASE
 ```
 ## Extending cccForth
+In the C code, TOS the "top-of-stack", and NOS is "next-on-stack". There is also push(x) and pop(), which manage the stack.
 
-There is a section in the cccForth.cpp file
+In the cccForth.cpp file, in the beginning, there is a section where prims[] is defined. This enumerates all the primitives that cccForth knows about. The first member of an entry is the Forth name, the second part is the VML code.
+
+You will see there are sections that add additional primitives if a symbol is #defined, for example:
+```
+#ifdef __PIN__
+    // Extension: PIN operations
+    // Pin operations for dev boards
+    , { "pin-input","zPI" }       // open input
+    , { "pin-output","zPO" }      // open output
+    , { "pin-pullup","zPU" }      // open input-pullup
+    , { "analog-read","zAR" }     // analog read
+    , { "analog-write","zAW" }    // analog write
+    , { "digital-read","zDR" }    // digital read
+    , { "digital-write","zDW" }   // digital write
+#endif
+```
+You will notice that the VML code for these operations all begin with 'z'. The byte 'z' is the trigger to the VM that the command is implemented in doExt(ir, pc). Here is the definition of that function for development boards (cccForth.ino):
+```
+byte *doExt(CELL ir, byte *pc) {
+    switch (ir) {
+    case 'G': pc = doGamePad(ir, pc);       break;
+    case 'N': push(micros());               break;
+    case 'P': pc = doPin(pc);               break;
+    case 'T': push(millis());               break;
+    case 'W': delay(pop());                 break;
+    default:
+        isError = 1;
+        printString("-notExt-");
+    }
+    return pc;
+}
+```
+In this context, 'pc' points to the next byte in the command stream, so "byte x = *(pc++);" sets x to the next byte and points pc to the next byte after that. A VML command "zN" will execute the 'N' case in doExt(), which in this case, calls "push(micros())", which pushes the return value from the Arduino lilbrary function "micros()" onto the stack. 
+So, to add one or more primitive, add the Forth you want somewhere in the prims[] section, make sure it starts with 'z', then add a handler for that new case in doExt() that does whatever you want.

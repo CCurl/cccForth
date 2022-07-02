@@ -121,6 +121,7 @@ PRIM_T prims[] = {
     , { "-TMPS", "l-" }
     , { "WORDS", "xD" }
 #ifdef __FILES__
+    // Extension: FILE operations
     , { "FOPEN", "fO" }
     , { "FREAD", "fR" }
     , { "FWRITE", "fW" }
@@ -130,8 +131,8 @@ PRIM_T prims[] = {
     , { "FSAVE", "fs" }
     , { "FLOAD", "fl" }
 #endif
-#if __BOARD__ == PC
-#else
+#ifdef __PIN__
+    // Extension: PIN operations
     // Pin operations for dev boards
     , { "pin-input","zPI" }       // open input
     , { "pin-output","zPO" }      // open output
@@ -142,10 +143,11 @@ PRIM_T prims[] = {
     , { "digital-write","zDW" }   // digital write
 #endif
 #ifdef __EDITOR__
+    // Extension: A simple block editor
     , { "EDIT","zE" }         // |EDIT|zE|(n--)|Edit block n|
 #endif
 #ifdef __GAMEPAD__
-    // Extensions
+    // Extension: GAMEPAD operations
     , { "gp-button","xGB" }
 #endif
     , {0,0}

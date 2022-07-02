@@ -50,6 +50,7 @@
   #define LSTK_SZ       16
   #define LOCALS_SZ    160
   #define FLT_SZ        10
+  #define __PIN__
   #define __FILES__
   // #define __EDITOR__
   #define NEEDS_ALIGN
@@ -60,6 +61,7 @@
   #define LSTK_SZ       16
   #define LOCALS_SZ    160
   #define FLT_SZ        10
+  #define __PIN__
   #define __FILES__
   #define __EDITOR__
   #define NEEDS_ALIGN
@@ -70,6 +72,7 @@
   #define LSTK_SZ       12
   #define LOCALS_SZ     80
   #define FLT_SZ         8
+  #define __PIN__
   #define NEEDS_ALIGN
 // #define __GAMEPAD__
 #elif __BOARD__ == ESP8266
@@ -79,6 +82,7 @@
   #define LSTK_SZ       12
   #define LOCALS_SZ     80
   #define FLT_SZ         8
+  #define __PIN__
   #define NEEDS_ALIGN
 // #define __GAMEPAD__
 #elif __BOARD__ == LEO
@@ -88,6 +92,7 @@
   #define LSTK_SZ        4
   #define LOCALS_SZ     10
   #define FLT_SZ         4
+  #define __PIN__
   #define NEEDS_ALIGN
 // #define __GAMEPAD__
 #endif
