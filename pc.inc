@@ -58,7 +58,8 @@ void fSave() {
     if (fp) {
         fwrite(&st, sizeof(st), 1, fp);
         fclose(fp);
-    }
+        printString("-saved-");
+    } else { printString("-error-"); }
 }
 
 void fLoad() {
@@ -67,7 +68,8 @@ void fLoad() {
         vmReset();
         fread(&st, sizeof(st), 1, fp);
         fclose(fp);
-    }
+        printString("-loaded-");
+    } else { printString("-error-"); }
 }
 
 void doLoad(int blk) {
