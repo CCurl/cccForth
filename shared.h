@@ -51,7 +51,7 @@
   #define LOCALS_SZ    160
   #define FLT_SZ        10
   #define __FILES__
-  #define __EDITOR__
+  // #define __EDITOR__
   #define NEEDS_ALIGN
 #elif __BOARD__ == PICO
   #define CODE_SZ      (48*1024)
@@ -142,6 +142,7 @@ extern void SET_WORD(byte *l, WORD v);
 extern void SET_LONG(byte *l, long v);
 extern void printString(const char*);
 extern void printStringF(const char*, ...);
+extern char *sprintF(char* dst, const char* fmt, ...);
 extern void printChar(char);
 extern void printBase(CELL, CELL);
 extern int strLen(const char *);
