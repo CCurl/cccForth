@@ -204,9 +204,10 @@ void run(WORD start) {
         case 'x': ir=*(pc++); if (ir=='S') { doDotS(); }                            // .S
                 else if (ir=='}') { pc=(byte*)L0; }                                 // AGAIN
                 else if (ir=='A') { st.oVHERE+=pop(); st.VHERE=st.oVHERE; }         // ALLOT
-                else if (ir=='T') { push(clock()); }                                 // TIMER
+                else if (ir=='T') { push(timer()); }                                // TIMER
                 else if (ir=='Y') { y=(byte*)pop(); system((char*)y); }             // SYSTEM
                 else if (ir=='D') { doWords(); }                                    // WORDS
+                else if (ir=='W') { doSleep(); }                                    // MS
                 else if (ir=='Q') { isBye=1; return; }                       break; // BYE
         case 'z': pc = doExt(*pc, pc+1);                                     break; // EXT
         case '{': ++lsp; L0=(CELL)pc;                                        break; // BEGIN

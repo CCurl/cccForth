@@ -109,7 +109,7 @@ PRIM_T prims[] = {
     , { "EXECUTE", "G" }
     , { "MAX", "%%<($)\\" }
     , { "MIN", "%%>($)\\" }
-    , { "WAIT", "zW" }
+    , { "MS", "xW" }
     , { "NOP", " " }
     , { "NOT", "~" }
     , { "RAND", "zR" }

@@ -221,8 +221,8 @@ NOP      (--)              Do nothing
 RAND     (--n)             n: a RANDOM 32-bit number
 RESET    (--)              Re-initialize cccForth
 SYSTEM   (a--)             a: string to send to system() ... eg: " dir" system (PC)
-TIMER    (--n)             n: clock()
-WAIT     (n--)             n: MS to sleep
+TIMER    (--n)             n: Time in MS
+MS       (n--)             n: MS to sleep
 VARIABLE (--)              Define a variable
 WORDS    (--)              Output the dictionary
 ```

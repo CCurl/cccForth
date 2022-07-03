@@ -7,6 +7,7 @@
 #define __SERIAL__
 
 CELL timer() { return millis(); }
+void doSleep() { delay(pop()); }
 CELL getSeed() { return millis(); }
 
 #ifdef __SERIAL__
@@ -74,7 +75,6 @@ byte *doExt(CELL ir, byte *pc) {
             isError = 1;
             printString("-notPin-");
         }                                       break;
-    case 'W': delay(pop());                     break;  // zW (n--)
     default:
         isError = 1;
         printString("-notExt-");
