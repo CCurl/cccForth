@@ -11,7 +11,7 @@
 #define LINUX        8
 #define LEO          9
 
-#define __BOARD__    TEENSY4
+#define __BOARD__    PICO
 
 #ifdef _WIN32
   #undef __BOARD__
@@ -63,7 +63,7 @@
   #define FLT_SZ        10
   #define __PIN__
   #define __FILES__
-  #define __EDITOR__
+  // #define __EDITOR__
   #define NEEDS_ALIGN
 #elif __BOARD__ == XIAO
   #define CODE_SZ      (14*1024)

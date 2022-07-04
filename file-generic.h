@@ -1,9 +1,16 @@
 // File support for generic boards
-
-// file-teensy.h
 // File ops on the Teensy are different
 
-LittleFS myFS;
+#include <FS.h>
+#include <LittleFS.h>
+
+#define myFS LittleFS
+
+#define NF 10
+#define VALIDF(x) BTW(x,1,NF) && (files[x])
+
+static File *files[NF+1];
+static int isInit = 0;
 
 void fileInit() {
     myFS.begin();
@@ -28,8 +35,11 @@ void fOpen() {               // (name mode--fh)
     TOS = 0;
     int i = openSlot();
     if (i) {
-        files[i] = myFS.open(fn, (mode) ? "w" : "r");
-        if (files[i]) { TOS = i; }
+        File f = myFS.open(fn, (mode) ? "w" : "r");
+        if (f) {
+            files[i] = &f;
+            TOS = i;
+        }
     }
 }
 
@@ -38,7 +48,7 @@ void fRead() {               // (fh--c n)
     CELL fh = TOS;
     push(0);
     if (VALIDF(fh)) {
-        TOS = files[fh].read(&c, 1);
+        TOS = files[fh]->read(&c, 1);
         NOS = (CELL)c;
     }
 }
@@ -46,13 +56,13 @@ void fRead() {               // (fh--c n)
 void fWrite() {              // (c fh--)
     CELL fh = pop();
     byte c = (byte)pop();
-    if (VALIDF(fh)) { files[fh].write(&c, 1); }
+    if (VALIDF(fh)) { files[fh]->write(&c, 1); }
 }
 
 void fClose() {              // (fh--)
     CELL fh = pop();
     if (VALIDF(fh)) {
-        files[fh].close();
+        files[fh]->close();
         files[fh] = 0;
     }
 }
@@ -60,7 +70,7 @@ void fClose() {              // (fh--)
 void fSave() {
     File fp = myFS.open("system.ccc", "w");
     if (fp) {
-        fp.write(&st, sizeof(st));
+        fp.write((byte*)&st, sizeof(st));
         fp.close();
         printString("-saved-");
     } else { printString("-error-"); }
@@ -70,15 +80,16 @@ void fLoad() {
     File fp = myFS.open("system.ccc", "r");
     if (fp) {
         vmReset();
-        fp.read(&st, sizeof(st));
+        fp.read((byte*)&st, sizeof(st));
         fp.close();
         printString("-loaded-");
     } else { printString("-error-"); }
 }
 
-
 void fDelete() {
-    char* fn = (char*)pop();
+    char *fn = (char*)pop();
     if (myFS.remove(fn)) { printString("-deleted-"); }
     else { printString("-noFile-"); }
 }
+
+void fList() {}

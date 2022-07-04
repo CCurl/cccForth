@@ -1,6 +1,6 @@
 #include "shared.h"
 
-byte sp, rsp, lsp, locSP, lb, isError, sb, rb, fsp, *y;
+byte sp, rsp, lsp, lb, isError, sb, rb, fsp, *y;
 CELL BASE, stks[STK_SZ], locals[LOCALS_SZ];
 CELL lstk[LSTK_SZ+1];
 float fstk[FLT_SZ];
@@ -8,7 +8,7 @@ float fstk[FLT_SZ];
 ST_T st;
 
 void vmReset() {
-    lsp = locSP = lb = 0, fsp = 0;
+    lsp = lb = 0, fsp = 0;
     sb = 2, rb = (STK_SZ-2);
     sp = sb - 1, rsp = rb + 1;
     st.LAST = 0;
@@ -104,7 +104,7 @@ byte* doFile(CELL ir, byte* pc) {
 void run(WORD start) {
     byte* pc = CA(start);
     CELL t1, t2;
-    lsp = locSP = isError = 0;
+    lsp = isError = 0;
     if (sp < sb) { sp = sb - 1; }
     if (rsp > rb) { rsp = rb + 1; }
     if (fsp < 0) { fsp = 0; }

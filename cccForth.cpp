@@ -133,13 +133,13 @@ PRIM_T prims[] = {
 #endif
 #ifdef __PIN__
     // Extension: PIN operations ... for dev boards
-    , { "pin-input","zPI" }       // open input
-    , { "pin-output","zPO" }      // open output
-    , { "pin-pullup","zPU" }      // open input-pullup
-    , { "analog-read","zPRA" }    // Pin read: analog
-    , { "digital-read","zPRD" }   // Pin read: digital
-    , { "analog-write","zPWA" }   // Pin write: analog
-    , { "digital-write","zPWD" }  // Pin write: digital
+    , { "pin-in","zPI" }          // open input
+    , { "pin-out","zPO" }         // open output
+    , { "pin-up","zPU" }          // open input-pullup
+    , { "pin!","zPWD" }           // Pin write: digital
+    , { "pin@","zPRD" }           // Pin read: digital
+    , { "pina!","zPWA" }          // Pin write: analog
+    , { "pina@","zPRA" }          // Pin read: analog
 #endif
 #ifdef __EDITOR__
     // Extension: A simple block editor

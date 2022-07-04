@@ -1,7 +1,14 @@
 // file-teensy.h
 // File ops on the Teensy are different
+#include <LittleFS.h>
 
 LittleFS_Program myFS;
+
+#define NF 10
+#define VALIDF(x) BTW(x,1,NF) && (files[x])
+
+static File files[NF+1];
+static int isInit = 0;
 
 void fileInit() {
     myFS.begin(1 * 1024 * 1024);

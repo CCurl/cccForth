@@ -238,6 +238,7 @@ la     (--a)   a: Address of LAST
 va     (--a)   a: Address of VHERE
 base   (--a)   a: Address of BASE
 ```
+
 ## Extending cccForth
 In the C code, TOS the "top-of-stack", and NOS is "next-on-stack". There is also push(x) and pop(), which manage the stack.
 
