@@ -144,13 +144,6 @@ void setup() {
     fileInit();
 }
 
-void doAutoRun() {
-    if (doFind("AUTORUN")) {
-      pop();
-      run((WORD) pop());
-    }
-}
-
 void loop() {
     static int iLed = 0;
     static long nextBlink = 0;
@@ -177,5 +170,7 @@ void loop() {
     //    isOTA = 1;
     //    handleInput(wifiGetChar()); 
     //}
-    doAutoRun();
+    // Auto-run?
+    WORD ar = GET_WORD(&st.code[0]);
+    if (ar) { run(ar); }
 }

@@ -550,10 +550,10 @@ void doParse(const char *line) {
 }
 
 void doOK() {
-    if (STATE) { printString(" ... "); return; }
-    printString("\r\nOK ");
+    if (STATE) { printString(" ... \r\n"); return; }
+    printString(" OK ");
     doDotS();
-    printString(">");
+    printString("\r\n");
 }
 
 char *rtrim(char *str) {

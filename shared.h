@@ -143,6 +143,7 @@ extern void vmReset();
 extern void systemWords();
 extern void push(CELL);
 extern CELL pop();
+extern WORD GET_WORD(byte *l);
 extern void SET_WORD(byte *l, WORD v);
 extern void SET_LONG(byte *l, long v);
 extern void printString(const char*);

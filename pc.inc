@@ -115,26 +115,64 @@ void doHistory(const char *txt) {
     FILE* fp = myFopen("history.txt", "at");
     if (fp) {
         fputs(txt, fp);
+        fputs("\n", fp);
         fclose(fp);
     }
+}
+
+int isBS(char c) {
+    return c==8 ? 1 : 0;
+}
+
+void handleChar(char c) {
+    static int tib = 0, tibEnd = 0;
+    if (!tib) { tibEnd = tib = CODE_SZ-128; }
+    if ((c==13) || (c==10)) {
+        st.code[tibEnd] = 0;
+        char *l = (char*)CA(tib);
+        if (!input_fp) {
+            printChar(' ');
+            doHistory(l); 
+        }
+        doParse(l);
+        tibEnd = tib;
+        if (!input_fp) { doOK(); }
+        return;
+    }
+    if (c == 9) { c = 32; }
+    if (BTW(c,32,126)) {
+        st.code[tibEnd++] = c;
+        if (!input_fp) { printChar(c); }
+        return;
+    }
+    if (isBS(c) && (tib < tibEnd)) {
+        --tibEnd;
+        char bs[4] = {8,32,8,0};
+        printString(bs);
+    }
+}
+
+void setup() {
+    printString("cccForth v0.0.1 - Chris Curl\n");
+    vmReset();
+    if (!input_fp) { doOK(); }
 }
 
 void loop() {
     char *tib = (char *)CA(st.HERE+32);
     FILE* fp = (input_fp) ? input_fp : stdin;
     if (input_fp) {
-        if (fgets(tib, 128, fp) == tib) {
-            doParse(rtrim(tib));
-        } else {
+        if (!feof(input_fp)) { handleChar(fgetc(input_fp)); }
+        else {
             fclose(input_fp);
             input_fp = fpPop();
+            if (!input_fp) { doOK(); }
         }
     } else {
-        doOK();
-        fgets(tib, 128, stdin);
-        doHistory(tib);
-        doParse(rtrim(tib));
+        while (charAvailable()) { handleChar(getChar()); }
     }
+    WORD ar = GET_WORD(st.code);
+    if (ar) { run(ar); }
 }
 
 int main(int argc, char *argv[]) {
@@ -142,9 +180,10 @@ int main(int argc, char *argv[]) {
         printf("ERROR: CELL cannot support a pointer!");
         exit(1);
     }
-    vmReset();
     if (argc > 1) { input_fp = myFopen(argv[1], "rt"); }
     else { doLoad(0); }
+    setup();
+
     while (!isBye) { loop(); }
     return 0;
 }
