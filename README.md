@@ -241,21 +241,21 @@ base   (--a)   a: Address of BASE
 ```
 
 ## Extending cccForth
-In the C code, TOS the "top-of-stack", and NOS is "next-on-stack". There is also push(x) and pop(), which manage the stack.
+In the C code, TOS is the "top-of-stack", and NOS is "next-on-stack". There is also push(x) and pop(), which manage the stack.
 
-In the cccForth.cpp file, in the beginning, there is a section where prims[] is defined. This enumerates all the primitives that cccForth knows about. The first member of an entry is the Forth name, the second part is the VML code.
+In the beginning of the cccForth.cpp file, there is a section where prims[] is defined. This enumerates all the primitives that cccForth knows about. The first member of an entry is the Forth name, the second part is the VML code.
 
 You will see there are sections that add additional primitives if a symbol is #defined, for example:
 ```
 #ifdef __PIN__
     // Extension: PIN operations ... for dev boards
-    , { "pin-input","zPI" }       // open input
-    , { "pin-output","zPO" }      // open output
-    , { "pin-pullup","zPU" }      // open input-pullup
-    , { "analog-read","zPRA" }    // Pin read: analog
-    , { "digital-read","zPRD" }   // Pin read: digital
-    , { "analog-write","zPWA" }   // Pin write: analog
-    , { "digital-write","zPWD" }  // Pin write: digital
+    , { "PIN-IN","zPI" }   // open input
+    , { "PIN-OUT","zPO" }  // open output
+    , { "PIN-UP","zPU" }   // open input-pullup
+    , { "PINA@","zPRA" }   // Pin read: analog
+    , { "PIN@","zPRD" }    // Pin read: digital
+    , { "PINA!","zPWA" }   // Pin write: analog
+    , { "PIN!","zPWD" }    // Pin write: digital
 #endif
 ```
 You will notice that the VML code for these operations all begin with 'z'. The byte 'z' is the trigger to the VM that the command is implemented in doExt(ir, pc). Here is the definition of that function for development boards (cccForth.ino):
@@ -288,6 +288,6 @@ byte *doExt(CELL ir, byte *pc) {
     return pc;
 }
 ```
-In this context, 'pc' points to the next byte in the command stream, so "byte x = *(pc++);" sets x to the next byte and points pc to the next byte after that. A VML command "zN" will execute the 'N' case in doExt(), which in this case, executes "push(micros())", which pushes the return value from the Arduino lilbrary function "micros()" onto the stack. 
+In this context, 'pc' points to the next byte in the command stream, so "ir = *(pc++);" sets ir to the next byte and moves pc to point to the next byte after that. A VML command "zN" will execute the 'N' case in doExt(), which in this case, executes "push(micros())", pushing the return value from the Arduino library function "micros()" onto the stack. 
 
 So, to add a primitive, add the Forth word to the prims[] array (either behind a #define or not), make sure it starts with 'z', then add a handler for that new case in doExt() that does whatever you want.
