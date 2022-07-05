@@ -205,6 +205,7 @@ void doExec() {
         CComma(0);
         run((WORD)st.oHERE);
         st.HERE = st.oHERE;
+        st.VHERE = st.oVHERE;
     }
 }
 
@@ -498,6 +499,13 @@ int doParseWord(char *wd) {
         else { return 0; }
     }
 
+    if (strEqI(wd, "LU")) {
+        doExec();
+        if (getWord(wd) == 0) { return 0; }
+        push(doFind(wd));
+        return 1;
+    }
+
     if (strEqI(wd, "FORGET")) {
         // Forget the last word
         st.oHERE = st.HERE = st.LAST;
@@ -513,6 +521,7 @@ int doParseWord(char *wd) {
 
     STATE = 0;
     st.HERE = st.oHERE;
+    st.VHERE = st.oVHERE;
     printStringF("[%s]??", wd);
     return 0;
 }

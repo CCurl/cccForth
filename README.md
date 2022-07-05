@@ -217,6 +217,7 @@ CELL     (--n)             n: The size of a CELL
 EDIT     (n--)             Edit block n
 EXECUTE  (a--)             Jump to CODE address a
 LOAD     (n--)             Load block n from disk
+LU xxx   (--f | xt i f)    Lookup xxx. If found f=1, i: immediate and xt: offset. Else f=0, and i and xt are not pushed.
 NOP      (--)              Do nothing
 RAND     (--n)             n: a RANDOM 32-bit number
 RESET    (--)              Re-initialize cccForth
