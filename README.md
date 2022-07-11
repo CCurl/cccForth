@@ -1,4 +1,4 @@
-# cccForth a minimal and extensible Forth system
+# cccForth - a minimal and extensible Forth system
 
 cccForth is intended to be a starting point for a programming environment that can grow to fit the user's needs.
 
