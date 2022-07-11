@@ -214,6 +214,7 @@ BL       (--c)             c: 32
 BYE      (--)              Exit cccForth (PC)
 CONSTANT (--)              Define a constant
 CELL     (--n)             n: The size of a CELL
+CELLS    (n--x)            x: The size of n CELLs
 EDIT     (n--)             Edit block n
 EXECUTE  (a--)             Jump to CODE address a
 LOAD     (n--)             Load block n from disk
