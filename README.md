@@ -191,14 +191,14 @@ THEN     (--)              Standard THEN
 FOR      (f t--)           Begin FOR/NEXT loop
 I        (--n)             n: Current index
 +I       (n--)             n: value to add to I
-EXIT-F   (--)              Drop top 3 entries from loop stack (unwind FOR loop)
+UNLOOP-F (--)              Drop top 3 entries from loop stack (unwind FOR loop)
 NEXT     (--)              Increment I, jump to start of loop if I < T
 BEGIN    (f--f)            Start WHILE/UNTIL/AGAIN loop.
 WHILE    (f--f?)           If f==0, jump to BEGIN, else DROP f and continue.
 UNTIL    (f--f?)           If f<>0, jump to BEGIN, else DROP f and continue.
-AGAIN    (--)              Jump to BEGIN. Use IF EXIT-W EXIT THEN to break out.
-EXIT-W   (--)              Drop top 1 entry from loop stack (unwind WHILE loop)
-EXIT     (--)              Exit the word immediately (don't forget to EXIT-F/W first if in a LOOP)
+AGAIN    (--)              Jump to BEGIN. Use IF UNLOOP-W EXIT THEN to break out.
+UNLOOP-W (--)              Drop top 1 entry from loop stack (unwind WHILE loop)
+EXIT     (--)              Exit the word immediately (don't forget to UNLOOP-<x> first if in a LOOP)
 
 *** TEMPORARY VARIABLES ***
 +TMPS    (--)              Allocate 10 temp variables, r0 .. r9
