@@ -143,7 +143,7 @@ void run(WORD start) {
         case '<': NOS = (NOS < TOS) ? 1 : 0; DROP1;                          break; // <
         case '?': if (pop()==0) { pc=CA(GET_WORD(pc)); } else { pc+=2; }     break; // 0BRANCH
         case '@': TOS = GET_LONG((byte*)TOS);                                break; // FETCH
-        case 'C': y=(byte*)TOS; t1=0; while (*(y++)) { ++t1; } push(t1);     break; // COUNT (a--a c)
+        case 'C': y=(byte*)TOS; TOS=0; while (*(y++)) { ++TOS; };            break; // STRLEN (a--c)
         case 'D': --TOS;                                                     break; // 1-
         case 'F': ir = *(pc++); if (ir=='.') { printStringF("%g",fpop()); }         // FLOAT ops
                 else if (ir=='#') { fpush(FTOS); }
@@ -173,7 +173,7 @@ void run(WORD start) {
         case 'T': t1=pop(); y=(byte*)pop(); while (t1--) printChar(*(y++));  break; // TYPE (a c--)
         case 'Y': vmReset();                                                return; // RESET
         case 'Z': doType((byte *)pop(),-1, 0);                               break; // ZTYPE
-        case '[': lsp += 3; L2 = (CELL)pc;                                          // FOR
+        case '[': lsp += 3; L2 = (CELL)pc;                                          // FOR (f t--)
             L1 = (TOS > NOS) ? TOS : NOS;
             L0 = (TOS < NOS) ? TOS : NOS; DROP2;                             break;
         case '\\': DROP1;                                                    break; // DROP
@@ -192,9 +192,9 @@ void run(WORD start) {
                 else if(ir=='!') { *AOS = (byte)NOS; DROP2; }                break; // c@, c!
         case 'd': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { --locals[lb+t1]; }      break; // decLocal
         case 'i': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { ++locals[lb+t1]; }      break; // incLocal
-        case 'f': pc = doFile(ir, pc);                                       break; // BINARY ops
+        case 'f': pc = doFile(ir, pc);                                       break; // FILE ops
         case 'l': ir=*(pc++); if (ir=='+') { lb+=((lb+10)<LOCALS_SZ)?10:0; }        // locals
-                else if (ir=='-') { lb-=(lb<10)?0:10; }                      break;
+                else if (ir=='-') { lb-=(lb>9)?10:0; }                      break;
         case 'r': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { push(locals[lb+t1]); }  break; // readLocal
         case 's': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]=pop(); }  break; // setLocal
         case 't': printString((char *)pop());                                break; // QTYPE

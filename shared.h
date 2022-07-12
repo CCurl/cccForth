@@ -11,7 +11,7 @@
 #define LINUX        8
 #define LEO          9
 
-#define __BOARD__    PICO
+#define __BOARD__    TEENSY4
 
 #ifdef _WIN32
   #undef __BOARD__

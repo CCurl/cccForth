@@ -59,7 +59,8 @@ PRIM_T prims[] = {
     , { "LOAD", "zL"}
     , { "QTYPE", "t" }
     , { "ZTYPE", "Z" }
-    , { "COUNT", "C" }
+    , { "COUNT", "#C" }
+    , { "STRLEN", "C" }
     , { "TYPE", "T" }
     // Logical / flow control
     , { ".IF", "(" }

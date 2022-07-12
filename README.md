@@ -129,11 +129,12 @@ FDROP    (a--)             Float DROP
 ."       (?--?)            Output a (possibly formatted) string. See (1).
 CR       (--)              Output a newline (#10,#13)
 EMIT     (c--)             Output c as a character
+STRLEN   (a--n)            n: length of the NULL-terminated string at a
 COUNT    (a--a n)          n: length of string at a (a must be NULL-terminated)
 TYPE     (a n--)           Output string at (standard Forth TYPE)
 KEY      (--c)             c: Next keyboard char, wait if no press yet
 KEY?     (--f)             f: FALSE if no keyboard press, else TRUE
-QTYPE    (a--)             Quick string output, no formatting.
+QTYPE    (a--)             Quick string output, no formatting, a is NULL-terminated.
 SPACE    (--)              Output a single SPACE
 ZTYPE    (a--)             Output string at a. See (1).
 
