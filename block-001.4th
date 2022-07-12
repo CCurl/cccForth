@@ -14,6 +14,7 @@ reset
 : dumpN  ( a n-- ) 0 for dup c@ .  1+ next drop ;
 : dumpNC ( a n-- ) 0 for dup c@ T0 1+ next drop ;
 : code cb here dumpNC ;
+: vars vb vhere dumpNC ;
 : elapsed timer swap - ;
 : fill ( c f t-- ) for dup i c! next drop ;
 : fill-n ( c a n-- ) over + fill ;
