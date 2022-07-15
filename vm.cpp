@@ -193,8 +193,8 @@ void run(WORD start) {
         case 'd': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { --locals[lb+t1]; }      break; // decLocal
         case 'i': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { ++locals[lb+t1]; }      break; // incLocal
         case 'f': pc = doFile(ir, pc);                                       break; // FILE ops
-        case 'l': ir=*(pc++); if (ir=='+') { lb+=((lb+10)<LOCALS_SZ)?10:0; }        // locals
-                else if (ir=='-') { lb-=(lb>9)?10:0; }                      break;
+        case 'l': if ((lb+10)<LOCALS_SZ) { lb+=10; }                         break; // +TMPS
+        case 'm': if (lb>9) { lb-=10; }                                      break; // -TMPS
         case 'r': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { push(locals[lb+t1]); }  break; // readLocal
         case 's': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]=pop(); }  break; // setLocal
         case 't': printString((char *)pop());                                break; // QTYPE

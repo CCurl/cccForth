@@ -119,8 +119,8 @@ PRIM_T prims[] = {
     , { "SPACE", "32," }
     , { "SYSTEM", "xY" }
     , { "TIMER", "xT" }
-    , { "+TMPS", "l+" }
-    , { "-TMPS", "l-" }
+    , { "+TMPS", "l" }
+    , { "-TMPS", "m" }
     , { "WORDS", "xD" }
 #ifdef __FILES__
     // Extension: FILE operations
