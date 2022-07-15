@@ -66,8 +66,9 @@ To these ends, I have wandered off the beaten path in the following ways:
 
 ## cccForth Primitives
 ```
-NOTE: (1) These are NOT case-sensitive.
-      (2) They do NOT show up in WORDS.
+NOTEs: (1) These built into cccForth.
+       (2) They are NOT case-sensitive.
+       (3) They do NOT show up in WORDS.
 
 *** MATH ***
 +        (a b--c)          Addition
@@ -260,7 +261,7 @@ You will see there are sections that add additional primitives if a symbol is #d
     , { "PIN!","zPWD" }    // Pin write: digital
 #endif
 ```
-You will notice that the VML code for these operations all begin with 'z'. The byte 'z' is the trigger to the VM that the command is implemented in doExt(ir, pc). Here is the definition of that function for development boards (cccForth.ino):
+You will notice that the VML code for these operations all begin with 'z'. The byte 'z' is the trigger to the VM that the command is implemented in doExt(ir, pc). Here is the definition of that function for development boards (in cccForth.ino):
 ```
 byte *doExt(CELL ir, byte *pc) {
     CELL pin;
@@ -273,11 +274,11 @@ byte *doExt(CELL ir, byte *pc) {
         case 'O': pinMode(pin, OUTPUT);                          break;  // zPO (p--)
         case 'U': pinMode(pin, INPUT_PULLUP);                    break;  // zPU (p--)
         case 'R': ir = *(pc++);
-            if (ir == 'A') { push(analogRead(pin));  }                     // zPRA (p--n)
-            if (ir == 'D') { push(digitalRead(pin)); }             break;  // zPRD (p--n)
+            if (ir == 'A') { push(analogRead(pin));  }                   // zPRA (p--n)
+            if (ir == 'D') { push(digitalRead(pin)); }           break;  // zPRD (p--n)
         case 'W': ir = *(pc++);
-            if (ir == 'A') { analogWrite(pin,  (int)pop()); }              // zPWA (n p--)
-            if (ir == 'D') { digitalWrite(pin, (int)pop()); }      break;  // zPWD (n p--)
+            if (ir == 'A') { analogWrite(pin,  (int)pop()); }            // zPWA (n p--)
+            if (ir == 'D') { digitalWrite(pin, (int)pop()); }    break;  // zPWD (n p--)
         default:
             isError = 1;
             printString("-notPin-");
