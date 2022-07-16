@@ -225,7 +225,7 @@ void doCreate(const char *name, byte f) {
     // dp->flags = f;
     strCpy(dp->name, name);
     st.LAST = st.HERE;
-    st.HERE += strLen(name) + 3;
+    st.HERE += strLen(name) + 2;
 }
 
 int doFind(const char *name) {
@@ -241,7 +241,7 @@ int doFind(const char *name) {
     while (def) {
         DICT_T* dp = DP_AT(def);
         if (strEq(dp->name, name)) {
-            push(def + strLen(dp->name) + 3);
+            push(def + strLen(dp->name) + 2);
             // push(dp->flags);
             return 1;
         }
