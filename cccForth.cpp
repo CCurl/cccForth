@@ -222,7 +222,7 @@ void doCreate(const char *name, byte f) {
     }
     DICT_T *dp = DP_AT(st.HERE);
     dp->prev = (byte)(st.HERE - st.LAST);
-    dp->flags = f;
+    // dp->flags = f;
     strCpy(dp->name, name);
     st.LAST = st.HERE;
     st.HERE += strLen(name) + 3;
@@ -232,7 +232,7 @@ int doFind(const char *name) {
     // Temporary word?
     if (isTempWord(name) && (tempWords[name[1]-'0'])) {
         push(tempWords[name[1]-'0']);
-        push(0);
+        // push(0);
         return 1;
     }
 
@@ -242,7 +242,7 @@ int doFind(const char *name) {
         DICT_T* dp = DP_AT(def);
         if (strEq(dp->name, name)) {
             push(def + strLen(dp->name) + 3);
-            push(dp->flags);
+            // push(dp->flags);
             return 1;
         }
         if (def == dp->prev) break;
@@ -256,9 +256,9 @@ int doSee(const char* wd) {
     CELL def = (WORD)st.LAST;
     CELL prevDef = st.oHERE;
     int found = 0;
-    DROP2;
+    DROP1;
     while (def && (!found)) {
-        DICT_T* dp = DP_AT(def);
+        DICT_T *dp = DP_AT(def);
         if (strEq(dp->name, wd)) {
             found = 1;
             break;
@@ -312,12 +312,10 @@ int doNumber(int t) {
     } else if ((num & 0xFF) == num) {
         CComma(1);
         CComma(num);
-    }
-    else if ((num & 0xFFFF) == num) {
+    } else if ((num & 0xFFFF) == num) {
         CComma(2);
         WComma((WORD)num);
-    }
-    else {
+    } else {
         CComma(4);
         Comma(num);
     }
@@ -408,15 +406,15 @@ int doDotQuote() {
 }
 
 int doWord() {
-    CELL flg = pop();
+    // CELL flg = pop();
     CELL xt = pop();
-    if (flg) {
-        doExec();
-        run((WORD)xt);
-    } else {
-        CComma(':');
-        WComma((WORD)xt);
-    }
+    //if (flg) {
+    //    doExec();
+    //    run((WORD)xt);
+    //} else {
+    CComma(':');
+    WComma((WORD)xt);
+    // }
     return 1;
 }
 
@@ -501,7 +499,7 @@ int doParseWord(char *wd) {
         else { return 0; }
     }
 
-    if (strEqI(wd, "LU")) {
+    if (strEqI(wd, "WFIND")) {
         doExec();
         if (getWord(wd) == 0) { return 0; }
         push(doFind(wd));

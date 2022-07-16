@@ -130,7 +130,7 @@ typedef struct {
 
 typedef struct {
     byte prev;
-    byte flags;
+    // byte flags;
     char name[32];
 } DICT_T;
 

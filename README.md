@@ -16,6 +16,7 @@ To these ends, I have wandered off the beaten path in the following ways:
 
 - This is NOT an ANSI-standard Forth.
 - This is a byte-coded implementation.
+- There is no STATE variable, and you cannot create an IMMEDIATE word.
 - Many primitives (core words) are built into the compiler, and are not included in the dictionary.
 - These primitves ARE NOT case sensitive (DUP = dup = Dup).
 - User-defined words ARE case sensitive.
@@ -34,7 +35,6 @@ To these ends, I have wandered off the beaten path in the following ways:
 - A temporary word is named T0 .. T9. (e.g. - ": T4 ... ;" will define word T4, but T4 is not added to the dictionary)
 - I think of temporary words as named transient words that don't incur any dictionary overhead.
 - Their purpose is to support code reuse and factoring without the overhead of a dictionary entriy.
-- You cannot create an IMMEDIATE temporary word.
 - When defined, they refer to the current value of HERE.
 - All previous references to T4 still refer to the previous definition. New references to T4 refer to the new definition.
 - Here is a simple example:
@@ -220,7 +220,7 @@ CELLS    (n--x)            x: The size of n CELLs
 EDIT     (n--)             Edit block n
 EXECUTE  (a--)             Jump to CODE address a
 LOAD     (n--)             Load block n from disk
-LU xxx   (--f | xt i f)    Lookup xxx. If found f=1, i: immediate and xt: offset. Else f=0, and i and xt are not pushed.
+WFIND xx (--f | xt f)      Lookup xx. If found f=1, xt: offset. Else f=0, and xt is not pushed.
 NOP      (--)              Do nothing
 RAND     (--n)             n: a RANDOM 32-bit number
 RESET    (--)              Re-initialize cccForth
@@ -241,6 +241,7 @@ ha     (--a)   a: Address of HERE
 la     (--a)   a: Address of LAST
 va     (--a)   a: Address of VHERE
 base   (--a)   a: Address of BASE
+NOTE: There is NO STATE variable
 ```
 
 ## Extending cccForth
