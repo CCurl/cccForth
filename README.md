@@ -52,10 +52,10 @@ To these ends, I have wandered off the beaten path in the following ways:
 - There are 4 special operations for temp variables: read, set, increment and decrement
 - The words to manage temps are: +tmps, r0..r9, s0..s9, i0..i9, d0..d9 and -tmps
   - +tmps: allocate 10 new temps
-  - rX: push the value of temp #x onto the stack (read)
+  - rX: push the value of temp #X onto the stack (read)
   - sX: pop the new value for temp #X off the stack (set)
   - iX: increment temp #X
-  - dX: decrement temp #x
+  - dX: decrement temp #X
   - -tmps: destroy the most recently allocated temps
 - Here are some simple examples:
 ```
@@ -220,7 +220,7 @@ CELLS    (n--x)            x: The size of n CELLs
 EDIT     (n--)             Edit block n
 EXECUTE  (a--)             Jump to CODE address a
 LOAD     (n--)             Load block n from disk
-LU xxx   (--f | xt i f)    Lookup xxx. If found f=1, i: immediate and xt: offset. Else f=0, and i and xt are not pushed.
+LOOKUP x (--f | xt i f)    Lookup x. If found f=1, i: immediate and xt: offset. Else f=0, and i and xt are not pushed.
 NOP      (--)              Do nothing
 RAND     (--n)             n: a RANDOM 32-bit number
 RESET    (--)              Re-initialize cccForth

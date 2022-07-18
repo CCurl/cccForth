@@ -189,6 +189,12 @@ int strLen(const char *str) {
     return l;
 }
 
+char *rtrim(char* str) {
+    char *cp = str + strLen(str);
+    while ((str <= cp) && (*cp <= ' ')) { *(cp--) = 0; }
+    return str;
+}
+
 void printStringF(const char *fmt, ...) {
     char *buf = (char*)&st.vars[VARS_SZ-100];
     va_list args;
@@ -501,7 +507,7 @@ int doParseWord(char *wd) {
         else { return 0; }
     }
 
-    if (strEqI(wd, "LU")) {
+    if (strEqI(wd, "LOOKUP")) {
         doExec();
         if (getWord(wd) == 0) { return 0; }
         push(doFind(wd));
@@ -536,9 +542,7 @@ bool isASM(const char* ln) {
     return 0;
 }
 
-const char* xln;
 void doParse(const char *line) {
-    xln = line;
     in = (char*)line;
     if (isASM(line)) { return; }
     int len = getWord(word);
@@ -556,14 +560,6 @@ void doOK() {
     printString("\r\nOK ");
     doDotS();
     printString(">");
-}
-
-char *rtrim(char *str) {
-    char *cp = str;
-    while (*cp) { ++cp; }
-    --cp;
-    while ((str <= cp) && (*cp <= ' ')) { *(cp--) = 0; }
-    return str;
 }
 
 void systemWords() {
