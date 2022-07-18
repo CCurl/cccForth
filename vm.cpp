@@ -101,7 +101,7 @@ byte* doFile(CELL ir, byte* pc) {
     return pc;
 }
 
-void run(WORD start) {
+void runX(WORD start) {
     byte* pc = CA(start);
     CELL t1, t2;
     lsp = isError = 0;
@@ -215,5 +215,155 @@ void run(WORD start) {
         case '~': TOS = (TOS) ? 0 : 1;                                       break; // NOT (0=)
         default: printStringF("-unk ir: %d (%c)-", ir, ir);                 return;
         }
+    }
+}
+
+byte ir, * pc;
+CELL t1, t2;
+
+void fXXX() { pc=0; }
+void f001() { push(*(pc++)); }
+void f002() { push(GET_WORD(pc)); pc+=2; }
+void f004() { push(GET_LONG(pc)); pc+=4; }
+void f032() { /* NOP */}
+void f033() { SET_LONG((byte*)TOS, NOS); DROP2; }
+void f034() { pc = doType(pc, -1, '"'); }
+void f035() { push(TOS); }
+void f036() { t1 = TOS; TOS = NOS; NOS = t1; }
+void f037() { push(NOS); }
+void f038() { t1 = NOS; t2 = TOS; NOS = t1 / t2; TOS = t1 % t2; }
+void f039() { push(*(pc++)); }
+void f040() { if (pop() == 0) { while (*pc != ')') ++pc; } }
+void f041() { /* Simple THEN */ }
+void f042() { t1 = pop(); TOS *= t1; }
+void f043() { t1 = pop(); TOS += t1; }
+void f044() { printChar((char)pop()); }
+void f045() { t1 = pop(); TOS -= t1; }
+void f046() { printBase(pop(), BASE); }
+void f047() { t1 = pop(); TOS /= t1; }
+void fNUM() { push(ir-'0'); while (BTW(*pc,'0','9')) { TOS = (TOS*10) + *(pc++) - '0'; } }
+void f058() { if (*(pc+2) != ';') { rpush(pc-st.code+2); } pc = CA(GET_WORD(pc)); }
+void f059() { if (rsp > rb) { pc = 0; rsp = rb + 1; } else { pc = CA(rpop()); } }
+void f060() { NOS = (NOS < TOS) ? 1 : 0; DROP1; }
+void f061() { NOS = (NOS == TOS) ? 1 : 0; DROP1; }
+void f062() { NOS = (NOS > TOS) ? 1 : 0; DROP1; }
+void f063() { if (pop() == 0) { pc = CA(GET_WORD(pc)); } else { pc += 2; } }
+void f064() { TOS = GET_LONG((byte*)TOS); }
+void f065() { /* A */ }
+void f066() { /* B */ }
+void f067() { y = (byte*)TOS; TOS=0; while (*(y++)) { ++TOS; }; }
+void f068() { --TOS; }
+void f069() { /* E */ }
+void f070() { ir = *(pc++); if (ir == '.') { printStringF("%g", fpop()); }
+    else if (ir == '#') { fpush(FTOS); }
+    else if (ir == '$') { float x = FTOS; FTOS = FNOS; FNOS = x; }
+    else if (ir == '%') { fpush(FNOS); }
+    else if (ir == '\\') { FDROP; }
+    else if (ir == 'i') { fpush((float)pop()); }
+    else if (ir == 'o') { push((CELL)fpop()); }
+    else if (ir == '+') { FNOS += FTOS; FDROP; }
+    else if (ir == '-') { FNOS -= FTOS; FDROP; }
+    else if (ir == '*') { FNOS *= FTOS; FDROP; }
+    else if (ir == '/') { FNOS /= FTOS; FDROP; }
+    else if (ir == '<') { push((FNOS < FTOS) ? 1 : 0); FDROP; FDROP; }
+    else if (ir == '>') { push((FNOS > FTOS) ? 1 : 0); FDROP; FDROP; } }
+void f071() { pc = CA((WORD)pop()); }
+void f072() { /* H */ }
+void f073() { push(L0); }
+void f074() { pc = CA(GET_WORD(pc)); }
+void f075() { ir = *(pc++); if (ir == '@') { push(getChar()); } 
+    else if (ir == '?') { push(charAvailable()); } }
+void f076() { /* L */ }
+void f077() { L0 += pop(); }
+void f078() { /* N */ }
+void f079() { /* O */ }
+void f080() { ++TOS; }
+void f081() { ir = *(pc++); if (ir == '<') { rpush(pop()); }
+    if (ir == '>') { push(rpop()); }
+    if (ir == '@') { push(stks[rsp]); } }
+void f082() { /* R */ }
+void f083() { ir = *(pc++); if (ir == 'L') { NOS = (NOS << TOS); }
+    else if (ir == 'R') { NOS = (NOS >> TOS); } DROP1; }
+void f084() { t1 = pop(); y = (byte*)pop(); while (t1--) printChar(*(y++)); }
+void f085() { /* U */ }
+void f086() { /* V */ }
+void f087() { /* W */ }
+void f088() { /* X */ }
+void f089() { vmReset(); }
+void f090() { doType((byte*)pop(), -1, 0); }
+void f091() { lsp += 3; L2 = (CELL)pc;
+    L1 = (TOS > NOS) ? TOS : NOS;
+    L0 = (TOS < NOS) ? TOS : NOS; DROP2; }
+void f092() { DROP1; }
+void f093() { ++L0; if (L0 < L1) { pc = (byte*)L2; } else { lsp -= 3; } }
+void f094() { ir=*(pc++); if (ir=='W') { lsp-=1; } else if (ir=='F') { lsp=-3; } }
+void f095() { TOS = -TOS; }
+void f096() { /* ` */ }
+void f097() { /* a */ }
+void f098() { ir = *(pc++); if (ir == '~') { TOS = ~TOS; }
+    else if (ir == '%') { NOS %= TOS; DROP1; }
+    else if (ir == '&') { NOS &= TOS; DROP1; }
+    else if (ir == '^') { NOS ^= TOS; DROP1; }
+    else if (ir == '|') { NOS |= TOS; DROP1; }
+    else { --pc; printChar(32); } }
+void f099() { ir=*(pc++); if (ir=='@') { TOS=*AOS; } else if (ir=='!') { *AOS=(byte)NOS; DROP2; } }
+void f100() { t1=*(pc++)-'0'; if (BTW(t1,0,9)) { --locals[lb+t1]; } }
+void f101() { /* e */ }
+void f102() { pc = doFile(ir, pc); }
+void f103() { /* g */ }
+void f104() { /* h */ }
+void f105() { t1=*(pc++)-'0'; if (BTW(t1,0,9)) { ++locals[lb+t1]; } }
+void f106() { /* j */ }
+void f107() { /* k */ }
+void f108() { if ((lb+10)<LOCALS_SZ) { lb+=10; } }
+void f109() { if (lb>9) { lb-=10; } }
+void f110() { /* n */ }
+void f111() { /* o */ }
+void f112() { /* p */ }
+void f113() { /* q */ }
+void f114() { t1=*(pc++)-'0'; if (BTW(t1,0,9)) { push(locals[lb+t1]); } }
+void f115() { t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]=pop(); } }
+void f116() { printString((char*)pop()); }
+void f117() { /* u */ }
+void f118() { t1=GET_LONG(pc); pc+=4; push((CELL)&st.vars[t1]); }
+void f119() { ir = *(pc++); if (ir=='@') { TOS=GET_WORD(AOS); }
+    else if (ir=='!') { SET_WORD(AOS, (WORD)NOS); DROP2; } }
+void f120() { ir=*(pc++); if (ir=='S') { doDotS(); }                    // .S
+    else if (ir=='}') { pc=(byte*)L0; }                                 // AGAIN
+    else if (ir=='A') { st.oVHERE+=pop(); st.VHERE=st.oVHERE; }         // ALLOT
+    else if (ir=='T') { push(timer()); }                                // TIMER
+    else if (ir=='Y') { y=(byte*)pop(); system((char*)y); }             // SYSTEM
+    else if (ir=='D') { doWords(); }                                    // WORDS
+    else if (ir=='W') { doSleep(); }                                    // MS
+    else if (ir=='Q') { isBye=1; return; } }
+void f121() { /* y */ }
+void f122() { pc=doExt(*pc, pc+1); }
+void f123() { ++lsp; L0=(CELL)pc; }
+void f124() { /* | */ }
+void f125() { if (pop()) { pc=(byte*)L0; } else { lsp--; } }
+void f126() { TOS=(TOS)?0:1; }
+void f127() {}
+
+void (*q[128])() = { 
+    fXXX,f001,f002,fXXX,f004,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,
+    fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,fXXX,
+    f032,f033,f034,f035,f036,f037,f038,f039,f040,f041,f042,f043,f044,f045,f046,f047,
+    fNUM,fNUM,fNUM,fNUM,fNUM,fNUM,fNUM,fNUM,fNUM,fNUM,f058,f059,f060,f061,f062,f063,
+    f064,f065,f066,f067,f068,f069,f070,f071,f072,f073,f074,f075,f076,f077,f078,f079,
+    f080,f081,f082,f083,f084,f085,f086,f087,f088,f089,f090,f091,f092,f093,f094,f095,
+    f096,f097,f098,f099,f100,f101,f102,f103,f104,f105,f106,f107,f108,f109,f110,f111,
+    f112,f113,f114,f115,f116,f117,f118,f119,f120,f121,f122,f123,f124,f125,f126,f127
+    };
+
+void run(WORD start) {
+    pc = CA(start);
+    lsp = isError = 0;
+    if (sp < sb) { sp = sb - 1; }
+    if (rsp > rb) { rsp = rb + 1; }
+    if (fsp < 0) { fsp = 0; }
+    if (9 < fsp) { fsp = 9; }
+    while (pc) {
+        ir = *(pc++);
+        q[ir]();
     }
 }
