@@ -8,6 +8,7 @@
 // strcatnw  ( n w dst-- )  Stringify n to width w and append to dst
 // strcatn   ( n dst-- )    Stringify n and append to dst
 // strcpy    ( src dst-- )  Copy src to dst
+// streq     ( s1 s2--f )   f: 1 if s1 and s2 are equivalent, else 0
 
 : strtrunc ( a--a ) dup 0 swap c! ;
 : strend ( a1--a2 ) count + ;
@@ -25,3 +26,10 @@
     -tmps ;
 : strcatn ( n dst-- ) 0 swap strcatnw ;
 : strcpy ( src dst-- ) strtrunc strcat ;
+: streq ( s1 s2--f ) +tmps s2 s1
+    begin
+        r1 c@ dup s3 r2 c@
+        <> .if -tmps unloop-w 0 exit .then
+        r3 0= .if -tmps unloop-w 1 exit .then
+        i1 i2
+    again ;
