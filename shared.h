@@ -166,17 +166,6 @@ extern CELL timer();
 extern void doSleep();
 extern WORD getXT(WORD, DICT_T *);
 
-extern int strLen(const char* str);
-extern byte strEq(const char* x, const char* y);
-extern byte strEqI(const char* x, const char* y);
-extern char* strCat(char* d, const char* s);
-extern char* strCpy(char* d, const char* s);
-extern char* strCatC(char* d, char c);
-extern char* strCatD(char* d, int c);
-extern char* strCatN(char* d, int n, int base);
-extern char* rtrim(char* str);
-
-
 // FILEs
 extern byte *doFile(CELL, byte *);
 extern void fileInit();

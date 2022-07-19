@@ -164,12 +164,6 @@ void WComma(WORD v) { SET_WORD(&st.code[st.HERE], v); st.HERE += 2; }
 
 char lower(char c) { return BTW(c, 'A', 'Z') ? (c + 32) : c; }
 
-int strLen(const char* str) {
-    int l = 0;;
-    while (*(str++)) { ++l; }
-    return l;
-}
-
 byte strEq(const char *x, const char *y) {
     while (*x && *y && (*x == *y)) { ++x; ++y; }
     return (*x || *y) ? 0 : 1;
@@ -183,44 +177,16 @@ byte strEqI(const char *x, const char *y) {
     return (*x || *y) ? 0 : 1;
 }
 
-char *strCat(char* d, const char* s) {
-    char* x = d + strLen(d);
-    while (*s) { *(x++) = *(s++); }
-    *x = 0;
-    return d;
-}
-
-char *strCpy(char* d, const char* s) {
+char *strCpy(char *d, const char *s) {
+    while (*s) { *(d++) = *(s++); }
     *d = 0;
-    return strCat(d, s);
-}
-
-char *strCatC(char* d, char c) {
-    char *x = d + strLen(d);
-    *(x++) = c;
-    *(x++) = 0;
     return d;
 }
 
-char *strCatD(char* d, int c) {
-    c += '0';
-    if (c > '9') c += 7;
-    return strCatC(d, c);
-}
-
-char *strCatN(char* d, int n, int base) {
-    char x[32],*y=&x[31];
-    int isNeg = (n<0) && (base==10);
-    if (isNeg) { n = -n; }
-    *(--y) = 0;
-    do {
-        int c = n % base + '0';
-        if (c > '9') c += 7;
-        *(--y) = c;
-        n /= base;
-    } while (n);
-    if (isNeg) *(--y) = '-';
-    return strCat(d, y);
+int strLen(const char *str) {
+    int l = 0;;
+    while (*(str++)) { ++l; }
+    return l;
 }
 
 char *rtrim(char* str) {
