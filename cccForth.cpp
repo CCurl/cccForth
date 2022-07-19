@@ -589,6 +589,7 @@ void systemWords() {
     sprintF(cp, ": la %lu ;", (UCELL)&st.LAST);    doParse(cp);
     sprintF(cp, ": va %lu ;", (UCELL)&st.oVHERE);  doParse(cp);
     sprintF(cp, ": base %lu ;", (UCELL)&BASE);     doParse(cp);
+    sprintF(cp, ": >in %lu ;", (UCELL)&in);        doParse(cp);
 }
 
 #if __BOARD__ == PC
