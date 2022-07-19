@@ -202,6 +202,18 @@ AGAIN    (--)              Jump to BEGIN. Use IF UNLOOP-W EXIT THEN to break out
 UNLOOP-W (--)              Drop top 1 entry from loop stack (unwind WHILE loop)
 EXIT     (--)              Exit the word immediately (don't forget to UNLOOP-<x> first if in a LOOP)
 
+*** STRINGS ***
+STR-CAT    ( src dst-- )   Concatenate src to dst
+STR-CPY    ( src dst-- )   Copy src to dst
+STR-END    ( a1--a2 )      a2: the end of string a1
+STR-EQ     ( s1 s2--f )    f: 1 if s1 and s2 are equivalent, else 0 (case-sensitive)
+STR-EQI    ( s1 s2--f )    f: 1 if s1 and s2 are equivalent, else 0 (case-insensitive)
+STR-LEN    ( str--n )      n: length of string str
+STR-RTRIM  ( str--str )    Trim rightmost chars from str whose ASCII value < 32
+STR-TRUNC  ( str--str )    Truncate str to 0 length
+
+NOTE: Strings in cccForth are NULL-TERMINATED, not COUNTED
+
 *** TEMPORARY VARIABLES ***
 +TMPS    (--)              Allocate 10 temp variables, r0 .. r9
 rX       (--n)             n: read value of temp var X (X:[0..9])

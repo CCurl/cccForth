@@ -14,8 +14,6 @@ PRIM_T prims[] = {
     , { "-", "-" }
     , { "/", "/" }
     , { "*", "*" }
-    , { "<<", "SL" }
-    , { ">>", "SR" }
     , { "ABS", "#0<(_)" }
     , { "/MOD", "&" }
     , { "MOD", "b%" }
@@ -84,11 +82,22 @@ PRIM_T prims[] = {
     , { "!=", "=~" }
     , { "0=", "~" }
     , { "EXIT", ";" }
+    // String
+    , { "STR-LEN", "Sl" }
+    , { "STR-END", "Se" }
+    , { "STR-CAT", "Sa" }
+    , { "STR-CPY", "Sy" }
+    , { "STR-EQ", "S=" }
+    , { "STR-EQI", "Si" }
+    , { "STR-TRUNC", "St" }
+    , { "STR-RTRIM", "Sr" }
     // Binary/bitwise
     , { "AND", "b&" }
     , { "OR", "b|" }
     , { "XOR", "b^" }
     , { "COM", "b~" }
+    , { "<<", "bL" }
+    , { ">>", "bR" }
     // Float
     , { "Fi", "Fi" }  // In
     , { "Fo", "Fo" }  // Out
@@ -164,12 +173,18 @@ void WComma(WORD v) { SET_WORD(&st.code[st.HERE], v); st.HERE += 2; }
 
 char lower(char c) { return BTW(c, 'A', 'Z') ? (c + 32) : c; }
 
-byte strEq(const char *x, const char *y) {
+int strLen(const char* str) {
+    int l = 0;;
+    while (*(str++)) { ++l; }
+    return l;
+}
+
+int strEq(const char *x, const char *y) {
     while (*x && *y && (*x == *y)) { ++x; ++y; }
     return (*x || *y) ? 0 : 1;
 }
 
-byte strEqI(const char *x, const char *y) {
+int strEqI(const char *x, const char *y) {
     while (*x && *y) {
         if (lower(*x) != lower(*y)) { return 0; }
         ++x; ++y;
@@ -178,21 +193,22 @@ byte strEqI(const char *x, const char *y) {
 }
 
 char *strCpy(char *d, const char *s) {
-    while (*s) { *(d++) = *(s++); }
-    *d = 0;
+    char *x = d;
+    while (*s) { *(x++) = *(s++); }
+    *x = 0;
     return d;
 }
 
-int strLen(const char *str) {
-    int l = 0;;
-    while (*(str++)) { ++l; }
-    return l;
+char *strCat(char *d, const char *s) {
+    char *x = d+strLen(d);
+    strCpy(x, s);
+    return d;
 }
 
-char *rtrim(char* str) {
-    char *cp = str + strLen(str);
-    while ((str <= cp) && (*cp <= ' ')) { *(cp--) = 0; }
-    return str;
+char *rTrim(char *d) {
+    char *x = d+strLen(d);
+    while ((d<=x) && (*x<=' ')) { *(x--) = 0; }
+    return d;
 }
 
 void printStringF(const char *fmt, ...) {

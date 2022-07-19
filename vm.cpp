@@ -168,8 +168,14 @@ void run(WORD start) {
         case 'Q': ir = *(pc++); if (ir == '<') { rpush(pop()); }                    // >R, R@, R>
                 if (ir == '>') { push(rpop()); }
                 if (ir == '@') { push(stks[rsp]); }                          break;
-        case 'S': ir = *(pc++); if (ir == 'L') { NOS = (NOS << TOS); }              // LSHIFT, RSHIFT
-                else if (ir == 'R') { NOS = (NOS >> TOS); } DROP1;           break;
+        case 'S': ir = *(pc++); if (ir == 'l') { TOS = strLen(CTOS); }              // STR-LEN
+                else if (ir == 'e') { TOS += strLen(CTOS); }                        // STR-END
+                else if (ir == 'a') { strCat(CTOS, CNOS); DROP2; }                  // STR-CAT
+                else if (ir == 'y') { strCpy(CTOS, CNOS); DROP2; }                  // STR-CPY
+                else if (ir == '=') { NOS = strEq(CTOS, CNOS); DROP1; }             // STR-EQ
+                else if (ir == 'i') { NOS = strEqI(CTOS, CNOS); DROP1; }            // STR-EQI
+                else if (ir == 'r') { TOS = (CELL)rTrim(CTOS); }                    // STR-RTRIM
+                else if (ir == 't') { *CTOS = 0; }                           break; // STR-TRUNC
         case 'T': t1=pop(); y=(byte*)pop(); while (t1--) printChar(*(y++));  break; // TYPE (a c--)
         case 'Y': vmReset();                                                return; // RESET
         case 'Z': doType((byte *)pop(),-1, 0);                               break; // ZTYPE
@@ -187,6 +193,8 @@ void run(WORD start) {
                 else if (ir == '&') { NOS &= TOS; DROP1; }
                 else if (ir == '^') { NOS ^= TOS; DROP1; }
                 else if (ir == '|') { NOS |= TOS; DROP1; }
+                else if (ir == 'L') { NOS = (NOS << TOS); DROP1; }
+                else if (ir == 'R') { NOS = (NOS >> TOS); DROP1; }
                 else { --pc; printChar(32); } break;
         case 'c': ir = *(pc++); if (ir=='@') { TOS = *(byte*)(TOS); }
                 else if(ir=='!') { *AOS = (byte)NOS; DROP2; }                break; // c@, c!

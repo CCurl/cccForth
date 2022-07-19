@@ -102,6 +102,8 @@
 #define TOS           stks[sp]
 #define NOS           stks[sp-1]
 #define AOS           (byte*)TOS
+#define CTOS          (char*)TOS
+#define CNOS          (char*)NOS
 #define L0            lstk[lsp]
 #define L1            lstk[lsp-1]
 #define L2            lstk[lsp-2]
@@ -150,8 +152,12 @@ extern void printStringF(const char*, ...);
 extern void printChar(char);
 extern void printBase(CELL, CELL);
 extern int strLen(const char *);
+extern char *strCpy(char *,const char *);
+extern char *strCat(char *,const char *);
+extern int strEq(const char *,const char *);
+extern int strEqI(const char *,const char *);
 extern char *sprintF(char* dst, const char* fmt, ...);
-extern char *rtrim(char *);
+extern char *rTrim(char *);
 extern void run(WORD);
 extern int doFind(const char *);
 extern void doParse(const char *);

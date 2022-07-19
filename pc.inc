@@ -124,7 +124,7 @@ void loop() {
     FILE* fp = (input_fp) ? input_fp : stdin;
     if (input_fp) {
         if (fgets(tib, 128, fp) == tib) {
-            doParse(rtrim(tib));
+            doParse(rTrim(tib));
         } else {
             fclose(input_fp);
             input_fp = fpPop();
@@ -133,7 +133,7 @@ void loop() {
         doOK();
         fgets(tib, 128, stdin);
         doHistory(tib);
-        doParse(rtrim(tib));
+        doParse(rTrim(tib));
     }
 }
 
