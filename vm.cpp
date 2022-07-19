@@ -4,6 +4,7 @@ byte sp, rsp, lsp, lb, isError, sb, rb, fsp, *y;
 CELL BASE, stks[STK_SZ], locals[LOCALS_SZ];
 CELL lstk[LSTK_SZ+1];
 float fstk[FLT_SZ];
+char c, cs[4], *pc1, *pc2;
 
 ST_T st;
 
@@ -159,6 +160,8 @@ void run(WORD start) {
                 else if(ir=='<') { push((FNOS<FTOS)?1:0); FDROP; FDROP; }
                 else if(ir=='>') { push((FNOS>FTOS)?1:0); FDROP; FDROP; }    break;
         case 'G': pc = CA((WORD)pop());                                      break; // EXECUTE (GOTO)
+        case 'H': ir = *(pc++); if (ir == 'L') { NOS = (NOS << TOS); }              // LSHIFT, RSHIFT
+                else if (ir == 'R') { NOS = (NOS >> TOS); } DROP1;           break;
         case 'I': push(L0);                                                  break; // I
         case 'J': pc = CA(GET_WORD(pc));                                     break; // BRANCH
         case 'K': ir = *(pc++); if (ir=='@') { push(getChar()); }                   // KEY?, KEY
@@ -168,8 +171,12 @@ void run(WORD start) {
         case 'Q': ir = *(pc++); if (ir == '<') { rpush(pop()); }                    // >R, R@, R>
                 if (ir == '>') { push(rpop()); }
                 if (ir == '@') { push(stks[rsp]); }                          break;
-        case 'S': ir = *(pc++); if (ir == 'L') { NOS = (NOS << TOS); }              // LSHIFT, RSHIFT
-                else if (ir == 'R') { NOS = (NOS >> TOS); } DROP1;           break;
+        case 'S': ir = *(pc++); pc1=(char*)pop(); if (ir == 'a') { *pc1=0; }            // STR-TRUNC
+                if (ir == 'b') { pc2=(char*)pop(); strcat(pc1,pc2); }        // STR-CAT
+                if (ir == 'c') { c=(char)pop(); cs[0]=c; cs[1]=0; strcat(pc1,cs); }        // STR-CATC
+                if (ir == 'd') {  }
+                if (ir == 'e') {  }
+                if (ir == 'f') {  }                          break;
         case 'T': t1=pop(); y=(byte*)pop(); while (t1--) printChar(*(y++));  break; // TYPE (a c--)
         case 'Y': vmReset();                                                return; // RESET
         case 'Z': doType((byte *)pop(),-1, 0);                               break; // ZTYPE
