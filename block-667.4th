@@ -1,11 +1,16 @@
 // Tests
 
+12345 constant xxx
+xxx .
+
 : elapsed timer swap - ;
 : mil 1000 dup * * ;
 : bm timer swap 1 for next elapsed ." %d ms" ;
 
-: here ha @ ;
+: here ha @ cb + ;
 here s7
+
+
 
 : T1 if 'Y' else 'N' then emit ;
 : T2 cr 1 2 3 + + . 19 42 for i . next ;

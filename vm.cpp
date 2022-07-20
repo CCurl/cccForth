@@ -142,8 +142,8 @@ void run(WORD start) {
         case '=': NOS = (NOS == TOS) ? 1 : 0; DROP1;                         break; // =
         case '<': NOS = (NOS < TOS) ? 1 : 0; DROP1;                          break; // <
         case '?': if (pop()==0) { pc=CA(GET_WORD(pc)); } else { pc+=2; }     break; // 0BRANCH
-        case '@': TOS = GET_LONG((byte*)TOS);                                break; // FETCH
-        case 'C': y=(byte*)TOS; TOS=0; while (*(y++)) { ++TOS; };            break; // STRLEN (a--c)
+        case '@': TOS = GET_LONG(AOS);                                       break; // FETCH
+        case 'C': y=AOS; TOS=0; while (*(y++)) { ++TOS; };                   break; // STRLEN (a--c)
         case 'D': --TOS;                                                     break; // 1-
         case 'F': ir = *(pc++); if (ir=='.') { printStringF("%g",fpop()); }         // FLOAT ops
                 else if (ir=='#') { fpush(FTOS); }
@@ -196,7 +196,7 @@ void run(WORD start) {
                 else if (ir == 'L') { NOS = (NOS << TOS); DROP1; }
                 else if (ir == 'R') { NOS = (NOS >> TOS); DROP1; }
                 else { --pc; printChar(32); } break;
-        case 'c': ir = *(pc++); if (ir=='@') { TOS = *(byte*)(TOS); }
+        case 'c': ir = *(pc++); if (ir=='@') { TOS = *AOS; }
                 else if(ir=='!') { *AOS = (byte)NOS; DROP2; }                break; // c@, c!
         case 'd': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { --locals[lb+t1]; }      break; // decLocal
         case 'i': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { ++locals[lb+t1]; }      break; // incLocal

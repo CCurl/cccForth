@@ -512,6 +512,7 @@ int doParseWord(char *wd) {
 
     if (strEqI(wd, "CONSTANT")) {
         if (getWord(wd)) {
+            doExec();
             doCreate(wd, 0);
             doNumber(0);
             CComma(';');
