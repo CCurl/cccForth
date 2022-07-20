@@ -10,14 +10,14 @@ xxx .
 : here ha @ cb + ;
 here s7
 
-
-
 : T1 if 'Y' else 'N' then emit ;
 : T2 cr 1 2 3 + + . 19 42 for i . next ;
 : T3 cr 20 s1 begin r1 . d1 r1 while ;
 : T4 cr +tmps 123 445 s2 s1 r1 . r2 . -tmps ;
 : T5 cr +tmps 666 777 s2 s1 r1 . r2 . T4 r1 . r2 . -tmps ;
 : T6 s6 for i . i r6 = .if unloop-f exit .then next ." out6" ;
+
+: xx ;
 
 cr 1 T1 0 T1 
 T2 T3 T4 T5
