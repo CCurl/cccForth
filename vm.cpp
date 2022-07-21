@@ -165,7 +165,7 @@ void run(WORD start) {
                 else if(ir=='?') { push(charAvailable()); }                  break;
         case 'M': L0 += pop();                                               break; // +I
         case 'P': ++TOS;                                                     break; // 1+
-        case 'Q': ir = *(pc++); if (ir == '<') { rpush(pop()); }                    // >R, R@, R>
+        case 'R': ir = *(pc++); if (ir == '<') { rpush(pop()); }                    // >R, R@, R>
                 if (ir == '>') { push(rpop()); }
                 if (ir == '@') { push(stks[rsp]); }                          break;
         case 'S': ir = *(pc++); if (ir == 'l') { TOS = strLen(CTOS); }              // STR-LEN
