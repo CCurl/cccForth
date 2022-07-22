@@ -151,9 +151,9 @@ ZTYPE    (a--)             Output string at a. See (1).
 example: : ascii $20 '~' for i i i i ." %n%d: (%c) %x %b" next ;
 
 *** FILE ***
-FOPEN    (a n--fh)         a: file name, fh: file handle, n: 0 => READ, else WRITE
-FREAD    (fh--c n)         c: next char from file fh, n: number chars read (0 => EOF)
-FWRITE   (c fh--)          c: char to write to file fh.
+FOPEN    (a n--fh)         a: file name, n: 0 => READ, else WRITE, fh: file handle
+FGETC    (fh--c n)         c: next char from file fh, n: 1 if a char was read, else 0 (EOF).
+FPUTC    (c fh--)          c: char to write to file fh.
 FCLOSE   (fh--)            fh: file handle to close.
 FDELETE  (fn--)            fn: The name of the file to be deleted.
 FLIST    (--)              Print the list of files created on the dev board.

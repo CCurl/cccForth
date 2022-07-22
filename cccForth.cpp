@@ -134,8 +134,8 @@ PRIM_T prims[] = {
 #ifdef __FILES__
     // Extension: FILE operations
     , { "FOPEN", "fO" }
-    , { "FREAD", "fR" }
-    , { "FWRITE", "fW" }
+    , { "FGETC", "fR" }
+    , { "FPUTC", "fW" }
     , { "FCLOSE", "fC" }
     , { "FDELETE", "fD" }
     , { "FLIST", "fL" }
@@ -576,7 +576,7 @@ void doOK() {
     if (STATE) { printString(" ... "); return; }
     printString("\r\nOK ");
     doDotS();
-    printString(">");
+    printString("> ");
 }
 
 void systemWords() {
