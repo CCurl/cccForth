@@ -238,8 +238,10 @@ int isTempWord(const char *nm) {
 }
 
 void doCreate(const char *name, byte f) {
+    doExec();
     if (isTempWord(name)) {
         tempWords[name[1]-'0'] = st.HERE;
+        STATE = 1;
         return;
     }
     DICT_T *dp = DP_AT(st.HERE);
@@ -248,6 +250,7 @@ void doCreate(const char *name, byte f) {
     strCpy(dp->name, name);
     st.LAST = st.HERE;
     st.HERE += strLen(name) + 3;
+    STATE = 1;
 }
 
 int doFind(const char *name) {
@@ -455,7 +458,6 @@ int doParseWord(char *wd) {
         doExec();
         if (getWord(wd) == 0) { return 0; }
         doCreate(wd, 0);
-        STATE = 1;
         return 1;
     }
 
@@ -502,7 +504,6 @@ int doParseWord(char *wd) {
             doCreate(wd, 0);
             doNumber('v');
             CComma(';');
-            STATE = 1;
             doExec();
             STATE = 0;
             return 1;
@@ -512,11 +513,9 @@ int doParseWord(char *wd) {
 
     if (strEqI(wd, "CONSTANT")) {
         if (getWord(wd)) {
-            doExec();
             doCreate(wd, 0);
             doNumber(0);
             CComma(';');
-            STATE = 1;
             doExec();
             STATE = 0;
             return 1;
