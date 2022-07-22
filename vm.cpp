@@ -69,19 +69,20 @@ byte *doType(byte *a, int l, int delim) {
     if (l < 0) { l = 0; while (a[l]!=delim) { ++l; } }
     byte* e = a+l;
     while (a < e) {
-        byte c = *(a++);
+        char c = (char)*(a++);
         if (c == '%') {
-            c = *(a++);
-            if (c == 'b') { printBase(pop(), 2); }
-            else if (c == 'c') { printChar((char)pop()); }
-            else if (c == 'd') { printBase(pop(), 10); }
-            else if (c == 'f') { printStringF("%g",fpop()); }
-            else if (c == 'n') { printString("\r\n"); }
-            else if (c == 'q') { printChar('"'); }
-            else if (c == 'x') { printBase(pop(), 16); }
-            else printChar((char)c);
-        }
-        else { printChar((char)c); }
+            c = *(a++); 
+            switch (c) {
+            case 'b': printBase(pop(), 2);          break;
+            case 'c': printChar((char)pop());       break;
+            case 'd': printBase(pop(), 10);         break;
+            case 'f': printStringF("%g", fpop());   break;
+            case 'n': printString("\r\n");          break;
+            case 'q': printChar('"');               break;
+            case 'x': printBase(pop(), 16);         break;
+            default: printChar(c);                  break;
+            }
+        } else { printChar(c); }
     }
     if (delim) { ++e; }
     return e;
