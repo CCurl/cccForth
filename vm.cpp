@@ -1,8 +1,7 @@
 #include "shared.h"
 
 byte sp, rsp, lsp, lb, isError, sb, rb, fsp, *y;
-CELL BASE, stks[STK_SZ], locals[LOCALS_SZ];
-CELL lstk[LSTK_SZ+1];
+CELL BASE, stks[STK_SZ], locals[LOCALS_SZ], lstk[LSTK_SZ+1], seed;
 float fstk[FLT_SZ];
 
 ST_T st;
@@ -100,6 +99,14 @@ byte* doFile(CELL ir, byte* pc) {
     else if (ir == 'W') { fWrite(); }
     else if (ir == 'C') { fClose(); }
     return pc;
+}
+
+ CELL doRand() {
+    if (seed == 0) { seed = clock(); }
+    seed ^= (seed << 13);
+    seed ^= (seed >> 17);
+    seed ^= (seed << 5);
+    return seed & 0x7FFFFFFF;
 }
 
 void run(WORD start) {

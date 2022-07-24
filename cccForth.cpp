@@ -211,15 +211,6 @@ char *rTrim(char *d) {
     return d;
 }
 
-long doRand() {
-    static long seed = 0;
-    if (seed == 0) { seed = clock(); }
-    seed ^= (seed << 13);
-    seed ^= (seed >> 17);
-    seed ^= (seed << 5);
-    return seed & 0x7FFFFFFF;
-}
-
 void printStringF(const char *fmt, ...) {
     char *buf = (char*)&st.vars[VARS_SZ-100];
     va_list args;
