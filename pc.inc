@@ -85,20 +85,12 @@ void doLoad(int blk) {
     }
 }
 
-long doRand() {
-    static long seed = clock();
-    seed ^= (seed << 13);
-    seed ^= (seed >> 17);
-    seed ^= (seed <<  5);
-    return seed;
-}
 
 byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
     case 'E': doEditor();                       break;
     case 'F': return doFile(ir, pc);
     case 'L': doLoad(pop());                    break;
-    case 'R': push(doRand());                   break;
     case 'T': push(clock());                    break;
     case 'W': if (TOS) { Sleep(TOS); } pop();   break;
     default: printString("-unk ext-");

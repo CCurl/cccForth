@@ -71,7 +71,7 @@ PRIM_T prims[] = {
     , { "BEGIN", "{" }
     , { "WHILE", "}" }
     , { "UNTIL", "~}" }
-    , { "AGAIN", "x}" }
+    , { "AGAIN", "1}" }
     , { "UNLOOP-W", "^W" }
     , { "=", "=" }
     , { "<", "<" }
@@ -123,7 +123,7 @@ PRIM_T prims[] = {
     , { "MS", "xW" }
     , { "NOP", " " }
     , { "NOT", "~" }
-    , { "RAND", "zR" }
+    , { "RAND", "xR" }
     , { "RESET", "Y" }
     , { "SPACE", "32," }
     , { "SYSTEM", "xY" }
@@ -209,6 +209,15 @@ char *rTrim(char *d) {
     char *x = d+strLen(d);
     while ((d<=x) && (*x<=' ')) { *(x--) = 0; }
     return d;
+}
+
+long doRand() {
+    static long seed = 0;
+    if (seed == 0) { seed = clock(); }
+    seed ^= (seed << 13);
+    seed ^= (seed >> 17);
+    seed ^= (seed << 5);
+    return seed & 0x7FFFFFFF;
 }
 
 void printStringF(const char *fmt, ...) {

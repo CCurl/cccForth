@@ -163,6 +163,7 @@ extern int doFind(const char *);
 extern void doParse(const char *);
 extern void doDotS();
 extern void doWords();
+extern long doRand();
 extern void doOK();
 extern byte *doExt(CELL, byte *);
 extern void doEditor();

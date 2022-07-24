@@ -234,7 +234,7 @@ EXECUTE  (a--)             Jump to CODE address a
 LOAD     (n--)             Load block n from disk
 LOOKUP x (--f | xt i f)    Lookup x. If found f=1, i: immediate and xt: offset. Else f=0, and i and xt are not pushed.
 NOP      (--)              Do nothing
-RAND     (--n)             n: a RANDOM 32-bit number
+RAND     (--n)             n: a RANDOM 31-bit number (0..$7FFFFFFF)
 RESET    (--)              Re-initialize cccForth
 SYSTEM   (a--)             a: string to send to system() ... eg: " dir" system (PC)
 TIMER    (--n)             n: Time in MS
