@@ -23,3 +23,6 @@ reset
 : FG ( fg -- ) 40 swap COLOR ;
 : C-ON  #27 ." %c[?25h" ;
 : C-OFF #27 ." %c[?25l" ;
+
+: min ( a b--x ) dup dup > .if swap .then drop ;
+: max ( a b--x ) dup dup < .if swap .then drop ;

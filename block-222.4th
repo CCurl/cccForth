@@ -1,9 +1,9 @@
 // A genetic algorithm
 
 1 load
-223 load
-// : rand-neu ;
-// : work-conns ;
+// 223 load
+: rand-neu rand ;
+: work-conns ;
 
 200 constant maxC
  55 constant maxR
@@ -23,15 +23,15 @@ variable world world-sz allot
 : worldPaint ( -- ) 1 1 ->XY 1 maxR for i worldPaintR next ;
 
 // connection
-// [from:1][to:1][weight:2]
+// [from:8][to:8][weight:16]
 // from: [type:1][id:7] - type: 0=>input, 1=>hidden
 // to:   [type:1][id:7] - type: 0=>output, 1=>hidden
 // weight: normalized to -400 to 400
 4 constant conn-sz
 
 // critter:
-// [c:1][r:1][color:1][unused:1][connections:?]
-#conns conn-sz * 4+      constant critter-sz
+// [c:1][r:1][color:1][unused:1][connections:#conns]
+#conns conn-sz * 4 +      constant critter-sz
 #crits 1+ critter-sz *   constant critters-sz
 variable critters #crits 1+ critter-sz * allot
 : critters-end critters critters-sz + ;
@@ -49,11 +49,11 @@ variable critters #crits 1+ critter-sz * allot
 : setCLR ( n-- ) r6 2+ c! ;
 : getCLR ( --n ) r6 2+ c@ ;
 
-: +rand rand abs ;
-: rand-cr +rand maxC mod 1+ setC +rand maxR mod 1+ setR ;
+// : +rand rand abs ;
+: rand-cr rand maxC mod 1+ setC rand maxR mod 1+ setR ;
 : rand-clr rand 7 mod 31 + setCLR ;
-: randCrit rand-cr rand-clr r6 4+ 1 #conns for rand-neu over ! 4+ next drop ;
-: randCrits 1 #crits for i setCrit randCrit next ;
+: randCrit rand-cr rand-clr r6 4 + 0 #conns for rand-neu over ! 4 + next drop ;
+: randCrits 0 #crits for i setCrit randCrit next ;
 
 : normC ( c--c1 ) maxC min 1 max ;
 : normR ( r--r1 ) maxR min 1 max ;
@@ -72,27 +72,27 @@ variable critters #crits 1+ critter-sz * allot
 : crit-Paint getCLR FG getCR ->XY '*' emit ;
 
 : move rand 3 and up? down? left? right? ;
-: workCrit crit-Unpaint r6 4+ work-conns crit-Paint ;
+: workCrit crit-Unpaint r6 4 + work-conns crit-Paint ;
 : workCrits 1 #crits for i setCrit workCrit next ;
 : oneDay workCrits ;
 
 : dumpCrit getCLR getCR swap i ." %d: (%d,%d) %d%n" ;
 : dumpCrits 1 #crits for i setCrit dumpCrit next ;
 
-: live CLS 1 365 for oneDay key? if leave then next ;
+: live CLS 0 365 for oneDay key? if unloop-f exit then next ;
 : T0 maxC getC - 10 <= r6 3 + c! ;
 : die 1 #crits for i setCrit T0 next ;
 : next-alive ( --a ) begin 
 		r7 critter-sz + s7
 		r7 critters-end > if critters s7 then
-		r7 3 + c@ if unloop exit then
+		r7 3 + c@ if unloop-w exit then
 	while ;
 : copy-mutate ( n1--n2 ) ;
-: copy-cr rand-cr r6 4+ s9
-	s7 4+ s8
+: copy-cr rand-cr r6 4 + s9
+	s7 4 + s8
 	1 #conns for 
 		r8 @ copy-mutate r9 !
-		r8 4+ s8 r9 4+ s9
+		r8 4 + s8 r9 4 + s9
 	next ;
 : T1 r6 3 + c@ if rand-cr else next-alive copy-cr then ;
 : regen critters s7 1 #crits for i setCrit T1 next ;
