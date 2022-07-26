@@ -11,8 +11,8 @@ void vmReset() {
     sb = 2, rb = (STK_SZ-2);
     sp = sb - 1, rsp = rb + 1;
     st.LAST = 0;
-    st.oHERE = st.HERE = 2;
-    st.oVHERE = st.VHERE = 0;
+    st.HERE = tHERE = 2;
+    st.VHERE = tVHERE = 0;
     for (int i = 0; i < CODE_SZ; i++) { st.code[i] = 0; }
     for (int i = 0; i < VARS_SZ; i++) { st.vars[i] = 0; }
     for (int i = 0; i < 10; i++) { tempWords[i] = 0; }
@@ -219,7 +219,7 @@ void run(WORD start) {
                 else if (ir == '!') { SET_WORD(AOS, (WORD)NOS); DROP2; }     break; // w@, w!
         case 'x': ir=*(pc++); if (ir=='S') { doDotS(); }                            // .S
                 else if (ir=='R') { push(doRand()); }                               // RAND
-                else if (ir=='A') { st.oVHERE+=pop(); st.VHERE=st.oVHERE; }         // ALLOT
+                else if (ir=='A') { st.VHERE+=pop(); tVHERE=st.VHERE; }             // ALLOT
                 else if (ir=='T') { push(doTimer()); }                              // TIMER
                 else if (ir=='Y') { y=(byte*)pop(); system((char*)y); }             // SYSTEM
                 else if (ir=='D') { doWords(); }                                    // WORDS

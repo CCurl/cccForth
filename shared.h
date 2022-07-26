@@ -124,8 +124,7 @@ typedef unsigned long UCELL;
 typedef unsigned short USHORT;
 
 typedef struct {
-    int oHERE, HERE, LAST;
-    int oVHERE, VHERE;
+    int HERE, VHERE, LAST;
     byte code[CODE_SZ + 4];
     byte vars[VARS_SZ + 4];
 } ST_T;
@@ -138,7 +137,7 @@ typedef struct {
 
 extern ST_T st;
 extern byte sp, isError, isBye;
-extern CELL BASE, STATE, tempWords[10];
+extern CELL BASE, STATE, tHERE, tVHERE, tempWords[10];
 extern CELL stks[];
 
 extern void vmReset();
