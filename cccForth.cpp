@@ -446,8 +446,8 @@ int doWord() {
 }
 
 int doParseWord(char *wd) {
-    if (strEq(word, "//")) { return 0; }
-    if (strEq(word, "\\")) { return 0; }
+    if (strEq(word, "//")) { doExec(); return 0; }
+    if (strEq(word, "\\")) { doExec(); return 0; }
     if (doPrim(wd))        { return 1; }
     if (doFind(wd))        { return doWord(); }
     if (isNum(wd))         { return doNumber2(); }
