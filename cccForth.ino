@@ -6,7 +6,7 @@
 #define mySerial Serial
 #define __SERIAL__
 
-CELL timer() { return millis(); }
+CELL doTimer() { return millis(); }
 void doSleep() { delay(pop()); }
 CELL getSeed() { return millis(); }
 
@@ -107,7 +107,7 @@ void handleInput(char c) {
     if (c == 13) {
         *e = 0;
         printString(" ");
-        doParse(rtrim(tib));
+        doParse(rTrim(tib));
         e = NULL;
         doOK();
         return;

@@ -19,6 +19,7 @@
   #define __WINDOWS__
   #include <Windows.h>
   #include <conio.h>
+  #include <time.h>
   #define CODE_SZ      ( 64*1024)
   #define VARS_SZ      (256*1024)
   #define STK_SZ        64
@@ -41,7 +42,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <time.h>
 
 #if __BOARD__ == TEENSY4
   #define CODE_SZ      (48*1024)
@@ -168,7 +168,7 @@ extern byte *doExt(CELL, byte *);
 extern void doEditor();
 extern int charAvailable();
 extern int getChar();
-extern CELL timer();
+extern CELL doTimer();
 extern void doSleep();
 extern WORD getXT(WORD, DICT_T *);
 

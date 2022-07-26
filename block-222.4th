@@ -15,12 +15,12 @@ variable world world-sz allot
 
 : worldClr 0 world world-sz fill-n ;
 : T0 ( c r--a ) maxC * + world + ;
-: worldSet ( n c r--) T0 c! ;
-: worldGet ( c r--n ) T0 c@ ;
-: worldPaintR ( r-- ) 1 swap T0
+: w-set ( n c r--) T0 c! ;
+: w-get ( c r--n ) T0 c@ ;
+: w-paintR ( r-- ) 1 swap T0
 	1 maxC for dup c@ dup if FG '*' else drop bl then emit 1+ next
 	drop cr ;
-: worldPaint ( -- ) 1 1 ->XY 1 maxR for i worldPaintR next ;
+: w-paint ( -- ) 1 1 ->XY 1 maxR for i w-paintR next ;
 
 // connection
 // [from:1][to:1][weight:2]

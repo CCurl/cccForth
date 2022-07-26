@@ -7,7 +7,7 @@ FILE *input_fp = NULL;
 FILE *fpStk[10];
 byte fpSP = 0;
 
-CELL timer() { return clock(); }
+CELL doTimer() { return clock(); }
 void doSleep() { Sleep(pop()); }
 
 void fpPush(FILE *v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }

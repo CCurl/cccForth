@@ -102,7 +102,7 @@ byte* doFile(CELL ir, byte* pc) {
 }
 
  CELL doRand() {
-    if (seed == 0) { seed = clock(); }
+    if (seed == 0) { seed = doTimer(); }
     seed ^= (seed << 13);
     seed ^= (seed >> 17);
     seed ^= (seed << 5);
@@ -220,7 +220,7 @@ void run(WORD start) {
         case 'x': ir=*(pc++); if (ir=='S') { doDotS(); }                            // .S
                 else if (ir=='R') { push(doRand()); }                               // RAND
                 else if (ir=='A') { st.oVHERE+=pop(); st.VHERE=st.oVHERE; }         // ALLOT
-                else if (ir=='T') { push(timer()); }                                // TIMER
+                else if (ir=='T') { push(doTimer()); }                              // TIMER
                 else if (ir=='Y') { y=(byte*)pop(); system((char*)y); }             // SYSTEM
                 else if (ir=='D') { doWords(); }                                    // WORDS
                 else if (ir=='W') { doSleep(); }                                    // MS
