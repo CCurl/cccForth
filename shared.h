@@ -132,6 +132,7 @@ typedef struct {
 typedef struct {
     byte prev;
     byte flags;
+    byte len;
     char name[32];
 } DICT_T;
 

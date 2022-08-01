@@ -73,6 +73,8 @@ PRIM_T prims[] = {
     , { "UNTIL", "~}" }
     , { "AGAIN", "1}" }
     , { "UNLOOP-W", "^W" }
+    , { "TRUE", "1_" }
+    , { "FALSE", "0" }
     , { "=", "=" }
     , { "<", "<" }
     , { ">", ">" }
@@ -95,9 +97,9 @@ PRIM_T prims[] = {
     , { "AND", "b&" }
     , { "OR", "b|" }
     , { "XOR", "b^" }
-    , { "COM", "b~" }
-    , { "<<", "bL" }
-    , { ">>", "bR" }
+    , { "INVERT", "b~" }
+    , { "LSHIFT", "bL" }
+    , { "RSHIFT", "bR" }
     // Float
     , { "Fi", "Fi" }  // In
     , { "Fo", "Fo" }  // Out
@@ -247,9 +249,10 @@ void doCreate(const char *name, byte f) {
     DICT_T *dp = DP_AT(tHERE);
     dp->prev = (byte)(tHERE - st.LAST);
     dp->flags = f;
+    dp->len = strLen(name);
     strCpy(dp->name, name);
     st.LAST = tHERE;
-    tHERE += strLen(name) + 3;
+    tHERE += dp->len + 4;
     STATE = 1;
 }
 
@@ -262,11 +265,12 @@ int doFind(const char *name) {
     }
 
     // Regular lookup
+    int len = strLen(name);
     CELL def = (WORD)st.LAST;
     while (def) {
         DICT_T* dp = DP_AT(def);
-        if (strEq(dp->name, name)) {
-            push(def + strLen(dp->name) + 3);
+        if ((len==dp->len) && strEq(dp->name, name)) {
+            push(def + len + 4);
             push(dp->flags);
             return 1;
         }

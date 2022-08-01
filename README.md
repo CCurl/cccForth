@@ -75,8 +75,8 @@ NOTEs: (1) These built into cccForth.
 -        (a b--c)          Subtraction
 /        (a b--c)          Division
 *        (a b--c)          Multiplication
-<<       (a b--c)          c: a left-shifted b bits
->>       (a b--c)          c: a right-shifted b bits
+LSHIFT   (a b--c)          c: a left-shifted b bits
+RSHIFT   (a b--c)          c: a right-shifted b bits
 ABS      (a--b)            Absolute value
 MAX      (a b--c)          c: max(a,b)
 MIN      (a b--c)          c: min(a,b)
@@ -107,7 +107,7 @@ ROT      (a b c--b c a)    Rotate a to TOS
 AND      (a b--c)          Bitwise AND
 OR       (a b--c)          Bitwise OR
 XOR      (a b--c)          Bitwise XOR
-COM      (a--b)            Bitwise COMPLEMENT
+INVERT   (a--b)            Bitwise COMPLEMENT
 
 *** FLOAT ***
 Fi       (n--)             Float In
@@ -161,6 +161,8 @@ FSAVE    (--)              Saves the system to file "/system.ccc"
 FLOAD    (--)              Loads the last saved system file, if any.
 
 *** LOGICAL ***
+FALSE    (--f)             f: 0 (FALSE)
+TRUE     (--f)             f: -1 (TRUE)
 =        (a b--f)          Equality
 <        (a b--f)          Less-than
 >        (a b--f)          Greater-than
