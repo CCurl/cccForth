@@ -156,8 +156,6 @@
     <None Include="block-001.4th" />
     <None Include="block-002.4th" />
     <None Include="block-111.4th" />
-    <None Include="block-222.4th" />
-    <None Include="block-223.4th" />
     <None Include="block-999.4th" />
     <None Include="LICENSE" />
     <None Include="cccForth.ino" />
