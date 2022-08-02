@@ -195,7 +195,7 @@ void run(WORD start) {
         case '^': ir = *(pc++); if (ir == 'W') { lsp -= 1; }                        // UNLOOP
                 else if (ir == 'F') { lsp =- 3; }                            break;
         case '_': TOS = -TOS;                                                break; // NEGATE
-        case '`': /* UNUSED */                                               break;
+        case '`': push((CELL)pc); while (*(pc++)) {}                         break; // ZQUOTE
         case 'b': ir = *(pc++); if (ir == '~') { TOS = ~TOS; }                      // BINARY ops
                 else if (ir == '%') { NOS %= TOS; DROP1; }
                 else if (ir == '&') { NOS &= TOS; DROP1; }

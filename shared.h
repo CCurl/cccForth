@@ -136,6 +136,8 @@ typedef struct {
     char name[32];
 } DICT_T;
 
+#define BIT_IMMEDIATE 0x80
+
 extern ST_T st;
 extern byte sp, isError, isBye;
 extern CELL BASE, STATE, tHERE, tVHERE, tempWords[10];

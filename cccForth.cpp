@@ -419,10 +419,9 @@ int doPrim(const char *wd) {
 
 int doQuote() {
     in++;
-    push((CELL)tVHERE);
-    doNumber('v');
-    while (*in && (*in != '"')) { st.vars[tVHERE++] = *(in++); }
-    st.vars[tVHERE++] = 0;
+    CComma('`');
+    while (*in && (*in != '"')) { CComma(*(in++)); }
+    CComma(0);
     if (*in) { ++in; }
     return 1;
 }
@@ -439,7 +438,7 @@ int doDotQuote() {
 int doWord() {
     CELL flg = pop();
     CELL xt = pop();
-    if (flg) {
+    if (flg & BIT_IMMEDIATE) {
         doExec();
         run((WORD)xt);
     } else {
