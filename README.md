@@ -208,6 +208,7 @@ EXIT     (--)              Exit the word immediately (don't forget to UNLOOP-<x>
 
 *** STRINGS ***
 STR-CAT    ( src dst-- )   Concatenate src to dst
+STR-CATC   ( c dst-- )     Concatenate char c to dst
 STR-CPY    ( src dst-- )   Copy src to dst
 STR-END    ( a1--a2 )      a2: the end of string a1
 STR-EQ     ( s1 s2--f )    f: 1 if s1 and s2 are equivalent, else 0 (case-sensitive)

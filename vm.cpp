@@ -179,11 +179,12 @@ void run(WORD start) {
                 if (ir == '@') { push(stks[rsp]); }                          break;
         case 'S': ir = *(pc++); if (ir == 'e') { TOS += strLen(CTOS); }             // STR-END
                 else if (ir == 'a') { strCat(CTOS, CNOS); DROP2; }                  // STR-CAT
-                else if (ir == 'y') { strCpy(CTOS, CNOS); DROP2; }                  // STR-CPY
+                else if (ir == 'c') { strCatC(CTOS, (char)NOS); DROP2; }            // STR-CATC
                 else if (ir == '=') { NOS = strEq(CTOS, CNOS); DROP1; }             // STR-EQ
                 else if (ir == 'i') { NOS = strEqI(CTOS, CNOS); DROP1; }            // STR-EQI
                 else if (ir == 'r') { TOS = (CELL)rTrim(CTOS); }                    // STR-RTRIM
-                else if (ir == 't') { *CTOS = 0; }                           break; // STR-TRUNC
+                else if (ir == 't') { *CTOS = 0; }                                  // STR-TRUNC
+                else if (ir == 'y') { strCpy(CTOS, CNOS); DROP2; }           break; // STR-CPY
         case 'T': t1=pop(); y=(byte*)pop(); while (t1--) printChar(*(y++));  break; // TYPE (a c--)
         case 'Y': vmReset();                                                return; // RESET
         case 'Z': doType((byte *)pop(),-1, 0);                               break; // ZTYPE

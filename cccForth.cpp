@@ -84,6 +84,7 @@ PRIM_T prims[] = {
     , { "STR-LEN", "C" }
     , { "STR-END", "Se" }
     , { "STR-CAT", "Sa" }
+    , { "STR-CATC", "Sc" }
     , { "STR-CPY", "Sy" }
     , { "STR-EQ", "S=" }
     , { "STR-EQI", "Si" }
@@ -205,6 +206,13 @@ char *strCpy(char *d, const char *s) {
 char *strCat(char *d, const char *s) {
     char *x = d+strLen(d);
     strCpy(x, s);
+    return d;
+}
+
+char *strCatC(char *d, char c) {
+    char *x = d+strLen(d);
+    *x = c;
+    *(x+1) = 0;
     return d;
 }
 

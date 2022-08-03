@@ -156,6 +156,7 @@ extern void printBase(CELL, CELL);
 extern int strLen(const char *);
 extern char *strCpy(char *,const char *);
 extern char *strCat(char *,const char *);
+extern char *strCatC(char *,const char);
 extern int strEq(const char *,const char *);
 extern int strEqI(const char *,const char *);
 extern char *sprintF(char* dst, const char* fmt, ...);
