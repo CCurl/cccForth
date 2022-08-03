@@ -21,7 +21,7 @@ To these ends, I have wandered off the beaten path in the following ways:
 - User-defined words ARE case sensitive.
 - The dictionary is intersparsed with the CODE; it is not separated.
 - A dictionary entry looks like this: (offset,flags,name,null terminator,implementation).
-- It has only 3 additional bytes of overhead (in addition to the name).
+- It has only 4 additional bytes of overhead (in addition to the name).
 - To save space, code addresses are 2 bytes, so code space is limited to 16 bits (64kb).
 - All CODE addresses are offsets into the CODE space, not absolute addresses.
 - HERE and LAST are also offsets into the CODE space, not absolute addresses.
@@ -44,7 +44,7 @@ To these ends, I have wandered off the beaten path in the following ways:
 : .code cb dup here + 1- for i c@ T1 emit next ;
 ```
 
-## Temporary variables:
+## Temporary variables (registers):
 - Temporary variables are allocated in sets of 10.
 - They are completely under the control of the programmer.
 - They are not built into the call sequence, so they can be accessed across words.
@@ -59,9 +59,9 @@ To these ends, I have wandered off the beaten path in the following ways:
   - -tmps: destroy the most recently allocated temps
 - Here are some simple examples:
 ```
-: betw +tmps s3 s2 s1 r2 r1 <= r1 r3 <= and -tmps ;
-: .c (n--) s9 r9 #32 $7e betw if r9 emit else r9 ." (%d)" then ;
-: dumpX (a n--) swap s8 1 for r8 c@ .c i8 next ;
+: betw ( n min max--f ) +tmps s3 s2 s1   r2 r1 <= r1 r3 <= and -tmps ;
+: .c (n--) s9   r9 #32 $7e betw if r9 emit else r9 '(' emit (.) ')' emit then ;
+: dumpX (a n--) over + for I c@ .c next ;
 ```
 
 ## cccForth Primitives
@@ -141,12 +141,14 @@ ZTYPE    (s--)             Output string at s. See (1).
 
 (1) Notes on ." and ZTYPE:
 - ." is NOT ansi-standard
-- %d: output TOS as integer
-- %x: output TOS as hex
 - %b: output TOS as binary
 - %c: output TOS as character
+- %d: output TOS as integer
+- %f: output FTOS as floating point number
+- %i: output TOS in the current BASE
 - %n: output a new-line (13,10)
 - %q: output the quote (") character
+- %x: output TOS as hex
 
 example: : ascii $20 '~' for i i i i ." %n%d: (%c) %x %b" next ;
 
