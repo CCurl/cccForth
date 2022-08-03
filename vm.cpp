@@ -151,7 +151,7 @@ void run(WORD start) {
         case '<': NOS = (NOS < TOS) ? 1 : 0; DROP1;                          break; // <
         case '?': if (pop()==0) { pc=CA(GET_WORD(pc)); } else { pc+=2; }     break; // 0BRANCH
         case '@': TOS = GET_LONG(AOS);                                       break; // FETCH
-        case 'C': y=AOS; TOS=0; while (*(y++)) { ++TOS; };                   break; // STRLEN (a--c)
+        case 'C': y=AOS; TOS=0; while (*(y++)) { ++TOS; };                   break; // STR-LEN (a--c)
         case 'D': --TOS;                                                     break; // 1-
         case 'F': ir = *(pc++); if (ir=='.') { printStringF("%g",fpop()); }         // FLOAT ops
                 else if (ir=='#') { fpush(FTOS); }
@@ -176,8 +176,7 @@ void run(WORD start) {
         case 'R': ir = *(pc++); if (ir == '<') { rpush(pop()); }                    // >R, R@, R>
                 if (ir == '>') { push(rpop()); }
                 if (ir == '@') { push(stks[rsp]); }                          break;
-        case 'S': ir = *(pc++); if (ir == 'l') { TOS = strLen(CTOS); }              // STR-LEN
-                else if (ir == 'e') { TOS += strLen(CTOS); }                        // STR-END
+        case 'S': ir = *(pc++); if (ir == 'e') { TOS += strLen(CTOS); }             // STR-END
                 else if (ir == 'a') { strCat(CTOS, CNOS); DROP2; }                  // STR-CAT
                 else if (ir == 'y') { strCpy(CTOS, CNOS); DROP2; }                  // STR-CPY
                 else if (ir == '=') { NOS = strEq(CTOS, CNOS); DROP1; }             // STR-EQ

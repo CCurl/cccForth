@@ -45,7 +45,7 @@ variable ln cols allot
     for i c@ .if b++ .then i4 next
     bak->pop .pop r7 . i7 ;
 
-// 65 (r) ! 200 (c) !
+// 60 (r) ! 200 (c) !
 40 (r) ! 150 (c) !
 : T1 begin gen key? until key drop ;
 : go 1 s7 clr-bak rand-pop C-OFF CLS T1 C-ON ;

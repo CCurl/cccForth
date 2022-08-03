@@ -9,15 +9,22 @@ typedef struct {
 
 // Words that directly map to VM operations
 PRIM_T prims[] = {
-    // Math
-    { "+", "+" }
-    , { "-", "-" }
-    , { "/", "/" }
-    , { "*", "*" }
-    , { "ABS", "#0<(_)" }
-    , { "/MOD", "&" }
-    , { "MOD", "b%" }
-    , { "NEGATE", "_" }
+    // Stack
+    { "DROP", "\\" }
+    , { "DUP", "#" }
+    , { "OVER", "%" }
+    , { "SWAP", "$" }
+    , { "NIP", "$\\" }
+    , { "1+", "P" }
+    , { "1-", "D" }
+    , { "2+", "PP" }
+    , { "2*", "#+" }
+    , { "2/", "2/" }
+    , { "2DUP", "%%" }
+    , { "2DROP", "\\\\" }
+    , { "ROT", "Q<$Q>$" }
+    , { "-ROT", "$Q<$Q>" }
+    , { "TUCK", "$%" }
     // Memory
     , { "@", "@" }
     , { "C@", "c@" }
@@ -26,27 +33,15 @@ PRIM_T prims[] = {
     , { "C!", "c!" }
     , { "W!", "w!" }
     , { "+!", "$%@+$!" }
-    , { "ALLOT", "xA" }
-    // Stack
-    , { "DROP", "\\" }
-    , { "DUP", "#" }
-    , { "OVER", "%" }
-    , { "SWAP", "$" }
-    , { "2DUP", "%%" }
-    , { "2DROP", "\\\\" }
-    , { "NIP", "$\\" }
-    , { "1-", "D" }
-    , { "2*", "#+" }
-    , { "2/", "2/" }
-    , { "ROT", "Q<$Q>$" }
-    , { "-ROT", "$Q<$Q>" }
-    , { ".S", "xS" }
-    , { "1+", "P" }
-    , { "TUCK", "$%" }
-    , { "2+", "PP" }
-    , { ">R", "R<" }
-    , { "R>", "R>" }
-    , { "R@", "R@" }
+    // Math
+    , { "+", "+" }
+    , { "-", "-" }
+    , { "/", "/" }
+    , { "*", "*" }
+    , { "ABS", "#0<(_)" }
+    , { "/MOD", "&" }
+    , { "MOD", "b%" }
+    , { "NEGATE", "_" }
     // Input/output
     , { "(.)", "." }
     , { ".", ".32," }
@@ -58,8 +53,9 @@ PRIM_T prims[] = {
     , { "QTYPE", "t" }
     , { "ZTYPE", "Z" }
     , { "COUNT", "#C" }
-    , { "STRLEN", "C" }
     , { "TYPE", "T" }
+    , { "SPACE", "32," }
+    , { "SPACES", "0[32,]" }
     // Logical / flow control
     , { ".IF", "(" }
     , { ".THEN", ")" }
@@ -85,7 +81,7 @@ PRIM_T prims[] = {
     , { "0=", "~" }
     , { "EXIT", ";" }
     // String
-    , { "STR-LEN", "Sl" }
+    , { "STR-LEN", "C" }
     , { "STR-END", "Se" }
     , { "STR-CAT", "Sa" }
     , { "STR-CPY", "Sy" }
@@ -101,8 +97,8 @@ PRIM_T prims[] = {
     , { "LSHIFT", "bL" }
     , { "RSHIFT", "bR" }
     // Float
-    , { "Fi", "Fi" }  // In
-    , { "Fo", "Fo" }  // Out
+    , { "I>F", "Fi" }  // In
+    , { "F>I", "Fo" }  // Out
     , { "F+", "F+" }  // Add
     , { "F-", "F-" }  // Sub
     , { "F*", "F*" }  // Mult
@@ -115,19 +111,24 @@ PRIM_T prims[] = {
     , { "FSWAP", "F$" }
     , { "FDROP", "F\\" }
     // System
+    , { "ALLOT", "xA" }
     , { "BL", "32" }
     , { "BYE", "xQ" }
     , { "CELL", "4" }
     , { "CELLS", "4*" }
+    , { "CELL+", "4+" }
     , { "EXECUTE", "G" }
     , { "MAX", "%%<($)\\" }
     , { "MIN", "%%>($)\\" }
     , { "MS", "xW" }
     , { "NOP", " " }
     , { "NOT", "~" }
+    , { ">R", "R<" }
+    , { "R>", "R>" }
+    , { "R@", "R@" }
     , { "RAND", "xR" }
     , { "RESET", "Y" }
-    , { "SPACE", "32," }
+    , { ".S", "xS" }
     , { "SYSTEM", "xY" }
     , { "TIMER", "xT" }
     , { "+TMPS", "l" }

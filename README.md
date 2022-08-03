@@ -110,8 +110,8 @@ XOR      (a b--c)          Bitwise XOR
 INVERT   (a--b)            Bitwise COMPLEMENT
 
 *** FLOAT ***
-Fi       (n--)             Float In
-Fo       (--n)             Float Out
+I>F      (n--)             Integer to Float
+F>I      (--n)             Float to Integer
 F+       (a b--c)          Float Add
 F-       (a b--c)          Float Sub
 F*       (a b--c)          Float Mult
@@ -130,14 +130,14 @@ FDROP    (a--)             Float DROP
 ."       (?--?)            Output a (possibly formatted) string. See (1).
 CR       (--)              Output a newline (#10,#13)
 EMIT     (c--)             Output c as a character
-STRLEN   (a--n)            n: length of the NULL-terminated string at a
-COUNT    (a--a n)          n: length of string at a (a must be NULL-terminated)
-TYPE     (a n--)           Output string at (standard Forth TYPE)
+COUNT    (s--s n)          n: length of string at s (s must be NULL-terminated)
+TYPE     (s n--)           Output string at s (standard Forth TYPE)
 KEY      (--c)             c: Next keyboard char, wait if no press yet
 KEY?     (--f)             f: FALSE if no keyboard press, else TRUE
-QTYPE    (a--)             Quick string output, no formatting, a is NULL-terminated.
-SPACE    (--)              Output a single SPACE
-ZTYPE    (a--)             Output string at a. See (1).
+QTYPE    (s--)             Quick string output, no formatting, s is NULL-terminated.
+SPACE    (--)              Output a single SPACE (32 EMIT)
+SPACES   (n--)             Output n SPACEs
+ZTYPE    (s--)             Output string at s. See (1).
 
 (1) Notes on ." and ZTYPE:
 - ." is NOT ansi-standard
