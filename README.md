@@ -59,9 +59,9 @@ To these ends, I have wandered off the beaten path in the following ways:
   - -tmps: destroy the most recently allocated temps
 - Here are some simple examples:
 ```
-: betw ( n min max--f ) +tmps s3 s2 s1   r2 r1 <= r1 r3 <= and -tmps ;
-: .c (n--) s9   r9 #32 $7e betw if r9 emit else r9 '(' emit (.) ')' emit then ;
-: dumpX (a n--) over + for I c@ .c next ;
+: betw ( n min max--f ) +tmps s3 s2 s1  r1 r2 >=  r1 r3 <=  and -tmps ;
+: .c ( n-- ) s9  r9 #32 $7e betw if r9 emit else r9 ." (%d)" then ;
+: dumpX ( a n-- ) over + for I c@ .c next ;
 ```
 
 ## cccForth Primitives
