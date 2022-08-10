@@ -118,18 +118,13 @@ typedef unsigned short USHORT;
 
 #define CELL_SZ      sizeof(CELL)
 
-typedef struct {
-    byte prev;
-    byte flags;
-    byte len;
-    char name[32];
-} DICT_T;
+#define NAME_LEN 16
 
 typedef struct {
     USHORT xt;
     byte flags;
     byte len;
-    char name[12];
+    char name[NAME_LEN];
 } DICT_E;
 
 typedef struct {
@@ -176,7 +171,6 @@ extern int charAvailable();
 extern int getChar();
 extern CELL doTimer();
 extern void doSleep();
-extern WORD getXT(WORD, DICT_T *);
 
 // FILEs
 extern byte *doFile(CELL, byte *);

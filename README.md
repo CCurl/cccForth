@@ -49,11 +49,12 @@ To these ends, I have wandered off the beaten path in the following ways:
 - They are completely under the control of the programmer.
 - They are not built into the call sequence, so they can be accessed across words.
 - They are not set or retrieved using @ and !.
-- There are 4 special operations for temp variables: read, set, increment and decrement
-- The words to manage temps are: +tmps, r0..r9, s0..s9, i0..i9, d0..d9 and -tmps
+- There are 5 special operations for temp variables: read, set, increment, decrement, and increment-cell
+- The words to manage temps are: +tmps, r0..r9, s0..s9, c0..c9, i0..i9, d0..d9 and -tmps
   - +tmps: allocate 10 new temps
   - rX: push the value of temp #X onto the stack (read)
   - sX: pop the new value for temp #X off the stack (set)
+  - cX: add CELL-SZ to temp #X
   - iX: increment temp #X
   - dX: decrement temp #X
   - -tmps: destroy the most recently allocated temps

@@ -27,10 +27,10 @@ PRIM_T prims[] = {
     , { "TUCK", "$%" }
     // Memory
     , { "@", "@" }
-    , { "C@", "c@" }
+    , { "C@", "C@" }
     , { "W@", "w@" }
     , { "!", "!" }
-    , { "C!", "c!" }
+    , { "C!", "C!" }
     , { "W!", "w!" }
     , { "+!", "$%@+$!" }
     // Math
@@ -52,7 +52,7 @@ PRIM_T prims[] = {
     , { "LOAD", "zL"}
     , { "QTYPE", "t" }
     , { "ZTYPE", "Z" }
-    , { "COUNT", "#C" }
+    , { "COUNT", "#Sl" }
     , { "TYPE", "T" }
     , { "SPACE", "32," }
     , { "SPACES", "0[32,]" }
@@ -69,7 +69,7 @@ PRIM_T prims[] = {
     , { "UNTIL", "~}" }
     , { "AGAIN", "1}" }
     , { "UNLOOP-W", "^W" }
-    , { "TRUE", "1_" }
+    , { "TRUE", "1" }
     , { "FALSE", "0" }
     , { "=", "=" }
     , { "<", "<" }
@@ -81,7 +81,7 @@ PRIM_T prims[] = {
     , { "0=", "~" }
     , { "EXIT", ";" }
     // String
-    , { "STR-LEN", "C" }
+    , { "STR-LEN", "Sl" }
     , { "STR-END", "Se" }
     , { "STR-CAT", "Sa" }
     , { "STR-CATC", "Sc" }
@@ -255,14 +255,14 @@ void doCreate(const char *name, byte f) {
         STATE = 1;
         return;
     }
-    DICT_T *dp = DP_AT(tHERE);
-    dp->prev = (byte)(tHERE - st.LAST);
+    DICT_E *dp = &st.dict[st.LAST];
+    dp->xt = st.HERE;
     dp->flags = f;
-    dp->len = strLen(name);
     strCpy(dp->name, name);
-    st.LAST = tHERE;
-    tHERE += dp->len + 4;
+    dp->name[NAME_LEN-1] = 0;
+    dp->len = strLen(dp->name);
     STATE = 1;
+    ++st.LAST;
 }
 
 int doFind(const char *name) {
@@ -275,39 +275,35 @@ int doFind(const char *name) {
 
     // Regular lookup
     int len = strLen(name);
-    CELL def = (WORD)st.LAST;
-    while (def) {
-        DICT_T* dp = DP_AT(def);
-        if ((len==dp->len) && strEq(dp->name, name)) {
-            push(def + len + 4);
+    for (int i = st.LAST-1; i >= 0; i--) {
+        DICT_E* dp = &st.dict[i];
+        if ((len == dp->len) && strEq(dp->name, name)) {
+            push(dp->xt);
             push(dp->flags);
             return 1;
         }
-        if (def == dp->prev) break;
-        def -= dp->prev;
     }
     return 0;
 }
 
 int doSee(const char* wd) {
     if (!doFind(wd)) { return 1; }
-    CELL def = (WORD)st.LAST;
-    CELL prevDef = st.HERE;
-    int found = 0;
-    DROP2;
-    while (def && (!found)) {
-        DICT_T* dp = DP_AT(def);
-        if (strEq(dp->name, wd)) {
-            found = 1;
+    DROP1;
+    CELL start = pop();
+    CELL end = st.HERE;
+
+    int len = strLen(wd);
+    for (int i = st.LAST-1; i > 0; i--) {
+        DICT_E* dp = &st.dict[i-1];
+        if ((len == dp->len) && strEq(dp->name, wd)) {
+            end = st.dict[i].xt;
             break;
         }
-        prevDef = def;
-        def -= dp->prev;
     }
 
-    if (def < prevDef) {
+    if (start < end) {
         printStringF("%s: ", wd);
-        for (int i = def; i < prevDef; i++) {
+        for (int i = start; i < end; i++) {
             byte c = st.code[i];
             if (BTW(c, 32, 126)) { printChar(c); }
             else { printStringF("(%d)",c); }
@@ -317,14 +313,12 @@ int doSee(const char* wd) {
 }
 
 void doWords() {
-    CELL l = (WORD)st.LAST, n = 0;
-    while (l) {
-        DICT_T *dp = DP_AT(l);
+    int n = 0;
+    for (int i = st.LAST-1; i >= 0; i--) {
+        DICT_E* dp = &st.dict[i];
         printString(dp->name);
-        if ((++n)%10==0) { printChar('\n'); }
+        if ((++n) % 10 == 0) { printChar('\n'); }
         else { printChar(9); }
-        if (l == dp->prev) break;
-        l -= dp->prev;
     }
 }
 
@@ -341,21 +335,19 @@ int getWord(char *wd) {
 
 int doNumber(int t) {
     CELL num = pop();
-    if (t=='v') {
+    if (t == 'v') {
         CComma('v');
         Comma(num);
-    } else if ((BTW(num,32,126))) {
-        CComma('\'');
-        CComma(num);
+    } else if (t == 4) {
+        CComma(4);
+        Comma(num);
     } else if ((num & 0xFF) == num) {
         CComma(1);
         CComma(num);
-    }
-    else if ((num & 0xFFFF) == num) {
+    } else if ((num & 0xFFFF) == num) {
         CComma(2);
         WComma((WORD)num);
-    }
-    else {
+    } else {
         CComma(4);
         Comma(num);
     }
@@ -368,15 +360,6 @@ char *sprintF(char *dst, const char *fmt, ...) {
     vsnprintf(dst, 256, fmt, args);
     va_end(args);
     return dst;
-}
-
-int doNumber2() {
-    if (TOS < 0) { return doNumber(0); }
-    char buf[16];
-    sprintF(buf, "%ld", pop());
-    if (tHERE && BTW(st.code[tHERE-1],'0','9')) { CComma(' '); }
-    for (int i=0; buf[i]; i++) { CComma(buf[i]); }
-    return 1;
 }
 
 int isNum(const char *wd) {
@@ -408,6 +391,7 @@ char *isRegOp(const char *wd) {
     if ((wd[0] == 's') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
     if ((wd[0] == 'i') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
     if ((wd[0] == 'd') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
+    if ((wd[0] == 'c') && BTW(wd[1], '0', '9') && (!wd[2])) { return (char*)wd; }
     return 0;
 }
 
@@ -462,7 +446,7 @@ int doParseWord(char *wd) {
     if (strEq(word, "\\")) { doExec(); return 0; }
     if (doPrim(wd))        { return 1; }
     if (doFind(wd))        { return doWord(); }
-    if (isNum(wd))         { return doNumber2(); }
+    if (isNum(wd))         { return doNumber(0); }
     if (strEq(wd, ".\""))  { return doDotQuote(); }
     if (strEq(wd, "\""))   { return doQuote(); }
 
@@ -526,7 +510,7 @@ int doParseWord(char *wd) {
     if (strEqI(wd, "CONSTANT")) {
         if (getWord(wd)) {
             doCreate(wd, 0);
-            doNumber(0);
+            doNumber(4);
             CComma(';');
             doExec();
             STATE = 0;
@@ -535,7 +519,7 @@ int doParseWord(char *wd) {
         else { return 0; }
     }
 
-    if (strEqI(wd, "LOOKUP")) {
+    if (strEqI(wd, "'")) {
         doExec();
         if (getWord(wd) == 0) { return 0; }
         push(doFind(wd));
@@ -544,8 +528,8 @@ int doParseWord(char *wd) {
 
     if (strEqI(wd, "FORGET")) {
         // Forget the last word
-        st.HERE = tHERE = st.LAST;
-        st.LAST -= st.code[st.LAST];
+        st.HERE = tHERE = st.dict[st.LAST].xt;
+        --st.LAST;
         return 1;
     }
 
@@ -599,6 +583,7 @@ void systemWords() {
     char *cp = (char*)(&st.vars[VARS_SZ-32]);
     sprintF(cp, ": cb %lu ;", (UCELL)st.code);     doParse(cp);
     sprintF(cp, ": vb %lu ;", (UCELL)st.vars);     doParse(cp);
+    sprintF(cp, ": db %lu ;", (UCELL)st.dict);     doParse(cp);
     sprintF(cp, ": csz %d ;", CODE_SZ);            doParse(cp);
     sprintF(cp, ": vsz %d ;", VARS_SZ);            doParse(cp);
     sprintF(cp, ": ha %lu ;", (UCELL)&st.HERE);   doParse(cp);
