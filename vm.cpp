@@ -194,7 +194,7 @@ void run(WORD start) {
         case '\\': DROP1;                                                    break; // DROP
         case ']': ++L0; if (L0<L1) { pc=(byte*)L2; } else { lsp-=3; }        break; // NEXT
         case '^': ir = *(pc++); if (ir == 'W') { lsp -= 1; }                        // UNLOOP
-                else if (ir == 'F') { lsp =- 3; }                            break;
+                else if (ir == 'F') { lsp -= 3; }                            break;
         case '_': TOS = -TOS;                                                break; // NEGATE
         case '`': push((CELL)pc); while (*(pc++)) {}                         break; // ZQUOTE
         case 'b': ir = *(pc++); if (ir == '~') { TOS = ~TOS; }                      // BINARY ops
