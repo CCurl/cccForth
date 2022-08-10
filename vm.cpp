@@ -152,7 +152,8 @@ void run(WORD start) {
         case '<': NOS = (NOS < TOS) ? 1 : 0; DROP1;                          break; // <
         case '?': if (pop()==0) { pc=CA(GET_WORD(pc)); } else { pc+=2; }     break; // 0BRANCH
         case '@': TOS = GET_LONG(AOS);                                       break; // FETCH
-        case 'C': y=AOS; TOS=0; while (*(y++)) { ++TOS; };                   break; // STR-LEN (a--c)
+        case 'C': ir = *(pc++); if (ir=='@') { TOS = *AOS; }
+                else if(ir=='!') { *AOS = (byte)NOS; DROP2; }                break; // C@, C!
         case 'D': --TOS;                                                     break; // 1-
         case 'F': ir = *(pc++); if (ir=='.') { printStringF("%g",fpop()); }         // FLOAT ops
                 else if (ir=='#') { fpush(FTOS); }
@@ -182,6 +183,7 @@ void run(WORD start) {
                 else if (ir == 'c') { strCatC(CTOS, (char)NOS); DROP2; }            // STR-CATC
                 else if (ir == '=') { NOS = strEq(CTOS, CNOS); DROP1; }             // STR-EQ
                 else if (ir == 'i') { NOS = strEqI(CTOS, CNOS); DROP1; }            // STR-EQI
+                else if (ir == 'l') { TOS = (CELL)strLen(CTOS); }                   // STR-LEN
                 else if (ir == 'r') { TOS = (CELL)rTrim(CTOS); }                    // STR-RTRIM
                 else if (ir == 't') { *CTOS = 0; }                                  // STR-TRUNC
                 else if (ir == 'y') { strCpy(CTOS, CNOS); DROP2; }           break; // STR-CPY
@@ -205,8 +207,7 @@ void run(WORD start) {
                 else if (ir == 'L') { NOS = (NOS << TOS); DROP1; }
                 else if (ir == 'R') { NOS = (NOS >> TOS); DROP1; }
                 else { --pc; printChar(32); } break;
-        case 'c': ir = *(pc++); if (ir=='@') { TOS = *AOS; }
-                else if(ir=='!') { *AOS = (byte)NOS; DROP2; }                break; // c@, c!
+        case 'c': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]+=CELL_SZ; }      break; // decLocal
         case 'd': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { --locals[lb+t1]; }      break; // decLocal
         case 'i': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { ++locals[lb+t1]; }      break; // incLocal
         case 'f': pc = doFile(ir, pc);                                       break; // FILE ops

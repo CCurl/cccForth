@@ -23,8 +23,9 @@
   #define CODE_SZ      ( 64*1024)
   #define VARS_SZ      (256*1024)
   #define STK_SZ        64
-  #define LSTK_SZ       16
+  #define LSTK_SZ       32
   #define LOCALS_SZ    160
+  #define DICT_SZ     2000
   #define FLT_SZ        10
   #define __FILES__
 #elif __BOARD__ == LINUX
@@ -33,8 +34,9 @@
   #define CODE_SZ      ( 64*1024)
   #define VARS_SZ      (256*1024)
   #define STK_SZ        64
-  #define LSTK_SZ       16
+  #define LSTK_SZ       32
   #define LOCALS_SZ    160
+  #define DICT_SZ     2000
   #define FLT_SZ        10
   #define __FILES__
 #endif
@@ -47,8 +49,9 @@
   #define CODE_SZ      (48*1024)
   #define VARS_SZ      (96*1024)
   #define STK_SZ        64
-  #define LSTK_SZ       16
+  #define LSTK_SZ       32
   #define LOCALS_SZ    160
+  #define DICT_SZ     1000
   #define FLT_SZ        10
   #define __PIN__
   #define __FILES__
@@ -58,19 +61,21 @@
   #define CODE_SZ      (48*1024)
   #define VARS_SZ      (96*1024)
   #define STK_SZ        64
-  #define LSTK_SZ       16
+  #define LSTK_SZ       32
   #define LOCALS_SZ    160
+  #define DICT_SZ     1000
   #define FLT_SZ        10
   #define __PIN__
   #define __FILES__
   // #define __EDITOR__
   #define NEEDS_ALIGN
 #elif __BOARD__ == XIAO
-  #define CODE_SZ      (14*1024)
+  #define CODE_SZ      (12*1024)
   #define VARS_SZ      (12*1024)
   #define STK_SZ        32
   #define LSTK_SZ       12
   #define LOCALS_SZ     80
+  #define DICT_SZ      200
   #define FLT_SZ         8
   #define __PIN__
   #define NEEDS_ALIGN
@@ -81,23 +86,12 @@
   #define STK_SZ        32
   #define LSTK_SZ       12
   #define LOCALS_SZ     80
+  #define DICT_SZ      100
   #define FLT_SZ         8
   #define __PIN__
   #define NEEDS_ALIGN
 // #define __GAMEPAD__
-#elif __BOARD__ == LEO
-  #define CODE_SZ      (1*256)
-  #define VARS_SZ      (1*256)
-  #define STK_SZ        12
-  #define LSTK_SZ        4
-  #define LOCALS_SZ     10
-  #define FLT_SZ         4
-  #define __PIN__
-  #define NEEDS_ALIGN
-// #define __GAMEPAD__
 #endif
-
-#define CELL_SZ      4
 
 #define TOS           stks[sp]
 #define NOS           stks[sp-1]
@@ -123,18 +117,23 @@ typedef long CELL;
 typedef unsigned long UCELL;
 typedef unsigned short USHORT;
 
+#define CELL_SZ      sizeof(CELL)
+
+#define NAME_LEN 16
+
+typedef struct {
+    USHORT xt;
+    byte flags;
+    byte len;
+    char name[NAME_LEN];
+} DICT_E;
+
 typedef struct {
     int HERE, VHERE, LAST;
     byte code[CODE_SZ + 4];
     byte vars[VARS_SZ + 4];
+    DICT_E dict[DICT_SZ];
 } ST_T;
-
-typedef struct {
-    byte prev;
-    byte flags;
-    byte len;
-    char name[32];
-} DICT_T;
 
 #define BIT_IMMEDIATE 0x80
 
@@ -173,7 +172,6 @@ extern int charAvailable();
 extern int getChar();
 extern CELL doTimer();
 extern void doSleep();
-extern WORD getXT(WORD, DICT_T *);
 
 // FILEs
 extern byte *doFile(CELL, byte *);

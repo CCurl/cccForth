@@ -19,12 +19,13 @@ To these ends, I have wandered off the beaten path in the following ways:
 - Many primitives (core words) are built into the compiler, and are not included in the dictionary.
 - These primitves ARE NOT case sensitive (DUP = dup = Dup).
 - User-defined words ARE case sensitive.
-- The dictionary is intersparsed with the CODE; it is not separated.
-- A dictionary entry looks like this: (offset,flags,name,null terminator,implementation).
-- It has only 4 additional bytes of overhead (in addition to the name).
+- The dictionary is separated from the CODE.
+- A dictionary entry looks like this: (xt,flags,word-len,word,null terminator).
+- The maximum length of a word is configurable. (#define NAME_LEN xx)
+- The number of available dictionary entries is configurable. (#define DICT_SZ xxx)
 - To save space, code addresses are 2 bytes, so code space is limited to 16 bits (64kb).
 - All CODE addresses are offsets into the CODE space, not absolute addresses.
-- HERE and LAST are also offsets into the CODE space, not absolute addresses.
+- HERE is also an offset into the CODE space, not an absolute address.
 - The VARIABLE space is separated from the CODE space, and can be larger than 64kb.
 - VHERE is a 32-bit offset to the first available byte in he VARIABLE space.
 - There are 10 temporary words (T0..T9) that can be re-defined without any dictionary overhead.
@@ -49,11 +50,12 @@ To these ends, I have wandered off the beaten path in the following ways:
 - They are completely under the control of the programmer.
 - They are not built into the call sequence, so they can be accessed across words.
 - They are not set or retrieved using @ and !.
-- There are 4 special operations for temp variables: read, set, increment and decrement
-- The words to manage temps are: +tmps, r0..r9, s0..s9, i0..i9, d0..d9 and -tmps
+- There are 5 special operations for temp variables: read, set, increment, decrement, and increment-cell
+- The words to manage temps are: +tmps, r0..r9, s0..s9, c0..c9, i0..i9, d0..d9 and -tmps
   - +tmps: allocate 10 new temps
   - rX: push the value of temp #X onto the stack (read)
   - sX: pop the new value for temp #X off the stack (set)
+  - cX: add CELL-SZ to temp #X
   - iX: increment temp #X
   - dX: decrement temp #X
   - -tmps: destroy the most recently allocated temps
