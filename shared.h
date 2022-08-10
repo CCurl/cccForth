@@ -25,7 +25,7 @@
   #define STK_SZ        64
   #define LSTK_SZ       32
   #define LOCALS_SZ    160
-  #define DICT_SZ     1000
+  #define DICT_SZ     2000
   #define FLT_SZ        10
   #define __FILES__
 #elif __BOARD__ == LINUX
@@ -36,6 +36,7 @@
   #define STK_SZ        64
   #define LSTK_SZ       32
   #define LOCALS_SZ    160
+  #define DICT_SZ     2000
   #define FLT_SZ        10
   #define __FILES__
 #endif
@@ -74,7 +75,7 @@
   #define STK_SZ        32
   #define LSTK_SZ       12
   #define LOCALS_SZ     80
-  #define DICT_SZ      100
+  #define DICT_SZ      200
   #define FLT_SZ         8
   #define __PIN__
   #define NEEDS_ALIGN
