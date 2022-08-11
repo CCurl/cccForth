@@ -19,8 +19,8 @@ void vmReset() {
     systemWords();
 }
 
-void push(CELL v) { stks[++sp] = v; }
-CELL pop() { return stks[sp--]; }
+inline void push(CELL v) { stks[++sp] = v; }
+inline CELL pop() { return stks[sp--]; }
 
 inline void fpush(float v) { fstk[++fsp] = v; }
 inline float fpop() { return fstk[fsp--]; }
