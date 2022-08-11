@@ -480,7 +480,7 @@ int doParseWord(char *wd) {
 
     if (strEqI(wd, "ELSE")) {
         CELL tgt = pop();
-        CComma('J');
+        CComma('G');
         push(tHERE);
         WComma(0);
         SET_WORD(CA(tgt), (WORD)tHERE);

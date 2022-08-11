@@ -35,10 +35,10 @@ variable ln cols allot
 : ->b ( c r -- v ) cols * + bak + ;
 
 : .pop 1 dup ->XY
-    1 rows 1+ for i s1 ln s6 
-        1 cols 1+ for i r1 ->p c@ if '*' else bl then r6 c! i6 next 
-        0 r6 c! ln qtype cr
-    next ;
+    1 rows 1+ FOR ln s6 
+        1 cols 1+ FOR I J ->p C@ IF '*' ELSE BL THEN r6 C! i6 NEXT 
+        0 r6 C! ln QTYPE CR
+    NEXT ;
 
 : gen 1 1 ->b s4
     1 1 ->p cols rows ->p
