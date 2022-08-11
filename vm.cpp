@@ -206,8 +206,8 @@ void run(WORD start) {
                 else if (ir == '|') { NOS |= TOS; DROP1; }
                 else if (ir == 'L') { NOS = (NOS << TOS); DROP1; }
                 else if (ir == 'R') { NOS = (NOS >> TOS); DROP1; }
-                else { --pc; printChar(32); } break;
-        case 'c': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]+=CELL_SZ; }      break; // decLocal
+                else { --pc; printChar(32); }                                break;
+        case 'c': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]+=CELL_SZ; }  break; // incLocal-CELL
         case 'd': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { --locals[lb+t1]; }      break; // decLocal
         case 'i': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { ++locals[lb+t1]; }      break; // incLocal
         case 'f': pc = doFile(ir, pc);                                       break; // FILE ops
