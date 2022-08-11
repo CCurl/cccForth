@@ -61,6 +61,7 @@ PRIM_T prims[] = {
     , { ".THEN", ")" }
     , { "FOR", "[" }
     , { "I", "I" }
+    , { "J", "J" }
     , { "+I", "M" }
     , { "NEXT", "]" }
     , { "UNLOOP-F", "^F" }
@@ -118,7 +119,7 @@ PRIM_T prims[] = {
     , { "CELL", "4" }
     , { "CELLS", "4*" }
     , { "CELL+", "4+" }
-    , { "EXECUTE", "G" }
+    , { "EXECUTE", "E" }
     , { "MAX", "%%<($)\\" }
     , { "MIN", "%%>($)\\" }
     , { "MS", "xW" }

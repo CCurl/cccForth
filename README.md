@@ -147,9 +147,11 @@ ZTYPE    (s--)             Output string at s. See (1).
 - %c: output TOS as character
 - %d: output TOS as integer
 - %f: output FTOS as floating point number
+- %g: output FTOS as scientific number
 - %i: output TOS in the current BASE
 - %n: output a new-line (13,10)
 - %q: output the quote (") character
+- %s: output TOS as a string (null terminated, no count byte)
 - %x: output TOS as hex
 
 example: : ascii $20 '~' for i i i i ." %n%d: (%c) %x %b" next ;
@@ -198,6 +200,7 @@ THEN     (--)              Standard THEN
 .THEN    (--)              Simple THEN
 FOR      (f t--)           Begin FOR/NEXT loop
 I        (--n)             n: Current index
+J        (--n)             n: Current index of next-most outer loop
 +I       (n--)             n: value to add to I
 UNLOOP-F (--)              Drop top 3 entries from loop stack (unwind FOR loop)
 NEXT     (--)              Increment I, jump to start of loop if I < T
@@ -239,7 +242,7 @@ CELLS    (n--x)            x: The size of n CELLs
 EDIT     (n--)             Edit block n
 EXECUTE  (a--)             Jump to CODE address a
 LOAD     (n--)             Load block n from disk
-LOOKUP x (--f | xt i f)    Lookup x. If found f=1, i: immediate and xt: offset. Else f=0, and i and xt are not pushed.
+' x      (--f | xt i f)    Lookup x. If found f=1, i: immediate and xt: offset. Else f=0, and i and xt are not pushed.
 NOP      (--)              Do nothing
 RAND     (--n)             n: a RANDOM 31-bit number (0..$7FFFFFFF)
 RESET    (--)              Re-initialize cccForth

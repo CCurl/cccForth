@@ -75,10 +75,12 @@ byte *doType(byte *a, int l, int delim) {
             case 'b': printBase(pop(), 2);          break;
             case 'c': printChar((char)pop());       break;
             case 'd': printBase(pop(), 10);         break;
-            case 'f': printStringF("%g", fpop());   break;
+            case 'f': printStringF("%f", fpop());   break;
+            case 'g': printStringF("%g", fpop());   break;
             case 'i': printBase(pop(), BASE);       break;
             case 'n': printString("\r\n");          break;
             case 'q': printChar('"');               break;
+            case 's': printString((char*)pop());    break;
             case 'x': printBase(pop(), 16);         break;
             default: printChar(c);                  break;
             }
@@ -155,22 +157,23 @@ void run(WORD start) {
         case 'C': ir = *(pc++); if (ir=='@') { TOS = *AOS; }
                 else if(ir=='!') { *AOS = (byte)NOS; DROP2; }                break; // C@, C!
         case 'D': --TOS;                                                     break; // 1-
+        case 'E': rpush(pc-st.code); pc = CA(pop());                         break; // EXECUTE
         case 'F': ir = *(pc++); if (ir=='.') { printStringF("%g",fpop()); }         // FLOAT ops
                 else if (ir=='#') { fpush(FTOS); }
                 else if (ir=='$') { float x=FTOS; FTOS=FNOS; FNOS=x; }
                 else if (ir=='%') { fpush(FNOS); }
                 else if (ir=='\\') { FDROP; }
                 else if (ir=='i') { fpush((float)pop()); }
-                else if(ir=='o') { push((CELL)fpop()); }
-                else if(ir=='+') { FNOS+=FTOS; FDROP; }
-                else if(ir=='-') { FNOS-=FTOS; FDROP; }
-                else if(ir=='*') { FNOS*=FTOS; FDROP; }
-                else if(ir=='/') { FNOS/=FTOS; FDROP; }
-                else if(ir=='<') { push((FNOS<FTOS)?1:0); FDROP; FDROP; }
-                else if(ir=='>') { push((FNOS>FTOS)?1:0); FDROP; FDROP; }    break;
-        case 'G': pc = CA((WORD)pop());                                      break; // EXECUTE (GOTO)
+                else if (ir=='o') { push((CELL)fpop()); }
+                else if (ir=='+') { FNOS+=FTOS; FDROP; }
+                else if (ir=='-') { FNOS-=FTOS; FDROP; }
+                else if (ir=='*') { FNOS*=FTOS; FDROP; }
+                else if (ir=='/') { FNOS/=FTOS; FDROP; }
+                else if (ir=='<') { push((FNOS<FTOS)?1:0); FDROP; FDROP; }
+                else if (ir=='>') { push((FNOS>FTOS)?1:0); FDROP; FDROP; }   break;
+        case 'G': pc = CA(GET_WORD(pc));                                     break; // BRANCH
         case 'I': push(L0);                                                  break; // I
-        case 'J': pc = CA(GET_WORD(pc));                                     break; // BRANCH
+        case 'J': t1 = (lsp>2) ? lsp-3 : 0; push(lstk[t1]);                  break; // J
         case 'K': ir = *(pc++); if (ir=='@') { push(getChar()); }                   // KEY?, KEY
                 else if(ir=='?') { push(charAvailable()); }                  break;
         case 'M': L0 += pop();                                               break; // +I
