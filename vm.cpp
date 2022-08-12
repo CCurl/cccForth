@@ -75,12 +75,14 @@ byte *doType(byte *a, int l, int delim) {
             case 'b': printBase(pop(), 2);          break;
             case 'c': printChar((char)pop());       break;
             case 'd': printBase(pop(), 10);         break;
+            case 'e': printChar(27);                break;
             case 'f': printStringF("%f", fpop());   break;
             case 'g': printStringF("%g", fpop());   break;
             case 'i': printBase(pop(), BASE);       break;
             case 'n': printString("\r\n");          break;
             case 'q': printChar('"');               break;
             case 's': printString((char*)pop());    break;
+            case 't': printChar(9);                 break;
             case 'x': printBase(pop(), 16);         break;
             default: printChar(c);                  break;
             }

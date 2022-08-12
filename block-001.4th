@@ -6,9 +6,18 @@ reset
 
 : vhere va @ vb + ;
 : here ha @ cb + ;
+: last la @ 1- 20 * db + ;
+
+: num-words la @ ;
+: used here cb - ;
+
+: T1 ( a-- ) DUP 4 + SWAP W@ ." %n%i: %s" ;
+: words-l db num-words 0 FOR DUP T1 20 + NEXT DROP ;
 
 ( n a b -betw- f )
 : betw +tmps s3 s2 s1  r2 r1 <=  r1 r3 <=  and -tmps ;
+: min ( a b--x ) OVER OVER > .if SWAP .then DROP ;
+: max ( a b--x ) OVER OVER < .if SWAP .then DROP ;
 
 : T0 ( c-- ) dup BL $7E betw .if emit exit .then ." (%d)" ;
 : code cb here  for i c@ T0 next ;
@@ -18,13 +27,10 @@ reset
 : ON 1 ; : OFF 0 ;
 
 // Screen stuff
-: ->XY #27 ." %c[%d;%dH" ;
-: CLS #27 ." %c[2J" 1 dup ->XY ;
-: COLOR ( bg fg -- ) #27 ." %c[%d;%dm" ;
+: ->XY ." %e[%d;%dH" ;
+: CLS ." %e[2J" 1 dup ->XY ;
+: COLOR ( bg fg -- ) ." %e[%d;%dm" ;
 : FG ( fg -- ) 40 swap COLOR ;
-: CURSOR-ON  #27 ." %c[?25h" ;
-: CURSOR-OFF #27 ." %c[?25l" ;
+: CURSOR-ON  ." %e[?25h" ;
+: CURSOR-OFF ." %e[?25l" ;
 : CURSOR ( f-- ) if CURSOR-ON else CURSOR-OFF then ;
-
-: min ( a b--x ) dup dup > .if swap .then drop ;
-: max ( a b--x ) dup dup < .if swap .then drop ;

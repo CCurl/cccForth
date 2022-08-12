@@ -587,9 +587,10 @@ void systemWords() {
     sprintF(cp, ": db %lu ;", (UCELL)st.dict);     doParse(cp);
     sprintF(cp, ": csz %d ;", CODE_SZ);            doParse(cp);
     sprintF(cp, ": vsz %d ;", VARS_SZ);            doParse(cp);
-    sprintF(cp, ": ha %lu ;", (UCELL)&st.HERE);   doParse(cp);
+    sprintF(cp, ": dsz %d ;", DICT_SZ);            doParse(cp);
+    sprintF(cp, ": ha %lu ;", (UCELL)&st.HERE);    doParse(cp);
     sprintF(cp, ": la %lu ;", (UCELL)&st.LAST);    doParse(cp);
-    sprintF(cp, ": va %lu ;", (UCELL)&st.VHERE);  doParse(cp);
+    sprintF(cp, ": va %lu ;", (UCELL)&st.VHERE);   doParse(cp);
     sprintF(cp, ": base %lu ;", (UCELL)&BASE);     doParse(cp);
     sprintF(cp, ": >in %lu ;", (UCELL)&in);        doParse(cp);
 }

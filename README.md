@@ -143,16 +143,18 @@ ZTYPE    (s--)             Output string at s. See (1).
 
 (1) Notes on ." and ZTYPE:
 - ." is NOT ansi-standard
-- %b: output TOS as binary
-- %c: output TOS as character
-- %d: output TOS as integer
-- %f: output FTOS as floating point number
-- %g: output FTOS as scientific number
-- %i: output TOS in the current BASE
-- %n: output a new-line (13,10)
-- %q: output the quote (") character
+- %b: output TOS as a binary number
+- %c: output TOS as a character
+- %d: output TOS as an integer (base 10)
+- %i: output TOS as an integer (current base)
+- %x: output TOS as a hex number
 - %s: output TOS as a string (null terminated, no count byte)
-- %x: output TOS as hex
+- %f: output FTOS as a floating point number
+- %g: output FTOS as a scientific number
+- %n: output a NEWLINE (13,10)
+- %t: output a TAB (9)
+- %t: output an ESCAPE (27)
+- %q: output the quote (") character
 
 example: : ascii $20 '~' for i i i i ." %n%d: (%c) %x %b" next ;
 
