@@ -117,7 +117,8 @@ typedef long CELL;
 typedef unsigned long UCELL;
 typedef unsigned short USHORT;
 
-#define CELL_SZ      sizeof(CELL)
+#define CELL_SZ   sizeof(CELL)
+#define CSZ       CELL_SZ
 
 #define NAME_LEN 16
 

@@ -200,8 +200,7 @@ void run(WORD start) {
             L0 = (TOS < NOS) ? TOS : NOS; DROP2;                             break;
         case '\\': DROP1;                                                    break; // DROP
         case ']': ++L0; if (L0<L1) { pc=(byte*)L2; } else { lsp-=3; }        break; // NEXT
-        case '^': ir = *(pc++); if (ir == 'W') { lsp -= 1; }                        // UNLOOP
-                else if (ir == 'F') { lsp -= 3; }                            break;
+        case '^': ir=*(pc++); lsp-=(ir=='F')?3:1; if (lsp<0) { lsp=0; }      break; // UNLOOP, UNLOOP-W
         case '_': TOS = -TOS;                                                break; // NEGATE
         case '`': push((CELL)pc); while (*(pc++)) {}                         break; // ZQUOTE
         case 'b': ir = *(pc++); if (ir == '~') { TOS = ~TOS; }                      // BINARY ops
@@ -212,7 +211,7 @@ void run(WORD start) {
                 else if (ir == 'L') { NOS = (NOS << TOS); DROP1; }
                 else if (ir == 'R') { NOS = (NOS >> TOS); DROP1; }
                 else { --pc; printChar(32); }                                break;
-        case 'c': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]+=CELL_SZ; }  break; // incLocal-CELL
+        case 'c': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]+=CSZ; }   break; // incLocal-CELL
         case 'd': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { --locals[lb+t1]; }      break; // decLocal
         case 'i': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { ++locals[lb+t1]; }      break; // incLocal
         case 'f': pc = doFile(ir, pc);                                       break; // FILE ops
