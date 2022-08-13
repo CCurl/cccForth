@@ -106,7 +106,7 @@ byte* doFile(CELL ir, byte* pc) {
     return pc;
 }
 
- CELL doRand() {
+CELL doRand() {
     if (seed == 0) { seed = doTimer(); }
     seed ^= (seed << 13);
     seed ^= (seed >> 17);
@@ -224,7 +224,12 @@ void run(WORD start) {
         case 'v': t1=GET_LONG(pc); pc+=4; push((CELL)&st.vars[t1]);          break; // VAR-ADDR
         case 'w': ir = *(pc++); if (ir == '@') { TOS = GET_WORD(AOS); }
                 else if (ir == '!') { SET_WORD(AOS, (WORD)NOS); DROP2; }     break; // w@, w!
-        case 'x': ir=*(pc++); if (ir=='S') { doDotS(); }                            // .S
+        case 'x': ir = *(pc++); if (ir==']') { t1 = L0; L0 += pop();                // +LOOP
+                    if ((t1 < L1) && (L0 < L1)) { pc = (byte*)(L2); }
+                    else if ((t1 > L1) && (L0 > L1)) { pc = (byte*)(L2); }
+                    else { lsp -= 3; } }
+                else if (ir=='[') { lsp += 3; L0=pop(); L1=pop(); L2=(CELL)pc; }    // DO
+                else if (ir=='S') { doDotS(); }                                     // .S
                 else if (ir=='R') { push(doRand()); }                               // RAND
                 else if (ir=='A') { st.VHERE+=pop(); tVHERE=st.VHERE; }             // ALLOT
                 else if (ir=='T') { push(doTimer()); }                              // TIMER

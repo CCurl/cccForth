@@ -200,12 +200,17 @@ ELSE     (--)              Standard ELSE
 THEN     (--)              Standard THEN
 .IF      (f--)             Simple IF, no ELSE allowed (shorter)
 .THEN    (--)              Simple THEN
-FOR      (f t--)           Begin FOR/NEXT loop
+FOR      (F T--)           Begin FOR/NEXT loop. Ensure that F<T (if F>T, SWAP them).
+NEXT     (--)              Increment I, jump to start of loop if I < T
+                     NOTE: Use IF UNLOOP EXIT THEN to break out prematurely.
+DO       (T F--)           Begin DO loop
+LOOP     (--)              Increment I, jump to start of loop if I < T
++LOOP    (N--)             Add N to I, jump to start of loop if I reaches T
+                     NOTE: Use IF UNLOOP EXIT THEN to break out prematurely.
 I        (--n)             n: Current index
 J        (--n)             n: Current index of next-most outer loop
 +I       (n--)             n: value to add to I
-UNLOOP-F (--)              Drop top 3 entries from loop stack (unwind FOR loop)
-NEXT     (--)              Increment I, jump to start of loop if I < T
+UNLOOP   (--)              Drop top 3 entries from loop stack (unwind FOR loop)
 BEGIN    (f--f)            Start WHILE/UNTIL/AGAIN loop.
 WHILE    (f--f?)           If f==0, jump to BEGIN, else DROP f and continue.
 UNTIL    (f--f?)           If f<>0, jump to BEGIN, else DROP f and continue.
