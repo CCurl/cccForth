@@ -270,6 +270,18 @@ void doCreate(const char *name, byte f) {
     ++st.LAST;
 }
 
+int doFindInternal(const char* name) {
+    // Regular lookup
+    int len = strLen(name);
+    for (int i = st.LAST - 1; i >= 0; i--) {
+        DICT_E* dp = &st.dict[i];
+        if ((len == dp->len) && strEq(dp->name, name)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 int doFind(const char *name) {
     // Temporary word?
     if (isTempWord(name) && (tempWords[name[1]-'0'])) {
@@ -279,40 +291,27 @@ int doFind(const char *name) {
     }
 
     // Regular lookup
-    int len = strLen(name);
-    for (int i = st.LAST-1; i >= 0; i--) {
-        DICT_E* dp = &st.dict[i];
-        if ((len == dp->len) && strEq(dp->name, name)) {
-            push(dp->xt);
-            push(dp->flags);
-            return 1;
-        }
+    int i = doFindInternal(name);
+    if (0 <= i) {
+        push(st.dict[i].xt);
+        push(st.dict[i].flags);
+        return 1;
     }
     return 0;
 }
 
 int doSee(const char* wd) {
-    if (!doFind(wd)) { return 1; }
-    DROP1;
-    CELL start = pop();
+    int i = doFindInternal(wd);
+    if (i<0) { printString("-nf-"); return 1; }
+    CELL start = st.dict[i].xt;
     CELL end = st.HERE;
+    if ((i+1) < st.LAST) { end = st.dict[i + 1].xt; }
 
-    int len = strLen(wd);
-    for (int i = st.LAST-1; i > 0; i--) {
-        DICT_E* dp = &st.dict[i-1];
-        if ((len == dp->len) && strEq(dp->name, wd)) {
-            end = st.dict[i].xt;
-            break;
-        }
-    }
-
-    if (start < end) {
-        printStringF("%s: ", wd);
-        for (int i = start; i < end; i++) {
-            byte c = st.code[i];
-            if (BTW(c, 32, 126)) { printChar(c); }
-            else { printStringF("(%d)",c); }
-        }
+    printStringF("%s (%d): ", wd, start);
+    for (int i = start; i < end; i++) {
+        byte c = st.code[i];
+        if (BTW(c, 32, 126)) { printChar(c); }
+        else { printStringF("(%d)",c); }
     }
     return 1;
 }
