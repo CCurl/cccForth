@@ -1,6 +1,6 @@
 // cccForth.cpp : An extremely memory conscious Forth interpreter
 
-#include "Shared.h"
+#include "shared.h"
 
 typedef struct {
     const char *name;

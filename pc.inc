@@ -8,7 +8,55 @@ FILE *fpStk[10];
 byte fpSP = 0;
 
 CELL doTimer() { return clock(); }
+#if __TARGET__ == LINUX
+
+void changeMode(int mode)
+{
+    static struct termios oldt, newt;
+    static int cmInit = 0;
+    if (cmInit == 0) {
+        cmInit = 1;
+        tcgetattr( STDIN_FILENO, &oldt);
+        newt = oldt;
+        newt.c_lflag &= ~( ICANON | ECHO );
+    }
+
+    if (mode) {
+        tcsetattr( STDIN_FILENO, TCSANOW, &newt);
+    } else {
+        tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
+    }
+}
+
+int charAvailable(void)
+{
+    struct timeval tv;
+    fd_set rdfs;
+
+    changeMode(1);
+
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+
+    FD_ZERO(&rdfs);
+    FD_SET(STDIN_FILENO, &rdfs);
+
+    select(STDIN_FILENO+1, &rdfs, NULL, NULL, &tv);
+    int x = FD_ISSET(STDIN_FILENO, &rdfs);
+    changeMode(0);
+    return x;
+}
+int getChar(void) {
+    return getchar(); 
+}
+void doSleep() { usleep(pop()); }
+
+#else // WINDOWS
+
+int charAvailable(void) { return _kbhit(); }
+int getChar(void) { return _getch(); }
 void doSleep() { Sleep(pop()); }
+#endif
 
 void fpPush(FILE *v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }
 FILE *fpPop() { return (fpSP) ? fpStk[fpSP--] : 0 ; }
@@ -18,7 +66,7 @@ FILE *myFopen(const char *fn, const char *md) {
 #ifdef _WIN32
     fopen_s(&fp, fn, md);
 #else
-    FILE *fp = fopen(fn, md);
+    fp = fopen(fn, md);
 #endif
     return fp;
 }
@@ -92,7 +140,6 @@ byte *doExt(CELL ir, byte *pc) {
     case 'F': return doFile(ir, pc);
     case 'L': doLoad(pop());                    break;
     case 'T': push(clock());                    break;
-    case 'W': if (TOS) { Sleep(TOS); } pop();   break;
     default: printString("-unk ext-");
     }
     return pc;
@@ -100,8 +147,6 @@ byte *doExt(CELL ir, byte *pc) {
 
 void printString(const char *cp) { fputs(cp, stdout); }
 void printChar(char c) { putc(c, stdout); }
-int charAvailable(void) { return _kbhit(); }
-int getChar(void) { return _getch(); }
 
 void doHistory(const char *txt) {
     FILE* fp = myFopen("history.txt", "at");

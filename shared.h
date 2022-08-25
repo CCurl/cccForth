@@ -11,7 +11,8 @@
 #define LINUX        8
 #define LEO          9
 
-#define __BOARD__    TEENSY4
+#define __BOARD__    LINUX
+#define __TARGET__   LINUX
 
 #ifdef _WIN32
   #undef __BOARD__
@@ -19,7 +20,6 @@
   #define __WINDOWS__
   #include <Windows.h>
   #include <conio.h>
-  #include <time.h>
   #define CODE_SZ      ( 64*1024)
   #define VARS_SZ      (256*1024)
   #define STK_SZ        64
@@ -31,6 +31,8 @@
 #elif __BOARD__ == LINUX
   #undef __BOARD__
   #define __BOARD__ PC
+  #include <unistd.h>
+  #include <termios.h>
   #define CODE_SZ      ( 64*1024)
   #define VARS_SZ      (256*1024)
   #define STK_SZ        64
@@ -44,6 +46,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <time.h>
 
 #if __BOARD__ == TEENSY4
   #define CODE_SZ      (48*1024)
