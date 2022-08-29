@@ -12,12 +12,11 @@
 #define LEO          9
 
 #define __BOARD__    LINUX
-#define __TARGET__   LINUX
 
 #ifdef _WIN32
   #undef __BOARD__
   #define __BOARD__ PC
-  #define __WINDOWS__
+  #define __TARGET__   WINDOWS
   #include <Windows.h>
   #include <conio.h>
   #define CODE_SZ      ( 64*1024)
@@ -31,6 +30,7 @@
 #elif __BOARD__ == LINUX
   #undef __BOARD__
   #define __BOARD__ PC
+  #define __TARGET__   LINUX
   #include <unistd.h>
   #include <termios.h>
   #define CODE_SZ      ( 64*1024)
