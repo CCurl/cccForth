@@ -66,6 +66,22 @@ To these ends, I have wandered off the beaten path in the following ways:
 : dumpX ( a n-- ) over + for I c@ .c next ;
 ```
 
+## Building cccForth
+```
+- Windows:
+  - I use Visual Studio 19, either the community or paid version.
+  - Open is a cccForth.sln file.
+  - Use the 'x86' configuration.
+  - It detects the _WIN32 #define and builds cccForth appropriately.
+
+- Linux:
+  - I use clang on Mint.
+  - Set the '\_\_BOARD\_\_' #define to LINUX (file shared.h, line 14).
+  - Use the simple 'make' shell script to build cccForth.
+
+- Development Boards:
+  - I use the Arduino IDE.
+```
 ## cccForth Primitives
 ```
 NOTEs: (1) These built into cccForth.
