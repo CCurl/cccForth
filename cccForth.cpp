@@ -544,10 +544,7 @@ int doParseWord(char *wd) {
     }
 
     printStringF("[%s]??", wd);
-    if (STATE == 1) {
-        STATE = 0;
-        st.LAST -= st.code[st.HERE];
-    }
+    if (STATE == 1) { STATE = 0; --st.LAST; }
     tHERE = st.HERE;
     tVHERE = st.VHERE;
     st.code[tHERE] = 0;
@@ -565,12 +562,10 @@ bool isASM(const char* ln) {
 void doParse(const char *line) {
     in = (char*)line;
     if (isASM(line)) { return; }
-    int len = getWord(word);
-    while (0 < len) {
+    while (getWord(word)) {
         if (tHERE < st.HERE) { tHERE = st.HERE; }
         if (tVHERE < st.VHERE) { tVHERE = st.VHERE; }
         if (doParseWord(word) == 0) { return; }
-        len = getWord(word);
     }
     doExec();
 }
