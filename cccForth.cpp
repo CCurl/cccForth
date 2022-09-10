@@ -324,6 +324,12 @@ void doWords() {
         if ((++n) % 10 == 0) { printChar('\n'); }
         else { printChar(9); }
     }
+    PRIM_T *x = prims;
+    while (x->name) {
+        printStringF("%s\t", x->name);
+        ++x;
+        if ((++n) % 10 == 0) { printChar('\n'); }
+    }
 }
 
 int getWord(char *wd) {
