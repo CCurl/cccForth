@@ -19,14 +19,14 @@ void vmReset() {
     systemWords();
 }
 
-inline void push(CELL v) { stks[++sp] = v; }
-inline CELL pop() { return stks[sp--]; }
+void push(CELL v) { stks[++sp] = v; }
+CELL pop() { return stks[sp--]; }
 
-inline void fpush(float v) { fstk[++fsp] = v; }
-inline float fpop() { return fstk[fsp--]; }
+void fpush(float v) { fstk[++fsp] = v; }
+float fpop() { return fstk[fsp--]; }
 
-inline void rpush(CELL v) { stks[--rsp] = v; }
-inline CELL rpop() { return stks[rsp++]; }
+void rpush(CELL v) { stks[--rsp] = v; }
+CELL rpop() { return stks[rsp++]; }
 
 #ifdef NEEDS_ALIGN
 WORD GET_WORD(byte* l) { return *l | (*(l + 1) << 8); }
