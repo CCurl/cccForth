@@ -199,8 +199,8 @@ void run(WORD start) {
             L1 = (TOS > NOS) ? TOS : NOS;
             L0 = (TOS < NOS) ? TOS : NOS; DROP2;                             break;
         case '\\': DROP1;                                                    break; // DROP
-        case ']': ++L0; if (L0<L1) { pc=(byte*)L2; } else { lsp-=3; }        break; // NEXT
-        case '^': ir=*(pc++); lsp-=(ir=='F')?3:1; if (lsp<0) { lsp=0; }      break; // UNLOOP, UNLOOP-W
+        case ']': ++L0; if (L0<L1) { pc=(byte*)L2; } else { lsp-=3; }        break; // LOOP
+        case '^': if (2 < lsp) { lsp -= 3; }                                 break; // UNLOOP
         case '_': TOS = -TOS;                                                break; // NEGATE
         case '`': push((CELL)pc); while (*(pc++)) {}                         break; // ZQUOTE
         case 'b': ir = *(pc++); if (ir == '~') { TOS = ~TOS; }                      // BINARY ops
@@ -237,8 +237,8 @@ void run(WORD start) {
                 else if (ir=='W') { doSleep(); }                                    // MS
                 else if (ir=='Q') { isBye=1; return; }                       break; // BYE
         case 'z': pc = doExt(*pc, pc+1);                                     break; // EXT
-        case '{': ++lsp; L0=(CELL)pc;                                        break; // BEGIN
-        case '}': if (pop()) { pc=(byte*)L0; } else { lsp--; }               break; // WHILE
+        case '{': lsp += 3; L0 = (CELL)pc;                                   break; // BEGIN
+        case '}': if (pop()) { pc = (byte*)L0; } else { lsp -= 3; }          break; // WHILE
         case '~': TOS = (TOS) ? 0 : 1;                                       break; // NOT (0=)
         default: printStringF("-unk ir: %d (%c)-", ir, ir);                 return;
         }

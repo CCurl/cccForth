@@ -67,13 +67,11 @@ PRIM_T prims[] = {
     , { "I", "I" }
     , { "J", "J" }
     , { "+I", "M" }
-    , { "UNLOOP", "^F" }
-    , { "UNLOOP-F", "^F" }
+    , { "UNLOOP", "^" }
     , { "BEGIN", "{" }
     , { "WHILE", "}" }
     , { "UNTIL", "~}" }
     , { "AGAIN", "1}" }
-    , { "UNLOOP-W", "^W" }
     , { "TRUE", "1" }
     , { "FALSE", "0" }
     , { "=", "=" }
