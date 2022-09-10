@@ -1,2 +1,2 @@
 #/bin/sh
-clang -m32 -g -o cccForth *.cpp
+clang -m32 -Os -o cccForth *.cpp
