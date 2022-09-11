@@ -349,6 +349,9 @@ int doNumber(int t) {
     } else if (t == 4) {
         CComma(4);
         Comma(num);
+    } else if (BTW(num,33,127)) {
+        CComma('\'');
+        CComma(num);
     } else if ((num & 0xFF) == num) {
         CComma(1);
         CComma(num);
@@ -452,9 +455,9 @@ int doWord() {
 int doParseWord(char *wd) {
     if (strEq(word, "//")) { doExec(); return 0; }
     if (strEq(word, "\\")) { doExec(); return 0; }
+    if (isNum(wd))         { return doNumber(0); }
     if (doPrim(wd))        { return 1; }
     if (doFind(wd))        { return doWord(); }
-    if (isNum(wd))         { return doNumber(0); }
     if (strEq(wd, ".\""))  { return doDotQuote(); }
     if (strEq(wd, "\""))   { return doQuote(); }
 
