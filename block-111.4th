@@ -36,7 +36,7 @@ variable ln cols allot
 
 : .pop 1 dup ->XY
     1 rows 1+ FOR ln s6 
-        1 cols 1+ FOR I J ->p C@ IF '*' ELSE BL THEN r6 C! i6 NEXT 
+        1 cols 1+ FOR $20 I J ->p C@ .IF DROP '*' .THEN r6 C! i6 NEXT 
         0 r6 C! ln QTYPE CR
     NEXT ;
 

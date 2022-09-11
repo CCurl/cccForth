@@ -8,10 +8,12 @@
 #define ESP8266      5
 #define APPLE_MAC    6
 #define PICO         7
-#define LINUX        8
-#define LEO          9
+#define LEO          8
+#define LINUX        9
 
-#define __BOARD__    LINUX
+#define __BOARD__    XIAO
+
+#define NAME_LEN 16
 
 #ifdef _WIN32
   #undef __BOARD__
@@ -27,7 +29,8 @@
   #define DICT_SZ     2000
   #define FLT_SZ        10
   #define __FILES__
-#elif __BOARD__ == LINUX
+#endif
+#if _LINUX
   #undef __BOARD__
   #define __BOARD__ PC
   #define __TARGET__   LINUX
@@ -73,10 +76,12 @@
   // #define __EDITOR__
   #define NEEDS_ALIGN
 #elif __BOARD__ == XIAO
-  #define CODE_SZ      (12*1024)
-  #define VARS_SZ      (12*1024)
+  #undef NAME_LEN
+  #define NAME_LEN      12
+  #define CODE_SZ      (10*1024)
+  #define VARS_SZ      (10*1024)
   #define STK_SZ        32
-  #define LSTK_SZ       12
+  #define LSTK_SZ       16
   #define LOCALS_SZ     80
   #define DICT_SZ      200
   #define FLT_SZ         8
@@ -84,10 +89,12 @@
   #define NEEDS_ALIGN
 // #define __GAMEPAD__
 #elif __BOARD__ == ESP8266
+  #undef NAME_LEN
+  #define NAME_LEN      12
   #define CODE_SZ      (14*1024)
   #define VARS_SZ      (12*1024)
   #define STK_SZ        32
-  #define LSTK_SZ       12
+  #define LSTK_SZ       16
   #define LOCALS_SZ     80
   #define DICT_SZ      100
   #define FLT_SZ         8
@@ -122,8 +129,6 @@ typedef unsigned short USHORT;
 
 #define CELL_SZ   sizeof(CELL)
 #define CSZ       CELL_SZ
-
-#define NAME_LEN 16
 
 typedef struct {
     USHORT xt;

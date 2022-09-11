@@ -33,4 +33,4 @@ reset
 : FG ( fg -- ) 40 swap COLOR ;
 : CURSOR-ON  ." %e[?25h" ;
 : CURSOR-OFF ." %e[?25l" ;
-: CURSOR ( f-- ) if CURSOR-ON else CURSOR-OFF then ;
+: CURSOR ( f-- ) IF CURSOR-ON EXIT THEN CURSOR-OFF ;

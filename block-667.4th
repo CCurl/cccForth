@@ -6,7 +6,7 @@ xxx .
 : here ha @ cb + ;
 here s7
 
-: T1 if 'Y' else 'N' then emit ;
+: T1 IF 'Y' EMIT EXIT THEN 'N' EMIT ;
 : T2 cr 1 2 3 + + . cr 19 42 for i . next cr 19 42 do i . -1 +loop ;
 : T3 cr 20 s1 begin r1 . d1 r1 while ;
 : T4 cr +tmps 123 445 s2 s1 r1 . r2 . -tmps ;
