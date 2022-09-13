@@ -10,21 +10,24 @@ byte fpSP = 0;
 CELL doTimer() { return clock(); }
 #if __TARGET__ == LINUX
 
-void changeMode(int mode)
+void ttyMode(int mode)
 {
     static struct termios oldt, newt;
-    static int cmInit = 0;
-    if (cmInit == 0) {
-        cmInit = 1;
+    static int curMode = -1;
+    if (curMode == -1) {
+        curMode = 0;
         tcgetattr( STDIN_FILENO, &oldt);
         newt = oldt;
         newt.c_lflag &= ~( ICANON | ECHO );
     }
 
-    if (mode) {
-        tcsetattr( STDIN_FILENO, TCSANOW, &newt);
-    } else {
-        tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
+    if (mode != curMode) {
+        if (mode) {
+            tcsetattr( STDIN_FILENO, TCSANOW, &newt);
+        } else {
+            tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
+        }
+        curMode = mode;
     }
 }
 
@@ -33,7 +36,7 @@ int charAvailable(void)
     struct timeval tv;
     fd_set rdfs;
 
-    changeMode(1);
+    ttyMode(1);
 
     tv.tv_sec = 0;
     tv.tv_usec = 0;
@@ -43,19 +46,28 @@ int charAvailable(void)
 
     select(STDIN_FILENO+1, &rdfs, NULL, NULL, &tv);
     int x = FD_ISSET(STDIN_FILENO, &rdfs);
-    changeMode(0);
     return x;
 }
 int getChar(void) {
-    return getchar(); 
+    ttyMode(1);
+    return getchar();
 }
 void doSleep() { usleep(pop()); }
+void readLine(char *buf, int sz) {
+    ttyMode(0);
+    fgets(buf, sz, stdin);
+    ttyMode(1);
+}
 
 #else // WINDOWS
 
 int charAvailable(void) { return _kbhit(); }
 int getChar(void) { return _getch(); }
 void doSleep() { Sleep(pop()); }
+void ttyMode(int x) {}
+void readLine(char *buf, int sz) {
+    fgets(buf, sz, stdin);
+}
 #endif
 
 void fpPush(FILE *v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }
@@ -168,7 +180,7 @@ void loop() {
         }
     } else {
         doOK();
-        fgets(tib, 128, stdin);
+        readLine(tib, 128);
         doHistory(tib);
         doParse(rTrim(tib));
     }
@@ -180,8 +192,10 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     vmReset();
+    ttyMode(1);
     if (argc > 1) { input_fp = myFopen(argv[1], "rt"); }
     else { doLoad(0); }
     while (!isBye) { loop(); }
+    ttyMode(0);
     return 0;
 }
