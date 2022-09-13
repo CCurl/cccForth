@@ -27,7 +27,7 @@ T2 T3 T4 T5
 : mil 1000 dup * * ;
 cr see prime? cr
 71 prime? ."  71 prime? (%d)%n"
-cr cr 1 mil bm cr
+cr cr 1 mil 2/ bm cr
 cr 100 .primes ." (primes in 100)%n"
 
 : T1 ." %nx1-"  9 begin dup . 1+ dup 34 < while ." -out1" drop ;

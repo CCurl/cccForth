@@ -12,18 +12,16 @@ CELL doTimer() { return clock(); }
 
 void ttyMode(int mode)
 {
-    static struct termios oldt, newt;
+    static struct termios oldt;
     static int curMode = -1;
     if (curMode == -1) {
         curMode = 0;
         tcgetattr( STDIN_FILENO, &oldt);
-        newt = oldt;
-        newt.c_lflag &= ~( ICANON | ECHO );
     }
 
     if (mode != curMode) {
         if (mode) {
-            tcsetattr( STDIN_FILENO, TCSANOW, &newt);
+            cfmakeraw();
         } else {
             tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
         }
@@ -37,7 +35,6 @@ int charAvailable(void)
     fd_set rdfs;
 
     ttyMode(1);
-
     tv.tv_sec = 0;
     tv.tv_usec = 0;
 
@@ -64,10 +61,8 @@ void readLine(char *buf, int sz) {
 int charAvailable(void) { return _kbhit(); }
 int getChar(void) { return _getch(); }
 void doSleep() { Sleep(pop()); }
-void ttyMode(int x) {}
-void readLine(char *buf, int sz) {
-    fgets(buf, sz, stdin);
-}
+#define ttyMode(x)
+#define readLine(buf, sz) fgets(buf, sz, stdin)
 #endif
 
 void fpPush(FILE *v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }
@@ -110,14 +105,12 @@ void fWrite() {
     if (fp) { fputc(val, fp); }
 }
 
-void fDelete() {
-}
+void fDelete() {}
 
-void fList() {
-}
+void fList() {}
 
 void fSave() {
-    FILE *fp = myFopen("system.ccc", "wb");
+    FILE *fp = myFopen("system.c4", "wb");
     if (fp) {
         fwrite(&st, sizeof(st), 1, fp);
         fclose(fp);
@@ -126,7 +119,7 @@ void fSave() {
 }
 
 void fLoad() {
-    FILE *fp = myFopen("system.ccc", "rb");
+    FILE *fp = myFopen("system.c4", "rb");
     if (fp) {
         vmReset();
         fread(&st, sizeof(st), 1, fp);
@@ -145,13 +138,10 @@ void doLoad(int blk) {
     }
 }
 
-
 byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
     case 'E': doEditor();                       break;
-    case 'F': return doFile(ir, pc);
     case 'L': doLoad(pop());                    break;
-    case 'T': push(clock());                    break;
     default: printString("-unk ext-");
     }
     return pc;

@@ -17,8 +17,8 @@
 
 #ifdef _WIN32
   #undef __BOARD__
-  #define __BOARD__ PC
-  #define __TARGET__   WINDOWS
+  #define __BOARD__     PC
+  #define __TARGET__    WINDOWS
   #include <Windows.h>
   #include <conio.h>
   #define CODE_SZ      ( 64*1024)
@@ -30,10 +30,11 @@
   #define FLT_SZ        10
   #define __FILES__
 #endif
+
 #if _LINUX
   #undef __BOARD__
-  #define __BOARD__ PC
-  #define __TARGET__   LINUX
+  #define __BOARD__     PC
+  #define __TARGET__    LINUX
   #include <unistd.h>
   #include <termios.h>
   #define CODE_SZ      ( 64*1024)
