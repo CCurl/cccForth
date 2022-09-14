@@ -13,15 +13,17 @@ CELL doTimer() { return clock(); }
 void ttyMode(int mode)
 {
     static struct termios oldt;
+    static struct termios rawt;
     static int curMode = -1;
     if (curMode == -1) {
         curMode = 0;
         tcgetattr( STDIN_FILENO, &oldt);
+        cfmakeraw(&rawt);
     }
 
     if (mode != curMode) {
         if (mode) {
-            cfmakeraw();
+            tcsetattr( STDIN_FILENO, TCSANOW, &rawt);
         } else {
             tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
         }
