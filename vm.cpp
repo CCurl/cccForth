@@ -100,7 +100,8 @@ byte* doFile(CELL ir, byte* pc) {
     else if (ir == 's') { fSave(); }
     else if (ir == 'l') { fLoad(); pc = 0; }
     else if (TOS == 0) { printString("-nofp-"); return pc; }
-    else if (ir == 'R') { fRead(); }
+    else if (ir == 'R') { fGetC(); }
+    else if (ir == 'G') { fGetS(); }
     else if (ir == 'W') { fWrite(); }
     else if (ir == 'C') { fClose(); }
     return pc;

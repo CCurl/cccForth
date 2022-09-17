@@ -36,13 +36,25 @@ void fOpen() {               // (name mode--fh)
     }
 }
 
-void fRead() {               // (fh--c n)
+void fGetC() {               // (fh--c n)
     byte c;
     CELL fh = TOS; 
     push(0);
     if (VALIDF(fh)) {
         TOS = files[fh].read(&c, 1);
         NOS = (CELL)c;
+    }
+}
+
+void fGetS() {               // (a sz fh--f)
+    CELL fh = pop();
+    CELL sz = pop();
+    char *a = (char *)TOS;
+    TOS = 0;
+    *a = 0;
+    if (VALIDF(fh) && (files[fh].available())) {
+        int l = files[fh].readBytesUntil('\n', a, sz);
+        TOS = 1;
     }
 }
 

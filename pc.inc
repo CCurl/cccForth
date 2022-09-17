@@ -65,7 +65,10 @@ int getChar(void) { return _getch(); }
 void doSleep() { Sleep(pop()); }
 #define ttyMode(x)
 #define readLine(buf, sz) fgets(buf, sz, stdin)
+
 #endif
+
+// ************************** FILES **************************
 
 void fpPush(FILE *v) { if (fpSP < 9) { fpStk[++fpSP] = v; } }
 FILE *fpPop() { return (fpSP) ? fpStk[fpSP--] : 0 ; }
@@ -92,11 +95,23 @@ void fClose() {
     if (fp) { fclose((FILE *)fp); }
 }
 
-void fRead() {
+void fGetC() {
     FILE *fp = (FILE *)pop();
     push(0); push(0);
     if (fp && (!feof(fp))) {
         NOS = fgetc(fp);
+        TOS = 1;
+    }
+}
+
+void fGetS() {
+    FILE *fp = (FILE *)pop();
+    CELL sz = pop();
+    char *cp = (char *)TOS;
+    TOS = 0;
+    *cp = 0;
+    if (fp && !feof(fp)) {
+        fgets(cp, sz, fp);
         TOS = 1;
     }
 }

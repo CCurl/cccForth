@@ -3,7 +3,8 @@
 void noFile() { printString("-noFile-"); }
 void fileInit() { }
 void fOpen() { noFile(); }
-void fRead() { noFile(); }
+void fGetC() { noFile(); }
+void fGetS() { noFile(); }
 void fWrite() { noFile(); }
 void fClose() { noFile(); }
 void fDelete() { noFile(); }

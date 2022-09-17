@@ -142,6 +142,7 @@ PRIM_T prims[] = {
     // Extension: FILE operations
     , { "FOPEN", "fO" }
     , { "FGETC", "fR" }
+    , { "FGETS", "fG" }
     , { "FPUTC", "fW" }
     , { "FCLOSE", "fC" }
     , { "FDELETE", "fD" }
@@ -319,14 +320,14 @@ void doWords() {
     for (int i = st.LAST-1; i >= 0; i--) {
         DICT_E* dp = &st.dict[i];
         printString(dp->name);
-        if ((++n) % 10 == 0) { printChar('\n'); }
+        if ((++n) % 10 == 0) { printString("\r\n"); }
         else { printChar(9); }
     }
     PRIM_T *x = prims;
     while (x->name) {
         printStringF("%s\t", x->name);
         ++x;
-        if ((++n) % 10 == 0) { printChar('\n'); }
+        if ((++n) % 10 == 0) { printString("\r\n"); }
     }
 }
 

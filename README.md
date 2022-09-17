@@ -176,7 +176,8 @@ example: : ascii $20 '~' for i i i i ." %n%d: (%c) %x %b" next ;
 
 *** FILE ***
 FOPEN    (a n--fh)         a: file name, n: 0 => READ, else WRITE, fh: file handle
-FGETC    (fh--c n)         c: next char from file fh, n: 1 if a char was read, else 0 (EOF).
+FGETC    (fh--c f)         c: next char from file fh, f: 0 if EOF/error, else 1.
+FGETS    (a n fh--f)       Read next line from file fh to address a, size n, f: 0 if EOF/error, else 1.
 FPUTC    (c fh--)          c: char to write to file fh.
 FCLOSE   (fh--)            fh: file handle to close.
 FDELETE  (fn--)            fn: The name of the file to be deleted.
