@@ -75,18 +75,16 @@ To these ends, I have wandered off the beaten path in the following ways:
   - It detects the _WIN32 #define and builds cccForth appropriately.
 
 - Linux:
-  - I use clang on Mint.
-  - Set the '\_\_BOARD\_\_' #define to LINUX (file shared.h, line 14).
-  - Use the simple 'make' shell script to build cccForth.
+  - I use clang on Mint. GCC works as well.
+  - There is a makefile to build cccForth.
 
 - Development Boards:
   - I use the Arduino IDE.
 ```
 ## cccForth Primitives
 ```
-NOTEs: (1) These built into cccForth.
+NOTEs: (1) These are built into cccForth.
        (2) They are NOT case-sensitive.
-       (3) They do NOT show up in WORDS.
 
 *** MATH ***
 +        (a b--c)          Addition
@@ -162,15 +160,15 @@ ZTYPE    (s--)             Output string at s. See (1).
 - %b: output TOS as a binary number
 - %c: output TOS as a character
 - %d: output TOS as an integer (base 10)
-- %i: output TOS as an integer (current base)
-- %x: output TOS as a hex number
-- %s: output TOS as a string (null terminated, no count byte)
+- %e: output an ESCAPE (27)
 - %f: output FTOS as a floating point number
 - %g: output FTOS as a scientific number
-- %n: output a NEWLINE (13,10)
-- %t: output a TAB (9)
-- %t: output an ESCAPE (27)
+- %i: output TOS as an integer (current base)
+- %n: output a CR/LF (13,10)
 - %q: output the quote (") character
+- %s: output TOS as a string (null terminated, no count byte)
+- %t: output a TAB (9)
+- %x: output TOS as a hex number
 
 example: : ascii $20 '~' for i i i i ." %n%d: (%c) %x %b" next ;
 
@@ -215,25 +213,23 @@ W!       (w a--)           Store WORD w at a
 IF       (f--)             Standard IF
 ELSE     (--)              Standard ELSE
 THEN     (--)              Standard THEN
-.IF      (f--)             Simple IF, no ELSE allowed (shorter)
+.IF      (f--)             Simple IF, no ELSE allowed (shorter, more human-readable)
 .THEN    (--)              Simple THEN
 FOR      (F T--)           Begin FOR/NEXT loop. Ensure that F<T (if F>T, SWAP them).
 NEXT     (--)              Increment I, jump to start of loop if I < T
-                     NOTE: Use IF UNLOOP EXIT THEN to break out prematurely.
 DO       (T F--)           Begin DO loop
 LOOP     (--)              Increment I, jump to start of loop if I < T
 +LOOP    (N--)             Add N to I, jump to start of loop if I reaches T
-                     NOTE: Use IF UNLOOP EXIT THEN to break out prematurely.
 I        (--n)             n: Current index
 J        (--n)             n: Current index of next-most outer loop
 +I       (n--)             n: value to add to I
-UNLOOP   (--)              Drop top 3 entries from loop stack (unwind FOR loop)
-BEGIN    (f--f)            Start WHILE/UNTIL/AGAIN loop.
-WHILE    (f--f?)           If f==0, jump to BEGIN, else DROP f and continue.
-UNTIL    (f--f?)           If f<>0, jump to BEGIN, else DROP f and continue.
-AGAIN    (--)              Jump to BEGIN. Use IF UNLOOP-W EXIT THEN to break out.
-UNLOOP-W (--)              Drop top 1 entry from loop stack (unwind WHILE loop)
-EXIT     (--)              Exit the word immediately (don't forget to UNLOOP-<x> first if in a LOOP)
+UNLOOP   (--)              Drop top 3 entries from loop stack (unwind loop)
+                     NOTE: Use IF UNLOOP EXIT THEN to break out prematurely.
+BEGIN    (f--)             Start WHILE/UNTIL/AGAIN loop.
+WHILE    (f--)             If f==0, jump to BEGIN, else DROP f and continue.
+UNTIL    (f--)             If f<>0, jump to BEGIN, else DROP f and continue.
+AGAIN    (--)              Jump to BEGIN. Use IF UNLOOP EXIT THEN to break out.
+EXIT     (--)              Exit the word immediately (don't forget to UNLOOP first if in a LOOP)
 
 *** STRINGS ***
 STR-CAT    ( src dst-- )   Concatenate src to dst
