@@ -146,7 +146,7 @@ void fLoad() {
 }
 
 void doLoad(int blk) {
-    char *fn = (char*)(&st.vars[VARS_SZ-32]);
+    char *fn = (char*)(&vars[VARS_SZ-32]);
     sprintF(fn, "./block-%03d.4th", blk);
     FILE *fp = myFopen(fn, "rt");
     if (fp) {

@@ -4,6 +4,8 @@ byte sp, rsp, lsp, lb, isError, sb, rb, fsp, *y;
 CELL BASE, stks[STK_SZ], locals[LOCALS_SZ], lstk[LSTK_SZ+1], seed;
 float fstk[FLT_SZ];
 
+byte *code, *vars;
+DICT_E *dict;
 ST_T st;
 
 void vmReset() {
@@ -13,9 +15,10 @@ void vmReset() {
     st.LAST = 0;
     st.HERE = tHERE = 2;
     st.VHERE = tVHERE = 0;
-    for (int i = 0; i < CODE_SZ; i++) { st.code[i] = 0; }
-    for (int i = 0; i < VARS_SZ; i++) { st.vars[i] = 0; }
-    for (int i = 0; i < 10; i++) { tempWords[i] = 0; }
+    for (int i = 0; i < MEM_SZ; i++) { st.mem[i] = 0; }
+    code = &st.mem[0];
+    vars = &st.mem[CODE_SZ+4];
+    dict = (DICT_E*)&st.mem[CODE_SZ+4+VARS_SZ+4];
     systemWords();
 }
 
@@ -43,7 +46,7 @@ void SET_LONG(byte* l, long v) { *(long *)l = v; }
 void printBase(CELL num, CELL base) {
     UCELL n = (UCELL) num, isNeg = 0;
     if ((base == 10) && (num < 0)) { isNeg = 1; n = -num; }
-    char* cp = (char *)&st.vars[VARS_SZ];
+    char* cp = (char *)&vars[VARS_SZ];
     *(cp--) = 0;
     do {
         int x = (n % base) + '0';
@@ -149,7 +152,7 @@ void run(WORD start) {
         case '0': case '1': case '2': case '3': case '4': case '5':                 // NUMBER
         case '6': case '7': case '8': case '9': push(ir-'0');
             while (BTW(*pc,'0','9')) { TOS = (TOS*10) + *(pc++) - '0'; }     break;
-        case ':': if (*(pc+2) != ';') { rpush(pc-st.code+2); }                      // CALL (w/tail-call optimization)
+        case ':': if (*(pc+2) != ';') { rpush(pc-code+2); }                      // CALL (w/tail-call optimization)
             pc = CA(GET_WORD(pc));                                           break;
         case ';': if (rsp>rb) { pc=0; rsp=rb+1; } else { pc=CA(rpop()); }    break; // RETURN
         case '>': NOS = (NOS > TOS) ? 1 : 0; DROP1;                          break; // >
@@ -160,7 +163,7 @@ void run(WORD start) {
         case 'C': ir = *(pc++); if (ir=='@') { TOS = *AOS; }
                 else if(ir=='!') { *AOS = (byte)NOS; DROP2; }                break; // C@, C!
         case 'D': --TOS;                                                     break; // 1-
-        case 'E': rpush(pc-st.code); pc = CA(pop());                         break; // EXECUTE
+        case 'E': rpush(pc-code); pc = CA(pop());                         break; // EXECUTE
         case 'F': ir = *(pc++); if (ir=='.') { printStringF("%g",fpop()); }         // FLOAT ops
                 else if (ir=='#') { fpush(FTOS); }
                 else if (ir=='$') { float x=FTOS; FTOS=FNOS; FNOS=x; }
@@ -221,7 +224,7 @@ void run(WORD start) {
         case 'r': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { push(locals[lb+t1]); }  break; // readLocal
         case 's': t1=*(pc++)-'0'; if (BTW(t1,0,9)) { locals[lb+t1]=pop(); }  break; // setLocal
         case 't': printString((char *)pop());                                break; // QTYPE
-        case 'v': t1=GET_LONG(pc); pc+=4; push((CELL)&st.vars[t1]);          break; // VAR-ADDR
+        case 'v': t1=GET_LONG(pc); pc+=4; push((CELL)&vars[t1]);          break; // VAR-ADDR
         case 'w': ir = *(pc++); if (ir == '@') { TOS = GET_WORD(AOS); }
                 else if (ir == '!') { SET_WORD(AOS, (WORD)NOS); DROP2; }     break; // w@, w!
         case 'x': ir = *(pc++); if (ir==']') { t1 = L0; L0 += pop();                // +LOOP

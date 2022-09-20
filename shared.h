@@ -117,8 +117,8 @@
 #define FDROP         fsp-=(0<fsp)?1:0
 #define DROP1         sp--
 #define DROP2         sp-=2
-#define CA(l)         (st.code+l)
-#define DP_AT(l)      ((DICT_T *)(&st.code[l]))
+#define CA(l)         (code+l)
+#define DP_AT(l)      ((DICT_T *)(&code[l]))
 #define BTW(x, a, b)  ((a<=x)&&(x<=b))
 #define BA(a)         ((byte *)a)
 
@@ -130,6 +130,7 @@ typedef unsigned short USHORT;
 
 #define CELL_SZ   sizeof(CELL)
 #define CSZ       CELL_SZ
+#define MEM_SZ CODE_SZ + VARS_SZ + (DICT_SZ * sizeof(DICT_E)) + 8
 
 typedef struct {
     USHORT xt;
@@ -140,9 +141,7 @@ typedef struct {
 
 typedef struct {
     int HERE, VHERE, LAST;
-    byte code[CODE_SZ + 4];
-    byte vars[VARS_SZ + 4];
-    DICT_E dict[DICT_SZ];
+    byte mem[MEM_SZ];
 } ST_T;
 
 #define BIT_IMMEDIATE 0x80
@@ -151,6 +150,8 @@ extern ST_T st;
 extern byte sp, isError, isBye;
 extern CELL BASE, STATE, tHERE, tVHERE, tempWords[10];
 extern CELL stks[];
+extern byte *code, *vars, *mem;
+extern DICT_E *dict;
 
 extern void vmReset();
 extern void systemWords();
