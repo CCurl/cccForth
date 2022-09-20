@@ -129,7 +129,7 @@ void fList() {}
 void fSave() {
     FILE *fp = myFopen("system.c4", "wb");
     if (fp) {
-        fwrite(&st, sizeof(st), 1, fp);
+        fwrite(&mem[0], MEM_SZ, 1, fp);
         fclose(fp);
         printString("-saved-");
     } else { printString("-error-"); }
@@ -139,7 +139,7 @@ void fLoad() {
     FILE *fp = myFopen("system.c4", "rb");
     if (fp) {
         vmReset();
-        fread(&st, sizeof(st), 1, fp);
+        fread(&mem[0], MEM_SZ, 1, fp);
         fclose(fp);
         printString("-loaded-");
     } else { printString("-error-"); }
@@ -194,7 +194,7 @@ void loop() {
 }
 
 int main(int argc, char *argv[]) {
-    if (sizeof(&st.HERE) > CELL_SZ) {
+    if (sizeof(&HERE) > CELL_SZ) {
         printf("ERROR: CELL cannot support a pointer!");
         exit(1);
     }

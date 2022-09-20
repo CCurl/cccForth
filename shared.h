@@ -130,7 +130,7 @@ typedef unsigned short USHORT;
 
 #define CELL_SZ   sizeof(CELL)
 #define CSZ       CELL_SZ
-#define MEM_SZ CODE_SZ + VARS_SZ + (DICT_SZ * sizeof(DICT_E)) + 8
+#define MEM_SZ    (CELL_SZ*3) + CODE_SZ + VARS_SZ + (DICT_SZ*sizeof(DICT_E)) + 8
 
 typedef struct {
     USHORT xt;
@@ -139,18 +139,12 @@ typedef struct {
     char name[NAME_LEN];
 } DICT_E;
 
-typedef struct {
-    int HERE, VHERE, LAST;
-    byte mem[MEM_SZ];
-} ST_T;
-
 #define BIT_IMMEDIATE 0x80
 
-extern ST_T st;
 extern byte sp, isError, isBye;
 extern CELL BASE, STATE, tHERE, tVHERE, tempWords[10];
-extern CELL stks[];
-extern byte *code, *vars, *mem;
+extern CELL stks[], &HERE, &VHERE, &LAST;
+extern byte *code, *vars, mem[];
 extern DICT_E *dict;
 
 extern void vmReset();
