@@ -7,7 +7,7 @@ xxx .
 here s7
 
 : T1 IF 'Y' EMIT EXIT THEN 'N' EMIT ;
-: T2 cr 1 2 3 + + . cr 19 42 for i . next cr 19 42 do i . -1 +loop ;
+: T2 cr 1 2 3 + + . cr 42 19 do i . loop cr 19 42 do i . -1 +loop ;
 : T3 cr 20 s1 begin r1 . d1 r1 while ;
 : T4 cr +tmps 123 445 s2 s1 r1 . r2 . -tmps ;
 : T5 cr +tmps 666 777 s2 s1 r1 . r2 . T4 r1 . r2 . -tmps ;
@@ -21,7 +21,7 @@ T2 T3 T4 T5
 		drop r2 dup * r1 > if unloop 1 exit then i2 i2 
 	again ;
 : primes ( n1--n2 ) +tmps 4 s5 11 do i prime? if i5 then 1 +loop r5 -tmps ;
-: .primes ( n1-- )  1 . 2 . 3 for i prime? if i . then 1 +i next ;
+: .primes ( n1-- )  1 . 2 . 3 do i prime? if i . then 1 +loop ;
 : elapsed timer swap - ;
 : bm timer swap primes . elapsed ." primes. (%d ms)" ;
 : mil 1000 dup * * ;

@@ -142,14 +142,13 @@
   <ItemGroup>
     <ClCompile Include="editor.cpp" />
     <ClCompile Include="cccForth.cpp" />
-    <ClCompile Include="vm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="file-board.h" />
     <ClInclude Include="file-generic.h" />
     <ClInclude Include="file-teensy.h" />
     <ClInclude Include="pc.inc" />
-    <ClInclude Include="shared.h" />
+    <ClInclude Include="cccForth.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="block-000.4th" />
