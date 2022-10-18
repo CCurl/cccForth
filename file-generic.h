@@ -82,7 +82,7 @@ void fClose() {              // (fh--)
 void fSave() {
     File fp = myFS.open("system.ccc", "w");
     if (fp) {
-        fp.write((byte*)&st, sizeof(st));
+        fp.write((byte*)&mem[0], MEM_SZ);
         fp.close();
         printString("-saved-");
     } else { printString("-error-"); }
@@ -92,7 +92,7 @@ void fLoad() {
     File fp = myFS.open("system.ccc", "r");
     if (fp) {
         vmReset();
-        fp.read((byte*)&st, sizeof(st));
+        fp.read((byte*)&mem[0], MEM_SZ);
         fp.close();
         printString("-loaded-");
     } else { printString("-error-"); }

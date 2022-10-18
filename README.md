@@ -80,6 +80,17 @@ To these ends, I have wandered off the beaten path in the following ways:
 
 - Development Boards:
   - I use the Arduino IDE.
+  - Edit the "shared.h" file. Set the __BOARD__  appropriately.
+  - If the board is not defined yet, create a new section for it. 
+    - CODE_SZ is the size of the code area (64K max).
+    - VARS_SZ is the size of the variables area (any size).
+    - STK_SZ is the size of the combined DATA and RETURN stacks.
+    - LSTK_SZ is the size of the loop stack.
+    - LOCALS_SZ is the size of the locals buffer.
+    - DICT_SZ is the size (number of entries) of the dictionary.
+    - FLT_SZ is the size of the float stack.
+    - The _PIN__ define indicates that the board supports digitalWrite(), et al.
+    - The __FILES__ define indicates that the board supports LittleFS.
 ```
 ## cccForth Primitives
 ```

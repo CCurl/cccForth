@@ -76,7 +76,7 @@ void fSave() {
     myFS.remove("/system.ccc");
     File fp = myFS.open("/system.ccc", FILE_WRITE);
     if (fp) {
-        fp.write(&st, sizeof(st));
+        fp.write(&mem[0], MEM_SZ);
         fp.close();
         printString("-saved-");
     } else { printString("-error-"); }
@@ -86,7 +86,7 @@ void fLoad() {
     File fp = myFS.open("/system.ccc", FILE_READ);
     if (fp) {
         vmReset();
-        fp.read(&st, sizeof(st));
+        fp.read(&mem[0], MEM_SZ);
         fp.close();
         printString("-loaded-");
     } else { printString("-error-"); }
