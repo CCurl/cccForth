@@ -2,11 +2,11 @@
 
 #include "cccForth.h"
 
-byte sp, rsp, lsp, lb, isError, sb, rb, fsp, *y;
+CELL sp, rsp, lsp, lb, isError, sb, rb, fsp;
 CELL BASE, stks[STK_SZ], locals[LOCALS_SZ], lstk[LSTK_SZ+1], seed;
 float fstk[FLT_SZ];
 
-byte *code, *vars, mem[MEM_SZ];
+byte *code, *vars, mem[MEM_SZ], *y;
 DICT_E *dict;
 CELL &HERE  = (CELL&)mem[0];
 CELL &VHERE = (CELL&)mem[CELL_SZ];
@@ -183,6 +183,7 @@ void fWordOp() {
     else if (ir == '!') { SET_WORD(AOS, (WORD)TOS); DROP2; }
 }
 void fType() { t1 = pop(); y = (byte*)pop(); while (t1--) printChar(*(y++)); }
+void fTypeQ() { printString((char*)pop()); }
 void fTypeF1() { pc = doType(pc, -1, '"'); }
 void fTypeF2() { doType((byte*)pop(), -1, 0); }
 void fDup() { push(TOS); }
@@ -210,6 +211,7 @@ void fLt() { NOS = (NOS <  TOS) ? 1 : 0; DROP1; }
 void fEq() { NOS = (NOS == TOS) ? 1 : 0; DROP1; }
 void fLNot() { TOS = (TOS) ? 0 : 1; }
 void fIf() { if (pop() == 0) { pc = CA(GET_WORD(pc)); } else { pc += 2; } }
+void fIf2() { if (pop() == 0) { while (*pc != ')') { ++pc; } } }
 void fInc() { ++TOS; }
 void fDec() { --TOS; }
 void fExecute() { rpush(pc - code); pc = CA(pop()); }
@@ -250,11 +252,11 @@ void fStrOps() {
     else if (ir == 't') { *CTOS = 0; }                        // STR-TRUNC
     else if (ir == 'y') { strCpy(CTOS, CNOS); DROP2; }        // STR-CPY
 }
-void fDo() { lsp+=3; L2=(CELL)pc; L1=NOS; L0=TOS; DROP2; }
+void fDo() { lsp += 3; L2 = (CELL)pc; L0 = pop(); L1 = pop(); }
 void fIndex() { push(L0); }
 void fIndex2() { t1 = (2 < lsp) ? lsp-3 : 0; push(lstk[t1]); }
 void fLeave() { if (3 <= lsp) { lsp -= 3; } }
-void fLoop() { ++L0; if (L0<L1) { pc=(byte*)L2; } else { lsp-=3; } }
+void fLoop() { ++L0; if (L0 < L1) { pc = (byte*)L2; return; } lsp -= 3; }
 void fPlusLoop() {
     t1 = L0; L0 += pop();
     if ((t1 < L1) && (L0 < L1)) { pc = (byte*)L2; }
@@ -288,7 +290,7 @@ void fBLit() { push(*(pc++)); }
 void fWLit() { push(GET_WORD(pc)); pc += 2; }
 void fLit() { push(GET_LONG(pc)); pc += 4; }
 void fVarAddr() { t1 = GET_LONG(pc); pc += 4; push((CELL)&vars[t1]); }
-void fUser() { pc = doExt(ir, pc); }
+void fUser() { pc = doExt(*pc, pc+1); }
 void fExt() {
     ir = *(pc++);
     if (ir == ']') { fPlusLoop(); }
@@ -299,19 +301,20 @@ void fExt() {
     else if (ir == 'Y') { y = (byte*)pop(); system((char*)y); }  // SYSTEM
     else if (ir == 'D') { doWords(); }                           // WORDS
     else if (ir == 'W') { doSleep(); }                           // MS
-    else if (ir == 'Q') { isBye = 1; }
+    else if (ir == 'Z') { vmReset(); }
+    else if (ir == 'Q') { isBye = 1; pc = 0; }
 }
-void X() {}
+void X() { if (ir) { printStringF("-invIr:%d-", ir); } pc = 0; }
 void N() {}
 
 void (*q[128])() = {
-    X,X,X,X,X,X,X,X,X,X,N,X,X,N,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,                        //   0:31
-    N,fStore,fTypeF1,fDup,fSwap,fOver,fSlashMod,fBLit,fIf,N,fMult,fAdd,fEmit,fSub,fDot,fDiv,    //  32:47
-    fNum,fNum,fNum,fNum,fNum,fNum,fNum,fNum,fNum,fNum,fCall,fRet,fLt,fEq,fGt,X,               //  48:63
-    fFetch,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,                                    //  64:79
-    X,X,X,X,X,X,X,X,X,X,X,fDo,fDrop,fLoop,fLeave,fNegate,                           //  80:95
-    fZQuote,fAbs,fBitOp,fCharOp,fLocDec,fExecute,fFloat,fGoto,X,fLocInc,X,fKey,fLocAdd,fLocRem,fIndex,X,  //  96:111
-    X,fDotS,fLocGet,fLocSet,fType,fUser,fVarAddr,fWordOp,fExt,X,fTypeF2,fBegin,X,fWhile,fLNot,X };  // 112:127
+    X,fBLit,fWLit,X,fLit,X,X,X,X,X,N,X,X,N,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,                           //   0:31
+    N,fStore,fTypeF1,fDup,fSwap,fOver,fSlashMod,fBLit,fIf2,N,fMult,fAdd,fEmit,fSub,fDot,fDiv,             //  32:47
+    fNum,fNum,fNum,fNum,fNum,fNum,fNum,fNum,fNum,fNum,fCall,fRet,fLt,fEq,fGt,fIf,                         //  48:63
+    fFetch,X,X,fCharOp,fDec,fExecute,fFloat,fGoto,X,fIndex,fIndex2,fKey,X,X,X,X,                          //  64:79
+    fInc,X,fRetOps,fStrOps,fType,X,X,X,X,X,fTypeF2,fDo,fDrop,fLoop,fLeave,fNegate,                        //  80:95
+    fZQuote,fAbs,fBitOp,fCharOp,fLocDec,X,fFileOp,X,X,fLocInc,X,X,fLocAdd,fLocRem,X,X,  //  96:111
+    X,X,fLocGet,fLocSet,fTypeQ,fUser,fVarAddr,fWordOp,fExt,X,X,fBegin,X,fWhile,fLNot,X };        // 112:127
 
 void run(WORD start) {
     pc = CA(start);
@@ -320,78 +323,7 @@ void run(WORD start) {
     if (rsp > rb) { rsp = rb + 1; }
     if (fsp < 0) { fsp = 0; }
     if (9 < fsp) { fsp = 9; }
-    while (pc) {
-        ir = *(pc++);
-        switch (ir) {
-        case 0: return;
-        case 1: fBLit();                                               break; // BLIT
-        case 2: fWLit();                                 break; // WLIT
-        case 4: fLit();                                 break; // LIT
-        case ' ': N(); /* NOP */                                                  break; // NOP
-        case '!': fStore();                                break; // STORE
-        case '"': fTypeF1();                                  break; // ."
-        case '#': fDup();                                                 break; // DUP
-        case '$': fSwap();                             break; // SWAP
-        case '%': fOver();                                                 break; // OVER
-        case '&': fSlashMod();          break; // /MOD
-        case '\'': fBLit();                                            break; // CHAR
-        case '(': if (pop() == 0) { while (*pc != ')') { ++pc; } }           break; // Simple IF (NO ELSE)
-        case ')': /* Simple THEN */                                          break; // Simple THEN
-        case '*': fMult();                                     break; // MULT
-        case '+': fAdd();                                     break; // ADD
-        case ',': fEmit();                                    break; // EMIT
-        case '-': fSub();                                     break; // SUB
-        case '.': fDot();                                    break; // DOT
-        case '/': fDiv();                                     break; // DIV
-        case '0': case '1': case '2': case '3': case '4': case '5':                 // NUMBER
-        case '6': case '7': case '8': case '9': fNum();     break;
-        case ':': fCall();                    break;  // CALL (w/tail-call optimization)
-        case ';': fRet();    break; // RETURN
-        case '>': fGt();                          break; // >
-        case '=': fEq();                         break; // =
-        case '<': fLt();                          break; // <
-        case '?': fIf();     break; // 0BRANCH
-        case '@': fFetch();                                       break; // FETCH
-        case 'C': fCharOp();                break; // C@, C!
-        case 'D': fDec();                                                     break; // 1-
-        case 'E': fExecute();                            break; // EXECUTE
-        case 'F': fFloat();   break;
-        case 'G': fGoto();                                     break; // BRANCH
-        case 'I': fIndex();                                                  break; // I
-        case 'J': fIndex2();                  break; // J
-        case 'K': fKey();          break;
-        case 'P': fInc();                                                     break; // 1+
-        case 'R': fRetOps();                          break;
-        case 'S': fStrOps();           break; // STR-CPY
-        case 'T': fType();  break; // TYPE (a c--)
-        case 'Y': vmReset();                                                return; // RESET
-        case 'Z': fTypeF2();                               break; // ZTYPE
-        case '[': fDo();                             break;
-        case '\\': fDrop();                                                    break; // DROP
-        case ']': fLoop();        break; // LOOP
-        case '^': fLeave();                                 break; // UNLOOP
-        case '_': fNegate();                                                break; // NEGATE
-        case '`': fZQuote();                         break; // ZQUOTE
-        case 'b': fBitOp();                                break;
-        case 'c': fLocIncCell();   break; // incLocal-CELL
-        case 'd': fLocDec();      break; // decLocal
-        case 'i': fLocInc();      break; // incLocal
-        case 'f': fFileOp();                                       break; // FILE ops
-        case 'l': fLocAdd();                         break; // +TMPS
-        case 'm': fLocRem();                                      break; // -TMPS
-        case 'r': fLocGet();  break; // readLocal
-        case 's': fLocSet();  break; // setLocal
-        case 't': printString((char *)pop());                                break; // QTYPE
-        case 'v': fVarAddr();             break; // VAR-ADDR
-        case 'w': fWordOp();     break; // w@, w!
-        case 'x': fExt();
-        case 'z': fUser();                                     break; // EXT
-        case '{': fBegin();                                   break; // BEGIN
-        case '}': fWhile();          break; // WHILE
-        case '~': fLNot();                                       break; // NOT (0=)
-        default: printStringF("-unk ir: %d (%c)-", ir, ir);                 return;
-        }
-    }
+    while (pc) { ir = *(pc++); q[ir](); }
 }
 
 
@@ -452,7 +384,7 @@ PRIM_T prims[] = {
     , { "-", "-" }
     , { "/", "/" }
     , { "*", "*" }
-    , { "ABS", "#0<(_)" }
+    , { "ABS", "a" }
     , { "/MOD", "&" }
     , { "MOD", "b%" }
     , { "NEGATE", "_" }
@@ -463,7 +395,7 @@ PRIM_T prims[] = {
     , { "EMIT", "," }
     , { "KEY", "K@" }
     , { "KEY?", "K?" }
-    , { "LOAD", "zL"}
+    , { "LOAD", "uL"}
     , { "QTYPE", "t" }
     , { "ZTYPE", "Z" }
     , { "COUNT", "#Sl" }
@@ -542,7 +474,7 @@ PRIM_T prims[] = {
     , { "R>", "R>" }
     , { "R@", "R@" }
     , { "RAND", "xR" }
-    , { "RESET", "Y" }
+    , { "RESET", "xZ" }
     , { ".S", "xS" }
     , { "SYSTEM", "xY" }
     , { "TIMER", "xT" }
@@ -563,17 +495,17 @@ PRIM_T prims[] = {
 #endif
 #ifdef __PIN__
     // Extension: PIN operations ... for dev boards
-    , { "pin-in","zPI" }          // open input
-    , { "pin-out","zPO" }         // open output
-    , { "pin-up","zPU" }          // open input-pullup
-    , { "pin!","zPWD" }           // Pin write: digital
-    , { "pin@","zPRD" }           // Pin read: digital
-    , { "pina!","zPWA" }          // Pin write: analog
-    , { "pina@","zPRA" }          // Pin read: analog
+    , { "pin-in","uPI" }          // open input
+    , { "pin-out","uPO" }         // open output
+    , { "pin-up","uPU" }          // open input-pullup
+    , { "pin!","uPWD" }           // Pin write: digital
+    , { "pin@","uPRD" }           // Pin read: digital
+    , { "pina!","uPWA" }          // Pin write: analog
+    , { "pina@","uPRA" }          // Pin read: analog
 #endif
 #ifdef __EDITOR__
     // Extension: A simple block editor
-    , { "EDIT","zE" }         // |EDIT|zE|(n--)|Edit block n|
+    , { "EDIT","uE" }         // |EDIT|zE|(n--)|Edit block n|
 #endif
 #ifdef __GAMEPAD__
     // Extension: GAMEPAD operations
@@ -965,6 +897,7 @@ void systemWords() {
     sprintF(cp, ": va %lu ;",   (UCELL)&VHERE);  doParse(cp);
     sprintF(cp, ": base %lu ;", (UCELL)&BASE);   doParse(cp);
     sprintF(cp, ": >in %lu ;",  (UCELL)&in);     doParse(cp);
+    sprintF(cp, ": cell-sz %lu ;",  (UCELL)CELL_SZ);     doParse(cp);
 }
 
 #if __BOARD__ == PC

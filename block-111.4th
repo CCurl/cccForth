@@ -22,27 +22,22 @@ variable ln cols allot
     3 = .if drop 1 exit .then
     drop 0 ;
 
-: rand-pop 0 pop-sz for rand $FF and #200 > i pop + c! next ;
-: clr-bak bak s1 0 pop-sz for 0 r1 c! i1 next ;
-: bak->pop 0 pop-sz for 
-        i bak + s1 i pop + s2
-        r2 c@ r1 c@ alive? 
-        r2 c! 
-      0 r1 c!
-    next ;
+: rand-pop pop-sz 0 DO rand $FF and #200 > i pop + c! LOOP ;
+: clr-bak bak s1 pop-sz 0 DO 0 r1 c! i1 LOOP ;
+: bak->pop bak s1 pop s2 pop-sz 0 DO 
+        r2 c@ r1 c@ alive? r2 c! 
+      0 r1 c! i1 i2
+    LOOP ;
 
 : ->p ( c r -- v ) cols * + pop + ;
 : ->b ( c r -- v ) cols * + bak + ;
 
-: .pop 1 dup ->XY
-    1 rows 1+ FOR ln s6 
-        1 cols 1+ FOR $20 I J ->p C@ .IF DROP '*' .THEN r6 C! i6 NEXT 
-        0 r6 C! ln QTYPE CR
-    NEXT ;
+: .row cols 1+ 1 DO $20 I J ->p C@ .if DROP '*' .then r6 C! i6 LOOP ;
+: .pop 1 dup ->XY rows 1+ 1 DO ln s6 .row 0 r6 C! ln QTYPE CR LOOP ;
 
 : gen 1 1 ->b s4
-    1 1 ->p cols rows ->p
-    for i c@ .if b++ .then i4 next
+    cols rows ->p 1 1 ->p
+    DO i c@ IF b++ THEN i4 LOOP
     bak->pop .pop r7 . i7 ;
 
 // 60 (r) ! 200 (c) !

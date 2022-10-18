@@ -25,11 +25,9 @@ T2 T3 T4 T5
 : elapsed timer swap - ;
 : bm timer swap primes . elapsed ." primes. (%d ms)" ;
 : mil 1000 dup * * ;
-." (got-here-1)"
 cr see prime? cr
-." (got-here-2)"
 71 prime? ."  71 prime? (%d)%n"
-cr cr 1 mil 2/ bm cr
+cr cr 1 mil 4 / bm cr
 cr 100 .primes ." (primes in 100)%n"
 
 : T1 ." %nx1-"  9 begin dup . 1+ dup 34 < while ." -out1" drop ;
