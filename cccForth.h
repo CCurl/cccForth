@@ -124,8 +124,8 @@
 
 typedef unsigned char byte;
 typedef unsigned short WORD;
-typedef long CELL;
-typedef unsigned long UCELL;
+typedef int CELL;
+typedef unsigned int UCELL;
 typedef unsigned short USHORT;
 
 #define CELL_SZ   sizeof(CELL)
@@ -141,7 +141,7 @@ typedef struct {
 
 #define BIT_IMMEDIATE 0x80
 
-extern byte sp, isError, isBye;
+extern byte isBye;
 extern CELL BASE, STATE, tHERE, tVHERE, tempWords[10];
 extern CELL stks[], &HERE, &VHERE, &LAST;
 extern byte *code, *vars, mem[];
