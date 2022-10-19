@@ -70,7 +70,7 @@ To these ends, I have wandered off the beaten path in the following ways:
 ```
 - Windows:
   - I use Visual Studio 19, either the community or paid version.
-  - Open is a cccForth.sln file.
+  - Open the cccForth.sln file.
   - Use the 'x86' configuration.
   - It detects the _WIN32 #define and builds cccForth appropriately.
 
