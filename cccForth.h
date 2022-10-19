@@ -124,8 +124,8 @@
 
 typedef unsigned char byte;
 typedef unsigned short WORD;
-typedef int CELL;
-typedef unsigned int UCELL;
+typedef long CELL;
+typedef unsigned long UCELL;
 typedef unsigned short USHORT;
 
 #define CELL_SZ   sizeof(CELL)

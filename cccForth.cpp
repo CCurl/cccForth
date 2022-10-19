@@ -1,7 +1,10 @@
-// cccForth.cpp : A Forth interpreter for PCs and development boards
+// cccForth.cpp : A stack-based OS for PCs and development boards
 
 #include "cccForth.h"
 
+// ----------------------------------
+// The Virtual Machine
+// ----------------------------------
 CELL sp, rsp, lsp, lb, isError, sb, rb, fsp;
 CELL BASE, stks[STK_SZ], locals[LOCALS_SZ], lstk[LSTK_SZ+1], seed;
 float fstk[FLT_SZ];
@@ -47,7 +50,7 @@ void SET_WORD(byte* l, WORD v) { *(WORD *)l = v; }
 void SET_LONG(byte* l, long v) { *(long *)l = v; }
 #endif // NEEDS_ALIGN
 
-char Upper(char c) { return c | 0x20; }
+char Lower(char c) { return BTW(c,'A','Z') ? c|0x20 : c; }
 
 int strLen(const char* str) {
     int l = 0;;
@@ -62,7 +65,7 @@ int strEq(const char* x, const char* y) {
 
 int strEqI(const char* x, const char* y) {
     while (*x && *y) {
-        if (Upper(*x) != Upper(*y)) { return 0; }
+        if (Lower(*x) != Lower(*y)) { return 0; }
         ++x; ++y;
     }
     return (*x || *y) ? 0 : 1;
@@ -92,6 +95,15 @@ char* rTrim(char* d) {
     char* x = d + strLen(d);
     while ((d <= x) && (*x <= ' ')) { *(x--) = 0; }
     return d;
+}
+
+void printStringF(const char* fmt, ...) {
+    char* buf = (char*)&vars[VARS_SZ - 100];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, 100, fmt, args);
+    va_end(args);
+    printString(buf);
 }
 
 void printBase(CELL num, CELL base) {
@@ -322,30 +334,13 @@ void run(WORD start) {
     if (sp < sb) { sp = sb - 1; }
     if (rsp > rb) { rsp = rb + 1; }
     if (fsp < 0) { fsp = 0; }
-    if (9 < fsp) { fsp = 9; }
+    if (FLT_SZ <= fsp) { fsp = (FLT_SZ-1); }
     while (pc) { ir = *(pc++); q[ir](); }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// ----------------------------------
+// The Assembler / Parser
+// ----------------------------------
 
 
 typedef struct {
@@ -461,9 +456,6 @@ PRIM_T prims[] = {
     , { "ALLOT", "xA" }
     , { "BL", "32" }
     , { "BYE", "xQ" }
-    , { "CELL", "4" }
-    , { "CELLS", "4*" }
-    , { "CELL+", "4+" }
     , { "EXECUTE", "E" }
     , { "MAX", "%%<($)\\" }
     , { "MIN", "%%>($)\\" }
@@ -521,15 +513,6 @@ byte isBye=0;
 void CComma(CELL v) { code[tHERE++] = (byte)v; }
 void Comma(CELL v) { SET_LONG(&code[tHERE], v); tHERE += CELL_SZ; }
 void WComma(WORD v) { SET_WORD(&code[tHERE], v); tHERE += 2; }
-
-void printStringF(const char *fmt, ...) {
-    char *buf = (char*)&vars[VARS_SZ-100];
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(buf, 100, fmt, args);
-    va_end(args);
-    printString(buf);
-}
 
 void doExec() {
     if (STATE) {
@@ -884,20 +867,20 @@ void doOK() {
 void systemWords() {
     BASE = 10;
     char *cp = (char*)(&vars[VARS_SZ-32]);
-    sprintF(cp, ": mem %lu ;",  (UCELL)mem);     doParse(cp);
-    sprintF(cp, ": msz %d ;",   MEM_SZ);         doParse(cp);
-    sprintF(cp, ": cb %lu ;",   (UCELL)code);    doParse(cp);
-    sprintF(cp, ": csz %d ;",   CODE_SZ);        doParse(cp);
-    sprintF(cp, ": vb %lu ;",   (UCELL)vars);    doParse(cp);
-    sprintF(cp, ": vsz %d ;",   VARS_SZ);        doParse(cp);
-    sprintF(cp, ": db %lu ;",   (UCELL)dict);    doParse(cp);
-    sprintF(cp, ": dsz %d ;",   DICT_SZ);        doParse(cp);
-    sprintF(cp, ": ha %lu ;",   (UCELL)&HERE);   doParse(cp);
-    sprintF(cp, ": la %lu ;",   (UCELL)&LAST);   doParse(cp);
-    sprintF(cp, ": va %lu ;",   (UCELL)&VHERE);  doParse(cp);
-    sprintF(cp, ": base %lu ;", (UCELL)&BASE);   doParse(cp);
-    sprintF(cp, ": >in %lu ;",  (UCELL)&in);     doParse(cp);
-    sprintF(cp, ": cell-sz %lu ;",  (UCELL)CELL_SZ);     doParse(cp);
+    sprintF(cp, ": code-sz %d ;",   CODE_SZ);        doParse(cp);
+    sprintF(cp, ": dict-sz %d ;",   DICT_SZ);        doParse(cp);
+    sprintF(cp, ": mem-sz %d ;",    MEM_SZ);         doParse(cp);
+    sprintF(cp, ": vars-sz %d ;",   VARS_SZ);        doParse(cp);
+    sprintF(cp, ": mem %lu ;",      (UCELL)mem);     doParse(cp);
+    sprintF(cp, ": cb %lu ;",       (UCELL)code);    doParse(cp);
+    sprintF(cp, ": db %lu ;",       (UCELL)dict);    doParse(cp);
+    sprintF(cp, ": vb %lu ;",       (UCELL)vars);    doParse(cp);
+    sprintF(cp, ": (here) %lu ;",   (UCELL)&HERE);   doParse(cp);
+    sprintF(cp, ": (last) %lu ;",   (UCELL)&LAST);   doParse(cp);
+    sprintF(cp, ": (vhere) %lu ;",  (UCELL)&VHERE);  doParse(cp);
+    sprintF(cp, ": base %lu ;",     (UCELL)&BASE);   doParse(cp);
+    sprintF(cp, ": >in %lu ;",      (UCELL)&in);     doParse(cp);
+    sprintF(cp, ": CELL %lu ;",     (UCELL)CELL_SZ); doParse(cp);
 }
 
 #if __BOARD__ == PC
