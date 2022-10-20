@@ -98,6 +98,11 @@ void fLoad() {
     } else { printString("-error-"); }
 }
 
+int doLoad() {
+      printString("-load-");
+      return 0;
+}
+
 void fDelete() {
     char *fn = (char*)pop();
     if (myFS.remove(fn)) { printString("-deleted-"); }

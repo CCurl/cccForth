@@ -4,13 +4,12 @@
 #define AR(x) analogRead(x)
 #define DR(x) digitalRead(x)
 #define mySerial Serial
-#define __SERIAL__
 
 CELL doTimer() { return millis(); }
 void doSleep() { delay(pop()); }
 CELL getSeed() { return millis(); }
 
-#ifdef __SERIAL__
+#ifdef mySerial
     int charAvailable() { return mySerial.available(); }
     int getChar() { 
         while (!charAvailable()) {}
@@ -55,7 +54,7 @@ void printChar(char ch) {
 
 #include "file-board.h"
 
-byte *doExt(CELL ir, byte *pc) {
+byte *doUser(CELL ir, byte *pc) {
     CELL pin;
     switch (ir) {
     case 'G': pc = doGamePad(ir, pc);           break;  // zG<x>
@@ -72,11 +71,11 @@ byte *doExt(CELL ir, byte *pc) {
             if (ir == 'A') { analogWrite(pin,  (int)pop()); }            // zPWA (n p--)
             if (ir == 'D') { digitalWrite(pin, (int)pop()); }    break;  // zPWD (n p--)
         default:
-            isError = 1;
+            pc = 0;
             printString("-notPin-");
         }                                       break;
     default:
-        isError = 1;
+        pc = 0;
         printString("-notExt-");
     }
     return pc;
@@ -86,8 +85,8 @@ byte *doExt(CELL ir, byte *pc) {
 // * HERE is where you load your default code *
 // ********************************************
 void loadCode() {
-    // doParse(": T0 dup 32 >= .if dup '~' <= .if emit exit .then .\" (%d)\" ;");
-    // doParse(": .code cb here over + 1- for i c@ T0 next ;");
+    doParse(": T0 dup 32 >= .if dup '~' <= .if emit exit .then .\" (%d)\" ;");
+    doParse(": .code (here) @ cb + cb do i c@ T0 loop ;");
     // doParse("cr words");
 }
 
@@ -129,7 +128,7 @@ void handleInput(char c) {
 }
 
 void setup() {
-#ifdef __SERIAL__
+#ifdef mySerial
     mySerial.begin(19200);
     while (!mySerial) {}
     delay(500);
@@ -170,8 +169,10 @@ void loop() {
     }
 
     while (charAvailable()) { 
+        int c = getChar();
+        // printStringF("-char:%d-", (int)c);
         isOTA = 0;
-        handleInput(getChar()); 
+        handleInput(c); 
     }
     //while (wifiCharAvailable()) { 
     //    isOTA = 1;

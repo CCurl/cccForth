@@ -152,15 +152,15 @@
     <ClInclude Include="c4.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="block-000.c4" />
-    <None Include="block-001.c4" />
-    <None Include="block-002.c4" />
-    <None Include="block-111.c4" />
-    <None Include="block-999.c4" />
+    <None Include="c4.c4" />
+    <None Include="index.c4" />
+    <None Include="init.c4" />
     <None Include="LICENSE" />
     <None Include="c4.ino" />
+    <None Include="life.c4" />
     <None Include="README.md" />
-    <None Include="block-667.c4" />
+    <None Include="strings.c4" />
+    <None Include="tests.c4" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="history.txt" />

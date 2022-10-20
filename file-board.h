@@ -11,6 +11,7 @@ void fDelete() { noFile(); }
 void fList() { noFile(); }
 void fSave() { noFile(); }
 void fLoad() { noFile(); }
+int doLoad() { noFile(); return 0; }
 
 #else
 

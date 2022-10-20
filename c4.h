@@ -1,5 +1,5 @@
-#ifndef __FORTH_SHARED__
-#define __FORTH_SHARED__
+#ifndef __C4_INCLUDED__
+#define __C4_INCLUDED__
 
 #define PC           1
 #define TEENSY4      2
@@ -9,14 +9,12 @@
 #define APPLE_MAC    6
 #define PICO         7
 #define LEO          8
-#define LINUX        9
-
-#define __BOARD__    XIAO
+#define LINUX      100
+#define WINDOWS    101
 
 #define NAME_LEN 16
 
 #ifdef _WIN32
-  #undef __BOARD__
   #define __BOARD__     PC
   #define __TARGET__    WINDOWS
   #include <Windows.h>
@@ -31,8 +29,7 @@
   #define __FILES__
 #endif
 
-#if _LINUX
-  #undef __BOARD__
+#ifdef _LINUX
   #define __BOARD__     PC
   #define __TARGET__    LINUX
   #include <unistd.h>
@@ -51,6 +48,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
+
+#ifndef __BOARD__
+    #define __BOARD__    TEENSY4
+#endif
 
 #if __BOARD__ == TEENSY4
   #define CODE_SZ      (48*1024)
@@ -141,8 +142,7 @@ typedef struct {
 
 #define BIT_IMMEDIATE 0x80
 
-extern byte isBye;
-extern CELL BASE, STATE, tHERE, tVHERE, tempWords[10];
+extern CELL BASE, STATE, tHERE, tVHERE, tempWords[10], sp;
 extern CELL stks[], &HERE, &VHERE, &LAST;
 extern byte *code, *vars, mem[];
 extern DICT_E *dict;
@@ -151,27 +151,17 @@ extern void vmReset();
 extern void systemWords();
 extern void push(CELL);
 extern CELL pop();
-extern void SET_WORD(byte *l, WORD v);
-extern void SET_LONG(byte *l, long v);
 extern void printString(const char*);
 extern void printStringF(const char*, ...);
 extern void printChar(char);
 extern void printBase(CELL, CELL);
-extern int strLen(const char *);
-extern char *strCpy(char *,const char *);
-extern char *strCat(char *,const char *);
-extern char *strCatC(char *,const char);
-extern int strEq(const char *,const char *);
-extern int strEqI(const char *,const char *);
-extern char *sprintF(char* dst, const char* fmt, ...);
-extern char *rTrim(char *);
 extern void run(WORD);
 extern int doFind(const char *);
 extern void doParse(const char *);
-extern void doDotS();
 extern void doWords();
 extern void doOK();
-extern byte *doExt(CELL, byte *);
+extern byte *doUser(CELL, byte *);
+extern char *rTrim(char *);
 extern void doEditor();
 extern int charAvailable();
 extern int getChar();
@@ -192,4 +182,4 @@ extern void fSave();
 extern void fLoad();
 extern int doLoad();
 
-#endif
+#endif // __C4_INCLUDED__

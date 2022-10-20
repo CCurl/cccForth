@@ -1,9 +1,9 @@
-// c4.cpp : A stack-based OS for PCs and development boards
+// c4: A stack-based VM/OS for PCs and development boards
 
 #include "c4.h"
 
 // ----------------------------------
-// The Virtual Machine
+// The Virtual Machine / OS
 // ----------------------------------
 CELL sp, rsp, lsp, lb, isError, sb, rb, fsp;
 CELL BASE, stks[STK_SZ], locals[LOCALS_SZ], lstk[LSTK_SZ+1], seed;
@@ -314,7 +314,7 @@ void fBLit() { push(*(pc++)); }
 void fWLit() { push(GET_WORD(pc)); pc += 2; }
 void fLit() { push(GET_LONG(pc)); pc += 4; }
 void fVarAddr() { t1 = GET_LONG(pc); pc += 4; push((CELL)&vars[t1]); }
-void fUser() { pc = doExt(*pc, pc+1); }
+void fUser() { pc = doUser(*pc, pc+1); }
 void fExt() {
     ir = *(pc++);
     if (ir == ']') { fPlusLoop(); }
@@ -326,7 +326,6 @@ void fExt() {
     else if (ir == 'D') { doWords(); }                           // WORDS
     else if (ir == 'W') { doSleep(); }                           // MS
     else if (ir == 'Z') { vmReset(); }
-    else if (ir == 'Q') { isBye = 1; pc = 0; }
 }
 void X() { if (ir) { printStringF("-invIr:%d-", ir); } pc = 0; }
 void N() {}
@@ -466,7 +465,7 @@ PRIM_T prims[] = {
     // System
     , { "ALLOT", "xA" }
     , { "BL", "32" }
-    , { "BYE", "xQ" }
+    , { "BYE", "uQ" }
     , { "EXECUTE", "E" }
     , { "MAX", "%%<($)\\" }
     , { "MIN", "%%>($)\\" }
@@ -519,7 +518,6 @@ PRIM_T prims[] = {
 
 char word[32];
 CELL STATE, tHERE, tVHERE, tempWords[10];
-byte isBye=0;
 
 void CComma(CELL v) { code[tHERE++] = (byte)v; }
 void Comma(CELL v) { SET_LONG(&code[tHERE], v); tHERE += CELL_SZ; }
@@ -868,7 +866,7 @@ void doParse(const char *line) {
 
 void doOK() {
     if (STATE) { printString(" ... "); return; }
-    printString("\r\nOK ");
+    printString("\r\nc4:");
     fDotS();
     printString("> ");
 }
@@ -880,7 +878,7 @@ void systemWords() {
     sprintF(cp, ": dict-sz %d ;",   DICT_SZ);        doParse(cp);
     sprintF(cp, ": mem-sz %d ;",    MEM_SZ);         doParse(cp);
     sprintF(cp, ": vars-sz %d ;",   VARS_SZ);        doParse(cp);
-    sprintF(cp, ": mem %lu ;",      (UCELL)mem);     doParse(cp);
+    sprintF(cp, ": mem %lu ;",      (UCELL)&mem[0]); doParse(cp);
     sprintF(cp, ": cb %lu ;",       (UCELL)code);    doParse(cp);
     sprintF(cp, ": db %lu ;",       (UCELL)dict);    doParse(cp);
     sprintF(cp, ": vb %lu ;",       (UCELL)vars);    doParse(cp);

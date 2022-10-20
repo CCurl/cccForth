@@ -1,8 +1,8 @@
-# c4 - a minimal and extensible Forth system
+# c4 - a minimal and extensible Forth-like VM / OS
 
 c4 is intended to be a starting point for a programming environment that can grow to fit the user's needs.
 
-The main goals for this minimal Forth are as follows:
+The main goals for this project are as follows:
 
 - To be easy to modify and add/extend the primitives.
 - To be able to run on any system that has a C compiler.
@@ -14,7 +14,7 @@ The main goals for this minimal Forth are as follows:
 
 To these ends, I have wandered off the beaten path in the following ways:
 
-- This is NOT an ANSI-standard Forth.
+- This is similar to a bare-bones, but it is NOT an ANSI-standard Forth.
 - This is a byte-coded implementation.
 - Many primitives (core words) are built into the compiler, and are not included in the dictionary.
 - These primitves ARE NOT case sensitive (DUP = dup = Dup).
@@ -155,16 +155,16 @@ FDROP    (a--)             Float DROP
 (.)      (n--)             Output n in the current BASE (no SPACE)
 .        (n--)             Output n in the current BASE (trailing SPACE)
 ."       (?--?)            Output a (possibly formatted) string. See (1).
+QTYPE    (A--)             Quick string output, no formatting, A is NULL-terminated.
+TYPE     (A N--)           Output string at A (standard Forth TYPE)
+ZTYPE    (A--)             Output the (possibly formatted) string at A. See (1).
 CR       (--)              Output a newline (#10,#13)
 EMIT     (c--)             Output c as a character
 COUNT    (s--s n)          n: length of string at s (s must be NULL-terminated)
-TYPE     (s n--)           Output string at s (standard Forth TYPE)
-KEY      (--c)             c: Next keyboard char, wait if no press yet
-KEY?     (--f)             f: FALSE if no keyboard press, else TRUE
-QTYPE    (s--)             Quick string output, no formatting, s is NULL-terminated.
+KEY      (--c)             c: Next keyboard char, wait if no char available
+KEY?     (--f)             f: FALSE if no char available, else TRUE
 SPACE    (--)              Output a single SPACE (32 EMIT)
 SPACES   (n--)             Output n SPACEs
-ZTYPE    (s--)             Output string at s. See (1).
 
 (1) Notes on ." and ZTYPE:
 - ." is NOT ansi-standard
@@ -181,7 +181,7 @@ ZTYPE    (s--)             Output string at s. See (1).
 - %t: output a TAB (9)
 - %x: output TOS as a hex number
 
-example: : ascii $20 '~' for i i i i ." %n%d: (%c) %x %b" next ;
+example: : ascii '~' $20 DO I I I I ." %n%d: (%c) %x %b" LOOP ;
 
 *** FILE ***
 FOPEN    (a n--fh)         a: file name, n: 0 => READ, else WRITE, fh: file handle
@@ -224,21 +224,18 @@ ELSE     (--)              Standard ELSE
 THEN     (--)              Standard THEN
 .IF      (f--)             Simple IF, no ELSE allowed (shorter, more human-readable)
 .THEN    (--)              Simple THEN
-FOR      (F T--)           Begin FOR/NEXT loop. Ensure that F<T (if F>T, SWAP them).
-NEXT     (--)              Increment I, jump to start of loop if I < T
-DO       (T F--)           Begin DO loop
-LOOP     (--)              Increment I, jump to start of loop if I < T
-+LOOP    (N--)             Add N to I, jump to start of loop if I reaches T
-I        (--n)             n: Current index
-J        (--n)             n: Current index of next-most outer loop
-+I       (n--)             n: value to add to I
-UNLOOP   (--)              Drop top 3 entries from loop stack (unwind loop)
-                     NOTE: Use IF UNLOOP EXIT THEN to break out prematurely.
-BEGIN    (f--)             Start WHILE/UNTIL/AGAIN loop.
+DO       (T F--)           Begin DO/LOOP loop
+LOOP     (--)              Increment I, jump to DO if I < T
++LOOP    (N--)             Add N to I, break out if I reaches or crosses T
+I        (--n)             n: Current DO/LOOP index
+J        (--n)             n: Index of next-most outer loop
+UNLOOP   (--)              Drop top 3 entries from the loop stack (unwind loop).
+                     NOTE: Use IF UNLOOP EXIT THEN to break out a loop (DO or BEGIN) prematurely.
+BEGIN    (f--)             Start BEGIN/WHILE/UNTIL/AGAIN loop.
 WHILE    (f--)             If f==0, jump to BEGIN, else DROP f and continue.
 UNTIL    (f--)             If f<>0, jump to BEGIN, else DROP f and continue.
-AGAIN    (--)              Jump to BEGIN. Use IF UNLOOP EXIT THEN to break out.
-EXIT     (--)              Exit the word immediately (don't forget to UNLOOP first if in a LOOP)
+AGAIN    (--)              Jump to BEGIN. Use <condition> IF UNLOOP EXIT THEN to break out.
+EXIT     (--)              Exit the word immediately (don't forget to UNLOOP first if in a loop)
 
 *** STRINGS ***
 STR-CAT    ( src dst-- )   Concatenate src to dst
@@ -248,7 +245,7 @@ STR-END    ( a1--a2 )      a2: the end of string a1
 STR-EQ     ( s1 s2--f )    f: 1 if s1 and s2 are equivalent, else 0 (case-sensitive)
 STR-EQI    ( s1 s2--f )    f: 1 if s1 and s2 are equivalent, else 0 (case-insensitive)
 STR-LEN    ( str--n )      n: length of string str
-STR-RTRIM  ( str--str )    Trim rightmost chars from str whose ASCII value < 32
+STR-RTRIM  ( str--str )    Trim rightmost chars from str whose ASCII value <= 32
 STR-TRUNC  ( str--str )    Truncate str to 0 length
 
 NOTE: Strings in c4 are NULL-TERMINATED, not COUNTED
@@ -267,12 +264,12 @@ BL       (--c)             c: 32
 BYE      (--)              Exit c4 (PC)
 CONSTANT (--)              Define a constant
 CELL     (--n)             n: The size of a CELL
-CELLS    (n--x)            x: The size of n CELLs
+CELLS    (n--x)            x: The number of bytes in n CELLs
 EDIT     (n--)             Edit block n
-EXECUTE  (a--)             Jump to CODE address a
-LOAD     (--)              Load a file from disk
-FLOAD    (--)              Loads the last saved system file, if any.
-FSAVE    (--)              Saves the system to file "/system.c4"
+EXECUTE  (a--)             Execute CODE at address a
+LOAD     (--)              Load a file from disk (usage: LOAD strings.c4)
+FLOAD    (--)              Loads the last saved "./system.c4" file, if it exists.
+FSAVE    (--)              Saves the system to file "./system.c4".
 ' x      (--f | xt i f)    Lookup x. If found f=1, i: immediate and xt: offset. Else f=0, and i and xt are not pushed.
 NOP      (--)              Do nothing
 RAND     (--n)             n: a RANDOM 31-bit number (0..$7FFFFFFF)
@@ -308,18 +305,18 @@ You will see there are sections that add additional primitives if a symbol is #d
 ```
 #ifdef __PIN__
     // Extension: PIN operations ... for dev boards
-    , { "PIN-IN","zPI" }   // open input
-    , { "PIN-OUT","zPO" }  // open output
-    , { "PIN-UP","zPU" }   // open input-pullup
-    , { "PINA@","zPRA" }   // Pin read: analog
-    , { "PIN@","zPRD" }    // Pin read: digital
-    , { "PINA!","zPWA" }   // Pin write: analog
-    , { "PIN!","zPWD" }    // Pin write: digital
+    , { "PIN-IN","uPI" }   // open input
+    , { "PIN-OUT","uPO" }  // open output
+    , { "PIN-UP","uPU" }   // open input-pullup
+    , { "PINA@","uPRA" }   // Pin read: analog
+    , { "PIN@","uPRD" }    // Pin read: digital
+    , { "PINA!","uPWA" }   // Pin write: analog
+    , { "PIN!","uPWD" }    // Pin write: digital
 #endif
 ```
-You will notice that the VML code for these operations all begin with 'z'. The byte 'z' is the trigger to the VM that the command is implemented in doExt(ir, pc). Here is the definition of that function for development boards (in c4.ino):
+You will notice that the VML code for these operations all begin with 'u'. The byte 'u' is the trigger to the VM that the command is implemented in doUser(ir, pc). Here is the definition of that function for development boards (in c4.ino):
 ```
-byte *doExt(CELL ir, byte *pc) {
+byte *doUser(CELL ir, byte *pc) {
     CELL pin;
     switch (ir) {
     case 'G': pc = doGamePad(ir, pc);           break;  // zG<x>
@@ -349,4 +346,4 @@ byte *doExt(CELL ir, byte *pc) {
 ```
 In this context, 'pc' points to the next byte in the command stream, so "ir = *(pc++);" sets ir to the next byte and moves pc to point to the next byte after that. A VML command "zN" will execute the 'N' case in doExt(), which in this case, executes "push(micros())", pushing the return value from the Arduino library function "micros()" onto the stack. 
 
-So, to add a primitive, add the Forth word to the prims[] array (either behind a #define or not), make sure it starts with 'z', then add a handler for that new case in doExt() that does whatever you want.
+So, to add a primitive, add the Forth word to the prims[] array (either behind a #define or not), make sure it starts with 'z', then add a handler for that new case in doUser() that does whatever you want.

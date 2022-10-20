@@ -53,7 +53,7 @@ void fGetS() {               // (a sz fh--f)
     TOS = 0;
     *a = 0;
     if (VALIDF(fh) && (files[fh].available())) {
-        int l = files[fh].readBytesUntil('\n', a, sz);
+        files[fh].readBytesUntil('\n', a, sz);
         TOS = 1;
     }
 }
@@ -92,6 +92,10 @@ void fLoad() {
     } else { printString("-error-"); }
 }
 
+int doLoad() {
+      printString("-load-");
+      return 0;
+}
 
 void fDelete() {
     char* fn = (char*)pop();

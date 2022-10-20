@@ -5,7 +5,7 @@
 
 FILE *input_fp = NULL;
 FILE *fpStk[10];
-byte fpSP = 0;
+byte fpSP = 0, isBye = 0;
 
 CELL doTimer() { return clock(); }
 #if __TARGET__ == LINUX
@@ -155,10 +155,11 @@ int doLoad() {
     return fp ? 1 : 0;
 }
 
-byte *doExt(CELL ir, byte *pc) {
+byte *doUser(CELL ir, byte *pc) {
     switch (ir) {
     case 'E': doEditor();                break;
     case 'L': doLoad();                  break;
+    case 'Q': isBye=1; pc=0;             break;
     default: printString("-unk ext-");
     }
     return pc;
