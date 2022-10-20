@@ -24,7 +24,7 @@
     <ProjectGuid>{7481fb3e-060e-4354-b1a0-f274e086d204}</ProjectGuid>
     <RootNamespace>MinForth</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>cccForth</ProjectName>
+    <ProjectName>c4</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -142,25 +142,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="editor.cpp" />
-    <ClCompile Include="cccForth.cpp" />
+    <ClCompile Include="c4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="file-board.h" />
     <ClInclude Include="file-generic.h" />
     <ClInclude Include="file-teensy.h" />
     <ClInclude Include="pc.inc" />
-    <ClInclude Include="cccForth.h" />
+    <ClInclude Include="c4.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="block-000.4th" />
-    <None Include="block-001.4th" />
-    <None Include="block-002.4th" />
-    <None Include="block-111.4th" />
-    <None Include="block-999.4th" />
+    <None Include="block-000.c4" />
+    <None Include="block-001.c4" />
+    <None Include="block-002.c4" />
+    <None Include="block-111.c4" />
+    <None Include="block-999.c4" />
     <None Include="LICENSE" />
-    <None Include="cccForth.ino" />
+    <None Include="c4.ino" />
     <None Include="README.md" />
-    <None Include="block-667.4th" />
+    <None Include="block-667.c4" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="history.txt" />

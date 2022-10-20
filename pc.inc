@@ -145,20 +145,20 @@ void fLoad() {
     } else { printString("-error-"); }
 }
 
-void doLoad(int blk) {
-    char *fn = (char*)(&vars[VARS_SZ-32]);
-    sprintF(fn, "./block-%03d.4th", blk);
-    FILE *fp = myFopen(fn, "rt");
+int doLoad() {
+    if (getWord(word) == 0) { printString("-fn?-"); return 0; }
+    FILE *fp = myFopen(word, "rt");
     if (fp) {
         if (input_fp) { fpPush(input_fp); }
         input_fp = fp;
     }
+    return fp ? 1 : 0;
 }
 
 byte *doExt(CELL ir, byte *pc) {
     switch (ir) {
-    case 'E': doEditor();                       break;
-    case 'L': doLoad(pop());                    break;
+    case 'E': doEditor();                break;
+    case 'L': doLoad();                  break;
     default: printString("-unk ext-");
     }
     return pc;
@@ -201,7 +201,6 @@ int main(int argc, char *argv[]) {
     vmReset();
     ttyMode(1);
     if (argc > 1) { input_fp = myFopen(argv[1], "rt"); }
-    else { doLoad(0); }
     while (!isBye) { loop(); }
     ttyMode(0);
     return 0;

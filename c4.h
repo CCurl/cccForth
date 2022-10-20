@@ -190,5 +190,6 @@ extern void fDelete();
 extern void fList();
 extern void fSave();
 extern void fLoad();
+extern int doLoad();
 
 #endif

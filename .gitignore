@@ -351,6 +351,6 @@ MigrationBackup/
 /history.txt
 /system.ccc
 /block-789.4th
-/cccForth
+/c4
 .depend
 /system.c4

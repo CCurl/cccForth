@@ -1,6 +1,6 @@
-// cccForth.cpp : A stack-based OS for PCs and development boards
+// c4.cpp : A stack-based OS for PCs and development boards
 
-#include "cccForth.h"
+#include "c4.h"
 
 // ----------------------------------
 // The Virtual Machine
@@ -9,7 +9,7 @@ CELL sp, rsp, lsp, lb, isError, sb, rb, fsp;
 CELL BASE, stks[STK_SZ], locals[LOCALS_SZ], lstk[LSTK_SZ+1], seed;
 float fstk[FLT_SZ];
 
-byte *code, *vars, mem[MEM_SZ], *y;
+byte *code, *vars, mem[MEM_SZ], *y, *in;
 DICT_E *dict;
 CELL &HERE  = (CELL&)mem[0];
 CELL &VHERE = (CELL&)mem[CELL_SZ];
@@ -156,6 +156,18 @@ byte *doType(byte *a, int l, int delim) {
     }
     if (delim) { ++e; }
     return e;
+}
+
+void fWord() {
+    byte *wd = AOS;
+    while (*in && (*in < 33)) { ++in; }
+    int l = 0;
+    while (*in && (32 < *in)) {
+        *(wd++) = *(in++);
+        ++l;
+    }
+    *wd = 0;
+    push(l);
 }
 
 byte* doFile(CELL ir, byte* pc) {
@@ -390,7 +402,6 @@ PRIM_T prims[] = {
     , { "EMIT", "," }
     , { "KEY", "K@" }
     , { "KEY?", "K?" }
-    , { "LOAD", "uL"}
     , { "QTYPE", "t" }
     , { "ZTYPE", "Z" }
     , { "COUNT", "#Sl" }
@@ -506,7 +517,7 @@ PRIM_T prims[] = {
     , {0,0}
 };
 
-char word[32], *in;
+char word[32];
 CELL STATE, tHERE, tVHERE, tempWords[10];
 byte isBye=0;
 
@@ -611,13 +622,10 @@ void doWords() {
 }
 
 int getWord(char *wd) {
-    while (*in && (*in < 33)) { ++in; }
-    int l = 0;
-    while (*in && (32 < *in)) {
-        *(wd++) = *(in++);
-        ++l;
-    }
-    *wd = 0;
+    push((CELL)wd);
+    fWord();
+    int l = pop();
+    DROP1;
     return l;
 }
 
@@ -687,7 +695,7 @@ char *isRegOp(const char *wd) {
 }
 
 int doPrim(const char *wd) {
-    // Words cccForth can map directly into its VML (Virtual Machine Language)
+    // Words c4 can map directly into its VML (Virtual Machine Language)
     const char *vml = isRegOp(wd);
 
     for (int i = 0; prims[i].op && (!vml); i++) {
@@ -733,13 +741,14 @@ int doWord() {
 }
 
 int doParseWord(char *wd) {
-    if (strEq(word, "//")) { doExec(); return 0; }
-    if (strEq(word, "\\")) { doExec(); return 0; }
-    if (isNum(wd))         { return doNumber(0); }
-    if (doPrim(wd))        { return 1; }
-    if (doFind(wd))        { return doWord(); }
-    if (strEq(wd, ".\""))  { return doDotQuote(); }
-    if (strEq(wd, "\""))   { return doQuote(); }
+    if (strEq(word, "//"))  { doExec(); return 0; }
+    if (strEq(word, "\\"))  { doExec(); return 0; }
+    if (isNum(wd))          { return doNumber(0); }
+    if (doPrim(wd))         { return 1; }
+    if (doFind(wd))         { return doWord(); }
+    if (strEq(wd, ".\""))   { return doDotQuote(); }
+    if (strEq(wd, "\""))    { return doQuote(); }
+    if (strEqI(wd, "load")) { return doLoad(); }
 
     if (strEq(wd, ":")) {
         doExec();
@@ -847,7 +856,7 @@ bool isASM(const char* ln) {
 }
 
 void doParse(const char *line) {
-    in = (char*)line;
+    in = (byte*)line;
     if (isASM(line)) { return; }
     while (getWord(word)) {
         if (tHERE < HERE) { tHERE = HERE; }

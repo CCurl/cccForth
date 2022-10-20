@@ -1,6 +1,6 @@
-# cccForth - a minimal and extensible Forth system
+# c4 - a minimal and extensible Forth system
 
-cccForth is intended to be a starting point for a programming environment that can grow to fit the user's needs.
+c4 is intended to be a starting point for a programming environment that can grow to fit the user's needs.
 
 The main goals for this minimal Forth are as follows:
 
@@ -66,17 +66,17 @@ To these ends, I have wandered off the beaten path in the following ways:
 : dumpX ( a n-- ) over + for I c@ .c next ;
 ```
 
-## Building cccForth
+## Building c4
 ```
 - Windows:
   - I use Visual Studio 19, either the community or paid version.
-  - Open the cccForth.sln file.
+  - Open the c4.sln file.
   - Use the 'x86' configuration.
-  - It detects the _WIN32 #define and builds cccForth appropriately.
+  - It detects the _WIN32 #define and builds c4 appropriately.
 
 - Linux:
   - I use clang on Mint. GCC works as well.
-  - There is a makefile to build cccForth.
+  - There is a makefile to build c4.
 
 - Development Boards:
   - I use the Arduino IDE.
@@ -92,9 +92,9 @@ To these ends, I have wandered off the beaten path in the following ways:
     - The _PIN__ define indicates that the board supports digitalWrite(), et al.
     - The __FILES__ define indicates that the board supports LittleFS.
 ```
-## cccForth Primitives
+## c4 Primitives
 ```
-NOTEs: (1) These are built into cccForth.
+NOTEs: (1) These are built into c4.
        (2) They are NOT case-sensitive.
 
 *** MATH ***
@@ -191,8 +191,6 @@ FPUTC    (c fh--)          c: char to write to file fh.
 FCLOSE   (fh--)            fh: file handle to close.
 FDELETE  (fn--)            fn: The name of the file to be deleted.
 FLIST    (--)              Print the list of files created on the dev board.
-FSAVE    (--)              Saves the system to file "/system.ccc"
-FLOAD    (--)              Loads the last saved system file, if any.
 
 *** LOGICAL ***
 FALSE    (--f)             f: 0 (FALSE)
@@ -253,7 +251,7 @@ STR-LEN    ( str--n )      n: length of string str
 STR-RTRIM  ( str--str )    Trim rightmost chars from str whose ASCII value < 32
 STR-TRUNC  ( str--str )    Truncate str to 0 length
 
-NOTE: Strings in cccForth are NULL-TERMINATED, not COUNTED
+NOTE: Strings in c4 are NULL-TERMINATED, not COUNTED
 
 *** TEMPORARY VARIABLES ***
 +TMPS    (--)              Allocate 10 temp variables, r0 .. r9
@@ -266,17 +264,19 @@ dX       (--n)             Decrement temp var X
 **** SYSTEM/OTHER ***
 .S       (--)              Output the stack
 BL       (--c)             c: 32
-BYE      (--)              Exit cccForth (PC)
+BYE      (--)              Exit c4 (PC)
 CONSTANT (--)              Define a constant
 CELL     (--n)             n: The size of a CELL
 CELLS    (n--x)            x: The size of n CELLs
 EDIT     (n--)             Edit block n
 EXECUTE  (a--)             Jump to CODE address a
-LOAD     (n--)             Load block n from disk
+LOAD     (--)              Load a file from disk
+FLOAD    (--)              Loads the last saved system file, if any.
+FSAVE    (--)              Saves the system to file "/system.c4"
 ' x      (--f | xt i f)    Lookup x. If found f=1, i: immediate and xt: offset. Else f=0, and i and xt are not pushed.
 NOP      (--)              Do nothing
 RAND     (--n)             n: a RANDOM 31-bit number (0..$7FFFFFFF)
-RESET    (--)              Re-initialize cccForth
+RESET    (--)              Re-initialize c4
 SYSTEM   (a--)             a: string to send to system() ... eg: " dir" system (PC)
 TIMER    (--n)             n: Time in MS
 MS       (n--)             n: MS to sleep
@@ -286,20 +286,23 @@ WORDS    (--)              Output the dictionary
 
 ## Built-in words
 ```
-cb     (--a)   a: Start address for CODE area
-vb     (--a)   a: Start address for VARS area
-csz    (--n)   n: Size of CODE area
-vsz    (--n)   n: Size of VARS area
-ha     (--a)   a: Address of HERE
-la     (--a)   a: Address of LAST
-va     (--a)   a: Address of VHERE
-base   (--a)   a: Address of BASE
+mem      (--a)   a: Start address for MEMORY area
+cb       (--a)   a: Start address for CODE area
+vb       (--a)   a: Start address for VARS area
+mem-sz   (--n)   n: Size of system to be persisted on FSAVE
+code-sz  (--n)   n: Size of CODE area
+vars-sz  (--n)   n: Size of VARS area
+(here)   (--a)   a: Address of HERE
+(last)   (--a)   a: Address of LAST
+(vars)   (--a)   a: Address of VHERE
+base     (--a)   a: Address of BASE
+CELL     (--n)   n: size in bytes of a CELL
 ```
 
-## Extending cccForth
+## Extending c4
 In the C code, TOS is the "top-of-stack", and NOS is "next-on-stack". There is also push(x) and pop(), which manage the stack.
 
-In the beginning of the cccForth.cpp file, there is a section where prims[] is defined. This enumerates all the primitives that cccForth knows about. The first member of an entry is the Forth name, the second part is the VML code.
+In the beginning of the c4.cpp file, there is a section where prims[] is defined. This enumerates all the primitives that c4 knows about. The first member of an entry is the Forth name, the second part is the VML code.
 
 You will see there are sections that add additional primitives if a symbol is #defined, for example:
 ```
@@ -314,7 +317,7 @@ You will see there are sections that add additional primitives if a symbol is #d
     , { "PIN!","zPWD" }    // Pin write: digital
 #endif
 ```
-You will notice that the VML code for these operations all begin with 'z'. The byte 'z' is the trigger to the VM that the command is implemented in doExt(ir, pc). Here is the definition of that function for development boards (in cccForth.ino):
+You will notice that the VML code for these operations all begin with 'z'. The byte 'z' is the trigger to the VM that the command is implemented in doExt(ir, pc). Here is the definition of that function for development boards (in c4.ino):
 ```
 byte *doExt(CELL ir, byte *pc) {
     CELL pin;

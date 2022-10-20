@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "cccForth.h"
+#include "c4.h"
 
 #define AR(x) analogRead(x)
 #define DR(x) digitalRead(x)
@@ -137,7 +137,7 @@ void setup() {
 #endif
     vmReset();
     loadCode();
-    printString("cccForth v0.0.1 - Chris Curl\r\n");
+    printString("c4 v0.0.1 - Chris Curl\r\n");
     doOK();
     gamePadInit();
 //    wifiStart();

@@ -1,4 +1,4 @@
-appname := cccForth
+appname := c4
 
 CXX := clang
 CXXFLAGS := -Os -m32 -D_LINUX
