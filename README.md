@@ -1,5 +1,21 @@
 # cccForth - a minimal and extensible Forth system
 
+
+
+# NOTE: cccForth is deprecated. Please see c4 for its replacement:
+
+https://github.com/CCurl/c4
+
+
+
+
+
+
+
+
+
+
+
 cccForth is intended to be a starting point for a programming environment that can grow to fit the user's needs.
 
 The main goals for this minimal Forth are as follows:
